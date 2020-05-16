@@ -1,0 +1,44 @@
+# Data files and directories common
+data/
+build/
+dist/
+*log.txt
+*.pth
+*.h5
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+env/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# VS Studio Code
+.vscode
+
+# PyCharm
+.idea/
+
+# Dropbox
+.dropbox.attr
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
