@@ -69,10 +69,10 @@ def main():
         opt.repeat_epoch = 1  # number of repeat times for one epoch training
     elif opt.dataset == 'pringles':
         opt.num_objects = 1
-        opt.num_points = 1000
+        opt.num_points = 50
         opt.outf = 'trained_models/pringles'
         opt.log_dir = 'experiments/logs/pringles'
-        opt.repeat_epoch = 50
+        opt.repeat_epoch = 1
     else:
         print('Unknown dataset')
         return

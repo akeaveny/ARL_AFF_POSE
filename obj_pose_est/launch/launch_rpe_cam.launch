@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="object_pose_estimation" pkg="obj_pose_est" type="object_rpe_cam_node" cwd="node">
+  
+  <param name="ObjectRPE_dir" value="/home/akeaveny/catkin_ws/src/Object-RPE"/>  
+  <param name="dataset" value="YCB-Video"/> <!-- YCB-Video or Warehouse -->  
+  <param name="data_dir" value="/data/Akeaveny/Datasets/YCB_Video_Dataset"/>
+  <param name="num_frames" value="10"/>
+  <param name="only_save_frames" value="true"/>
+
+  <param name="depth_topsub" value="/zed/zed_node/depth/depth_registered"/>
+  <param name="rgb_topsub" value="/zed/zed_node/left/image_rect_color"/>
+  
+  </node>
+</launch>

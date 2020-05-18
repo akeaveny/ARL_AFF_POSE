@@ -169,7 +169,7 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
         data[obj_name]['fileref'] = ""
         data[obj_name]['size'] = 1024
         # /data/Akeaveny/Datasets/part-affordance-dataset/train/scene_01_00000001_rgb.jpg
-        data[obj_name]['filename'] = folder_to_save + img_number + '.jpg'
+        data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
         data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
         data[obj_name]['base64_img_data'] = ""
         data[obj_name]['file_attributes'] = {}
@@ -177,9 +177,9 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
     return stop
 
 
-# ===================== real data ====================
-data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/combined/'
-folder_to_save = 'combined/'
+# ===================== val ====================
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/val/'
+folder_to_save = 'train/'
 
 if data_path[len(data_path) - 1] != '/':
     print(data_path)
@@ -187,67 +187,99 @@ if data_path[len(data_path) - 1] != '/':
     exit()
 
 class_id = [0, 1, 2, 3, 4, 5, 6, 7]
-# ========== selecting train/val splits ==========
-# batch_size = 10
-# train_split = 8 # 80 %
-batch_size = 19773
-train_split = 15818 # 80 %
-combined_imgs = np.arange(0,batch_size, 1)
-train_imgs = np.random.choice(batch_size, size=int(train_split), replace=False)
-val_imgs = np.delete(combined_imgs, train_imgs)
 
-print('\n-------- Loading Images! ---------------')
-print('Batch Size: ', combined_imgs.shape[0])
-print("Training: ", train_imgs.shape[0])
-print("Val: ", val_imgs.shape[0])
-# print("\n")
+min_img = 0
+max_img = 289
 
 data = {}
-# ===================== training ====================
-print('\n-------- Training json! ---------------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_combined_train.json'
 count = 0
-for train_idx in train_imgs:
-    print('Image: {}/{}'.format(count, train_imgs.shape[0]))
-    img_number = str(train_idx)
+# ===================== VAL ====================
+print('\n-------- VAL ---------------')
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_train.json'
+for i in range(min_img, max_img+1):
+    print('Image: {}/{}'.format(i, max_img))
+    # count = 1000000 + i
+    # img_number = str(count)[1:]
+    img_number = str(i)
     label_addr = data_path + img_number + '_label.png'
-    # print("img_number: ", img_number)
-    # print("label_addr: ", label_addr)
+
+    print("img_number: ", img_number)
+    print("label_addr: ", label_addr)
 
     label_img = load_image(label_addr)
-    # print("Classes: ", np.unique(label_img))
+    print("Classes: ", np.unique(label_img))
 
     if label_img.size == 0:
         print('\n ------------------ Pass! --------------------')
         pass
     else:
         write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
-    count +=1
+    count += 1
 
 with open(json_addr, 'w') as outfile:
     json.dump(data, outfile, sort_keys=True)
-
-data = {}
-# ===================== val ====================
-print('\n-------- Val json! ---------------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_combined_val.json'
-count = 0
-for val_idx in val_imgs:
-    print('Image: {}/{}'.format(count, val_imgs.shape[0]))
-    img_number = str(val_idx)
-    label_addr = data_path + img_number + '_label.png'
-    # print("img_number: ", img_number)
-    # print("label_addr: ", label_addr)
-
-    label_img = load_image(label_addr)
-    # print("Classes: ", np.unique(label_img))
-
-    if label_img.size == 0:
-        print('\n ------------------ Pass! --------------------')
-        pass
-    else:
-        write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
-    count +=1
-
-with open(json_addr, 'w') as outfile:
-    json.dump(data, outfile, sort_keys=True)
+#
+# # ========== selecting train/val splits ==========
+# # batch_size = 10
+# # train_split = 8 # 80 %
+# # batch_size = 0
+# # train_split = 5 # 80 %
+# # combined_imgs = np.arange(0,batch_size, 1)
+# # train_imgs = np.random.choice(batch_size, size=int(train_split), replace=False)
+# # val_imgs = np.delete(combined_imgs, train_imgs)
+#
+# print('\n-------- Loading Images! ---------------')
+# print('Batch Size: ', combined_imgs.shape[0])
+# print("Training: ", train_imgs.shape[0])
+# print("Val: ", val_imgs.shape[0])
+# # print("\n")
+#
+# data = {}
+# # ===================== training ====================
+# print('\n-------- Training json! ---------------')
+# json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_train.json'
+# count = 0
+# for train_idx in train_imgs:
+#     print('Image: {}/{}'.format(count, train_imgs.shape[0]))
+#     img_number = str(train_idx)
+#     label_addr = data_path + img_number + '_label.png'
+#     # print("img_number: ", img_number)
+#     # print("label_addr: ", label_addr)
+#
+#     label_img = load_image(label_addr)
+#     # print("Classes: ", np.unique(label_img))
+#
+#     if label_img.size == 0:
+#         print('\n ------------------ Pass! --------------------')
+#         pass
+#     else:
+#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+#     count +=1
+#
+# with open(json_addr, 'w') as outfile:
+#     json.dump(data, outfile, sort_keys=True)
+#
+# data = {}
+# # ===================== val ====================
+# print('\n-------- Val json! ---------------')
+# json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_val.json'
+# count = 0
+# for val_idx in val_imgs:
+#     print('Image: {}/{}'.format(count, val_imgs.shape[0]))
+#     img_number = str(val_idx)
+#     label_addr = data_path + img_number + '_label.png'
+#     # print("img_number: ", img_number)
+#     # print("label_addr: ", label_addr)
+#
+#     label_img = load_image(label_addr)
+#     # print("Classes: ", np.unique(label_img))
+#
+#     if label_img.size == 0:
+#         print('\n ------------------ Pass! --------------------')
+#         pass
+#     else:
+#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+#     count +=1
+#
+# with open(json_addr, 'w') as outfile:
+#     json.dump(data, outfile, sort_keys=True)

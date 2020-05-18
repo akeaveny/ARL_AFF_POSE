@@ -18,9 +18,9 @@ import scipy.io as scio
 class PoseDataset(data.Dataset):
     def __init__(self, mode, num_pt, add_noise, root, noise_trans, refine):
         if mode == 'train':
-            self.path = '/home/akeaveny/catkin_ws/src/DenseFusion/datasets/pringles/dataset_config/train_data_list.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/train_data_list_zed.txt'
         elif mode == 'test':
-            self.path = '/home/akeaveny/catkin_ws/src/DenseFusion/datasets/pringles/dataset_config/test_data_list.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/test_data_list_zed.txt'
         self.num_pt = num_pt
         self.root = root
         self.add_noise = add_noise
@@ -48,7 +48,7 @@ class PoseDataset(data.Dataset):
         self.len_real = len(self.real)
         self.len_syn = len(self.syn)
 
-        class_file = open('/home/akeaveny/catkin_ws/src/DenseFusion/datasets/pringles/dataset_config/classes.txt')
+        class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/classes.txt')
         class_id = 1
         self.cld = {}
         while 1:
@@ -56,7 +56,8 @@ class PoseDataset(data.Dataset):
             if not class_input:
                 break
 
-            input_file = open('/home/akeaveny/catkin_ws/src/DenseFusion/datasets/pringles/models/model_Pringles_20180815_173653581.xyz')
+            input_file = open(
+                '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/model_Pringles_20180815_173653581.xyz')
             self.cld[class_id] = []
             while 1:
                 input_line = input_file.readline()
@@ -66,7 +67,7 @@ class PoseDataset(data.Dataset):
                 self.cld[class_id].append([float(input_line[0]), float(input_line[1]), float(input_line[2])])
             self.cld[class_id] = np.array(self.cld[class_id])
             input_file.close()
-            
+
             class_id += 1
 
         self.cam_cx_1 = 620.2407836914062
@@ -79,17 +80,18 @@ class PoseDataset(data.Dataset):
         # self.cam_fx_2 = 697.6871337890625
         # self.cam_fy_2 = 697.6871337890625
 
-        # self.xmap = np.array([[j for i in range(720)] for j in range(1280)])
-        # self.ymap = np.array([[i for i in range(720)] for j in range(1280)])
-        self.xmap = np.array([[j for i in range(512)] for j in range(512)])
-        self.ymap = np.array([[i for i in range(512)] for j in range(512)])
-        
+        self.xmap = np.array([[j for i in range(720)] for j in range(1280)])
+        self.ymap = np.array([[i for i in range(720)] for j in range(1280)])
+        # self.xmap = np.array([[j for i in range(512)] for j in range(512)])
+        # self.ymap = np.array([[i for i in range(512)] for j in range(512)])
+
         self.trancolor = transforms.ColorJitter(0.2, 0.2, 0.2, 0.05)
         self.noise_img_loc = 0.0
         self.noise_img_scale = 7.0
         self.minimum_num_pt = 50
-        self.norm = transforms.Normalize(mean=[0.47486324, 0.47596024, 0.47596024], std=[0.10642694, 0.11272365, 0.09551936])
-        #self.symmetry_obj_idx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+        self.norm = transforms.Normalize(mean=[0.47486324, 0.47596024, 0.47596024],
+                                         std=[0.10642694, 0.11272365, 0.09551936])
+        # self.symmetry_obj_idx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         self.symmetry_obj_idx = [1]
         # self.num_pt_mesh_small = 118942
         # self.num_pt_mesh_large = 118942
@@ -103,7 +105,7 @@ class PoseDataset(data.Dataset):
 
     def __getitem__(self, index):
         img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
-        depth = np.array(Image.open('{0}/{1}.depth.png'.format(self.root, self.list[index])))
+        depth = np.array(Image.open('{0}/{1}.depth.16.png'.format(self.root, self.list[index])))
         label = np.array(Image.open('{0}/{1}.cs.png'.format(self.root, self.list[index])))
         meta = scio.loadmat('{0}/{1}-meta.mat'.format(self.root, self.list[index]))
 
@@ -115,7 +117,7 @@ class PoseDataset(data.Dataset):
         mask_back = ma.getmaskarray(ma.masked_equal(label, 0))
 
         add_front = False
-        
+
         # #Cuong We dont have synthetic data
         # if len(self.syn) > 0:
         #     if self.add_noise:
@@ -142,22 +144,19 @@ class PoseDataset(data.Dataset):
 
         obj = meta['cls_indexes'].flatten().astype(np.int32)
 
-        # while 1:
-        idx = np.random.randint(0, len(obj))
-        mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
-        # mask_label = ma.getmaskarray(ma.masked_equal(label, obj[idx]))
-        # TODO: Change Object Index
-        mask_label = ma.getmaskarray(ma.masked_equal(label, 204))
-        mask = mask_label * mask_depth
-            # if len(mask.nonzero()[0]) > self.minimum_num_pt:
-            #     break
+        while 1:
+            idx = np.random.randint(0, len(obj))
+            mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
+            # TODO: Change Object Index
+            mask_label = ma.getmaskarray(ma.masked_equal(label, 4))
+            mask = mask_label * mask_depth
+            if len(mask.nonzero()[0]) > self.minimum_num_pt:
+                break
 
         if self.add_noise:
             img = self.trancolor(img)
 
         rmin, rmax, cmin, cmax = get_bbox(mask)
-        # print("-------------- Bounding Box ----------------")
-        # print(rmin, rmax, cmin, cmax)
 
         img = np.transpose(np.array(img)[:, :, :3], (2, 0, 1))[:, rmin:rmax, cmin:cmax]
 
@@ -184,6 +183,7 @@ class PoseDataset(data.Dataset):
         add_t = np.array([random.uniform(-self.noise_trans, self.noise_trans) for i in range(3)])
 
         choose = mask[rmin:rmax, cmin:cmax].flatten().nonzero()[0]
+        print("mask: ", np.unique(mask[rmin:rmax, cmin:cmax].flatten()).sum())
         if len(choose) > self.num_pt:
             c_mask = np.zeros(len(choose), dtype=int)
             c_mask[:self.num_pt] = 1
@@ -252,11 +252,13 @@ class PoseDataset(data.Dataset):
         else:
             return self.num_pt_mesh_small
 
+
 #
 # border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680]
 border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 500]
 img_width = 512
 img_length = 512
+
 
 def get_bbox(label):
     rows = np.any(label, axis=1)

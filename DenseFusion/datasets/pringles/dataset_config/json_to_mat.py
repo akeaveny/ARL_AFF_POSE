@@ -7,13 +7,15 @@ import scipy
 import scipy.io as sio
 from scipy.spatial.transform import Rotation as R  # scipy>=1.3
 
-data_dir = '/data/Akeaveny/Datasets/pringles/Alex/train/images/'
+data_dir = '/data/Akeaveny/Datasets/pringles/zed/train/'
+folder_to_save = 'train/'
+
 output = {}
 output['cls_indexes'] = []
 
 # ============= load json ==================
 json_files = []
-json_addrs = '/data/Akeaveny/Datasets/pringles/Alex/train/images/*.json'
+json_addrs = '/data/Akeaveny/Datasets/pringles/zed/train/*.json'
 images = [json_files.append(file) for file in glob.glob(json_addrs)]
 
 # ============ output file ================
@@ -22,6 +24,7 @@ output['cls_indexes'] = []
 
 # ================ pose ===========
 for json_file in json_files:
+        print(json_file)
         open_json_file = json.load(open(json_file))
         labels = []
         poses = []
@@ -49,8 +52,8 @@ for json_file in json_files:
         output['factor_depth'] = [np.asarray([1000], dtype=np.uint16)]
 
         # /data/Akeaveny/Datasets/pringles/Alex/train/images/000000.json
-        str_num = json_file.split('images/')[1]
+        str_num = json_file.split(folder_to_save)[1]
         str_num = str_num.split(".")[0]
 
-        saved_mat_file = '/data/Akeaveny/Datasets/pringles/Alex/train/images/' + np.str(str_num) + '-meta.mat'
+        saved_mat_file = data_dir + np.str(str_num) + '-meta.mat'
         sio.savemat(saved_mat_file, output)

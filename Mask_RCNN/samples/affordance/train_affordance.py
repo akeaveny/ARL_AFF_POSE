@@ -58,26 +58,28 @@ class PringlesConfig(Config):
     bs = GPU_COUNT * IMAGES_PER_GPU
 
     # ===== dataset ======
-    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/bowl/*.jpg
-    # Loaded Images:  90
+    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/combined/???.jpg
+    # Loaded Images:  900
     # ---------stats---------------
     # Means:
-    #  [[97.77970014]
-    #  [88.01273163]
-    #  [90.25397264]]
+    #  [[105.35439623]
+    #  [ 96.47040321]
+    #  [100.36951199]]
     # STD:
-    #  [[24.25474554]
-    #  [34.13697498]
-    #  [38.37487672]]
-    MEAN_PIXEL = np.array([97.77970014, 88.01273163, 90.25397264])
+    #  [[26.29635024]
+    #  [36.48407807]
+    #  [40.38755174]]
+    MEAN_PIXEL = np.array([105.35439623, 96.47040321, 100.36951199])
     RESNET_ARCHITECTURE = "resnet50"
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 7  # Background + objects
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 88 // bs
-    VALIDATION_STEPS = 88 // bs
+    # batch_size = 19773
+    # train_split = 15818 # 80 %
+    STEPS_PER_EPOCH = 15818 // bs
+    VALIDATION_STEPS = (19773 - 15818) // bs
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9

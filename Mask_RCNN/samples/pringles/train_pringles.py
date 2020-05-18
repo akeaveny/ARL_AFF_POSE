@@ -76,8 +76,8 @@ class PringlesConfig(Config):
     NUM_CLASSES = 1 + 1  # Background + objects
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 15000 // bs
-    VALIDATION_STEPS = 3750 // bs
+    STEPS_PER_EPOCH = 25 // bs
+    VALIDATION_STEPS = 5 // bs
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -182,15 +182,21 @@ def train(model):
 
     print("Training network heads")
 
+
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=40,
-                layers='heads',
-                augmentation=imgaug.augmenters.OneOf([
-                                imgaug.augmenters.Fliplr(0.5),
-                                imgaug.augmenters.Flipud(0.5),
-                                imgaug.augmenters.Affine(rotate=(-90, 90))
-                                ]))
+                learning_rate=config.LEARNING_RATE/2,
+                epochs=200,
+                layers='heads')
+
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE,
+    #             epochs=40,
+    #             layers='heads',
+    #             augmentation=imgaug.augmenters.OneOf([
+    #                             imgaug.augmenters.Fliplr(0.5),
+    #                             imgaug.augmenters.Flipud(0.5),
+    #                             imgaug.augmenters.Affine(rotate=(-90, 90))
+    #                             ]))
 
     # model.train(dataset_train, dataset_val,
     #             learning_rate=config.LEARNING_RATE/10,
@@ -201,12 +207,6 @@ def train(model):
     #                 imgaug.augmenters.Flipud(0.5),
     #                 imgaug.augmenters.Affine(rotate=(-90, 90))
     #             ]))
-
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=1,
-    #             # epochs=80,
-    #             layers="all")
 
 ############################################################
 #  Training

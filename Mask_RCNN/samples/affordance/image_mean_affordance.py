@@ -11,11 +11,12 @@ import numpy as np
 #                     help='Directory of the dataset')
 # args = parser.parse_args()
 
+images = []
 # =================== load images ========================
-images_path = '/data/Akeaveny/Datasets/part-affordance-dataset/bowl/*.jpg'
+images_path = '/data/Akeaveny/Datasets/part-affordance-dataset/combined/*.jpg'
 print("Images: ", images_path)
 images = [cv2.imread(file) for file in glob.glob(images_path)]
-# images = [cv2.imread(file) for file in glob.glob(args.dataset)]
+# images = [images.append(file) for file in glob.glob(images_path)]
 print("Loaded Images: ", len(images))
 
 dataset_mean, dataset_std, dataset_count = 0, 0, 0

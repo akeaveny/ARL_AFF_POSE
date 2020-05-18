@@ -177,9 +177,7 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
         data[obj_name]['regions'] = regions
     return stop
 
-
 # ===================== Synthetic data ====================
-
 data_path = '/data/Akeaveny/Datasets/pringles/zed/train/'
 json_addr = '/data/Akeaveny/Datasets/pringles/zed/via_region_data_train.json'
 folder_to_save = 'train/'
@@ -193,6 +191,10 @@ if data_path[len(data_path) - 1] != '/':
 min_img = 0
 max_img = 14999
 
+data = {}
+# ===================== training ====================
+print('\n-------- Training json! ---------------')
+count = 0
 for i in range(min_img, max_img):
     print('Image: {}/{}'.format(i, max_img))
     count = 1000000 + i
@@ -201,9 +203,52 @@ for i in range(min_img, max_img):
 
     # print("img_number: ", img_number)
     # print("label_addr: ", label_addr)
-
     label_img = load_image(label_addr)
-    write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+
+    if label_img.size == 0:
+        print('\n ------------------ Pass! --------------------')
+        pass
+    else:
+        write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+    count += 1
+
+with open(json_addr, 'w') as outfile:
+    json.dump(data, outfile, sort_keys=True)
+
+# ===================== Synthetic data ====================
+data_path = '/data/Akeaveny/Datasets/pringles/zed/val/'
+json_addr = '/data/Akeaveny/Datasets/pringles/zed/via_region_data_val.json'
+folder_to_save = 'val/'
+class_id = 4
+
+if data_path[len(data_path) - 1] != '/':
+    print(data_path)
+    print('The data path should have / in the end')
+    exit()
+
+min_img = 0
+max_img = 3749
+
+data = {}
+# ===================== val ====================
+print('\n-------- Val json! ---------------')
+count = 0
+for i in range(min_img, max_img):
+    print('Image: {}/{}'.format(i, max_img))
+    count = 1000000 + i
+    img_number = str(count)[1:]
+    label_addr = data_path + img_number + '.cs.png'
+
+    # print("img_number: ", img_number)
+    # print("label_addr: ", label_addr)
+    label_img = load_image(label_addr)
+
+    if label_img.size == 0:
+        print('\n ------------------ Pass! --------------------')
+        pass
+    else:
+        write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+    count += 1
 
 with open(json_addr, 'w') as outfile:
     json.dump(data, outfile, sort_keys=True)
