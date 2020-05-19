@@ -25,7 +25,6 @@ from mrcnn import model as modellib, utils, visualize
 # Path to trained weights file
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
-
 ##########################################################
 # Configurations
 ###########################################################
@@ -46,30 +45,34 @@ class PringlesConfig(Config):
     bs = GPU_COUNT * IMAGES_PER_GPU
 
     # ===== dataset ======
-    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/train/*.jpg
-    # Loaded Images:  27
+    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_train_syn/000???.png
+    # Loaded Images:  800
     # ---------stats---------------
     # Means:
-    #  [[165.07549995]
-    #  [164.29060791]
-    #  [169.21665953]]
+    #  [[169.16699019]
+    #  [164.5587391 ]
+    #  [170.56142267]]
     # STD:
-    #  [[39.81733604]
-    #  [37.94594621]
-    #  [41.01003182]]
-    MEAN_PIXEL = np.array([165.07549995, 164.29060791, 169.21665953])
+    #  [[24.74091172]
+    #  [26.44241505]
+    #  [25.5041049 ]]
+    # IMAGE_MAX_DIM = 1280
+    # IMAGE_MIN_DIM = 720
+    MEAN_PIXEL = np.array([169.16699019, 164.5587391, 170.56142267])
+    # BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 7  # Background + objects
+    NUM_CLASSES = 1 + 2  # Background + objects
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 27 // bs
-    VALIDATION_STEPS = 27 // bs
+    # batch_size = 19773
+    # train_split = 15818 # 80 %
+    STEPS_PER_EPOCH = 800 // bs
+    VALIDATION_STEPS = 200 // bs
 
     # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
-
+    DETECTION_MIN_CONFIDENCE = 0.1
 
 ###########################################################
 # Dataset
@@ -162,18 +165,26 @@ def seq_get_masks(image, pre_detection, cur_detection):
     return semantic_masks, instance_masks, color_masks, pre_detection, good_detection
 
 def detect_and_get_masks(model, data_path, num_frames):
-    classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/classes.txt'
-    class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/class_ids.txt'
+    classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/classes.txt'
+    class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/class_ids.txt'
+    # classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/classes.txt'
+    # class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/class_ids.txt'
     assign_first_pre_detect = True
-    for i in range(11, 11+num_frames-1):
+    for i in range(0, num_frames-1):
         # assign_first_pre_detect = True
 
         ## ============== clutter ===================
-        folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/bowl/'
-        count = 100 + i
-        str_num = str(count)[1:]
-        rgb_addr = folder_to_save + str_num + '_rgb.jpg'
-        depth_addr = folder_to_save + str_num + '_depth.png'
+        # folder_to_load = '/data/Akeaveny/Datasets/part-affordance-dataset/bowl/'
+        # folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/bowl/'
+        folder_to_load = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/'
+        folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/test/'
+        # count = 100 + i
+        # count = 1000000 + i
+        str_num = str(i)
+        rgb_addr = folder_to_load + str_num + '_rgb.jpg'
+        depth_addr = folder_to_load + str_num + '_depth.png'
+        # rgb_addr = folder_to_load + str_num + '.png'
+        # depth_addr = folder_to_load + str_num + '.depth.16.png'
         print(rgb_addr, depth_addr)
 
         if os.path.isfile(rgb_addr) == False: 
@@ -186,8 +197,8 @@ def detect_and_get_masks(model, data_path, num_frames):
         depth = skimage.io.imread(depth_addr)
 
         # ## ============== SYNTHETIC ===================
-        # if image.shape[-1] == 4:
-        #     image = image[..., :3]
+        if image.shape[-1] == 4:
+            image = image[..., :3]
 
         # Detect objects
         cur_detect = model.detect([image], verbose=1)[0]
@@ -215,7 +226,7 @@ def detect_and_get_masks(model, data_path, num_frames):
             results = model.detect([image], verbose=1)
             r = results[0]
             class_names = np.loadtxt(classes_file_dir, dtype=np.str)
-            class_names = np.array([class_names])
+            class_names = np.array(class_names)
             class_ids = r['class_ids'] - 1
 
             print("-------------------------")

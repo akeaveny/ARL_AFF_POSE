@@ -13,7 +13,7 @@ import numpy as np
 
 images = []
 # =================== load images ========================
-images_path = '/data/Akeaveny/Datasets/part-affordance-dataset/combined/*.jpg'
+images_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_train_syn/000???.png'
 print("Images: ", images_path)
 images = [cv2.imread(file) for file in glob.glob(images_path)]
 # images = [images.append(file) for file in glob.glob(images_path)]

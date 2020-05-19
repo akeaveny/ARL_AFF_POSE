@@ -38,6 +38,10 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+# ================ warnings ==================
+# import warnings
+# warnings.filterwarnings("ignore")
+
 ##########################################################
 # Configurations
 ###########################################################
@@ -58,31 +62,34 @@ class PringlesConfig(Config):
     bs = GPU_COUNT * IMAGES_PER_GPU
 
     # ===== dataset ======
-    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/combined/???.jpg
-    # Loaded Images:  900
+    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_train_syn/000???.png
+    # Loaded Images:  800
     # ---------stats---------------
     # Means:
-    #  [[105.35439623]
-    #  [ 96.47040321]
-    #  [100.36951199]]
+    #  [[169.16699019]
+    #  [164.5587391 ]
+    #  [170.56142267]]
     # STD:
-    #  [[26.29635024]
-    #  [36.48407807]
-    #  [40.38755174]]
-    MEAN_PIXEL = np.array([105.35439623, 96.47040321, 100.36951199])
+    #  [[24.74091172]
+    #  [26.44241505]
+    #  [25.5041049 ]]
+    # IMAGE_MAX_DIM = 1280
+    # IMAGE_MIN_DIM = 720
+    MEAN_PIXEL = np.array([169.16699019, 164.5587391, 170.56142267])
+    BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 7  # Background + objects
+    NUM_CLASSES = 1 + 2  # Background + objects
 
     # Number of training steps per epoch
     # batch_size = 19773
     # train_split = 15818 # 80 %
-    STEPS_PER_EPOCH = 15818 // bs
-    VALIDATION_STEPS = (19773 - 15818) // bs
+    STEPS_PER_EPOCH = 800 // bs
+    VALIDATION_STEPS = 200 // bs
 
     # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
+    DETECTION_MIN_CONFIDENCE = 0.7
 
 ###########################################################
 # Dataset
@@ -105,21 +112,16 @@ class PringlesDataset(utils.Dataset):
         #   7 - 'wrap-grasp'
         self.add_class("Pringles", 1, "grasp")
         self.add_class("Pringles", 2, "cut")
-        self.add_class("Pringles", 3, "scoop")
-        self.add_class("Pringles", 4, "contain")
-        self.add_class("Pringles", 5, "pound")
-        self.add_class("Pringles", 6, "support")
-        self.add_class("Pringles", 7, "wrap-grasp")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
         # /data/Akeaveny/Datasets/pringles/Alex/train/via_region_data.json
         if subset == 'train':
             print("------------------TRAIN------------------")
-            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_combined_train.json'))
+            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_train.json'))
         elif subset == 'val':
             print("------------------VAL--------------------")
-            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_combined_val.json'))
+            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_val.json'))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -209,7 +211,7 @@ def train(model):
 
     # model.train(dataset_train, dataset_val,
     #             learning_rate=config.LEARNING_RATE/10,
-    #             epochs=100,
+    #             epochs=160,
     #             layers="all",
     #             augmentation=imgaug.augmenters.OneOf([
     #                 imgaug.augmenters.Fliplr(0.5),
@@ -259,6 +261,7 @@ if __name__ == '__main__':
 
     # Configurations
     config = PringlesConfig()
+    config.display()
 
     # Create model
     model = modellib.MaskRCNN(mode="training", config=config,

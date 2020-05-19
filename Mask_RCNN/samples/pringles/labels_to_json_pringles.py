@@ -189,7 +189,7 @@ if data_path[len(data_path) - 1] != '/':
     exit()
 
 min_img = 0
-max_img = 14999
+max_img = 3
 
 data = {}
 # ===================== training ====================
@@ -203,7 +203,9 @@ for i in range(min_img, max_img):
 
     # print("img_number: ", img_number)
     # print("label_addr: ", label_addr)
+
     label_img = load_image(label_addr)
+    print("Classes: ", np.unique(label_img))
 
     if label_img.size == 0:
         print('\n ------------------ Pass! --------------------')
@@ -227,7 +229,7 @@ if data_path[len(data_path) - 1] != '/':
     exit()
 
 min_img = 0
-max_img = 3749
+max_img = 3
 
 data = {}
 # ===================== val ====================
@@ -241,7 +243,9 @@ for i in range(min_img, max_img):
 
     # print("img_number: ", img_number)
     # print("label_addr: ", label_addr)
+
     label_img = load_image(label_addr)
+    print("Classes: ", np.unique(label_img))
 
     if label_img.size == 0:
         print('\n ------------------ Pass! --------------------')
