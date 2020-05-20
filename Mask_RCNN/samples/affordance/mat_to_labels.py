@@ -26,19 +26,27 @@ import numpy as np
 #     im.save(label_filename)
 
 # ===================== check labels ===========================
-label_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/val/*_label.png'
+label_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/*_label.png'
 print("Images: ", label_path)
 label_imgs = [imageio.imread(label) for label in sorted(glob.glob(label_path))]
 print("Loaded Labels: ", len(label_imgs))
 
 # /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/val/289_rgb.png
-rgb_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/val/*_rgb.png'
+rgb_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/*_rgb.png'
 print("Images: ", label_path)
 rgb_imgs = [imageio.imread(label) for label in sorted(glob.glob(rgb_path))]
 print("Loaded RGBs: ", len(rgb_imgs))
 
-f, (ax1, ax2) = plt.subplots(2, sharex=True, sharey=True)
-# for idx, _ in enumerate(label_imgs):
-ax1.imshow(label_imgs[-1])
-ax2.imshow(rgb_imgs[-1])
-plt.show()
+# f, (ax1, ax2) = plt.subplots(2, sharex=True, sharey=True)
+for idx, _ in enumerate(label_imgs):
+    # ax1.imshow(label_imgs[idx])
+    # ax2.imshow(rgb_imgs[idx])
+
+    # ================ animation ================
+    plt.cla()
+    # for stopping simulation with the esc key.
+    plt.gcf().canvas.mpl_connect(
+        'key_release_event',
+        lambda event: [exit(0) if event.key == 'escape' else None])
+    plt.imshow(label_imgs[idx])
+    plt.show()

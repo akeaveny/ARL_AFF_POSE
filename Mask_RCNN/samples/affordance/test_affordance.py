@@ -37,7 +37,7 @@ class PringlesConfig(Config):
     NAME = "Pringles"
 
     # ========== GPU config ================
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     GPU_COUNT = 1
@@ -56,10 +56,12 @@ class PringlesConfig(Config):
     #  [[24.74091172]
     #  [26.44241505]
     #  [25.5041049 ]]
-    # IMAGE_MAX_DIM = 1280
-    # IMAGE_MIN_DIM = 720
+    IMAGE_MAX_DIM = 1280
+    IMAGE_MIN_DIM = 720
+    # IMAGE_MAX_DIM = 640
+    # IMAGE_MIN_DIM = 480
     MEAN_PIXEL = np.array([169.16699019, 164.5587391, 170.56142267])
-    # BACKBONE = "resnet50"
+    BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
 
     # Number of classes (including background)
@@ -72,7 +74,7 @@ class PringlesConfig(Config):
     VALIDATION_STEPS = 200 // bs
 
     # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.1
+    DETECTION_MIN_CONFIDENCE = 0.9
 
 ###########################################################
 # Dataset
@@ -165,23 +167,23 @@ def seq_get_masks(image, pre_detection, cur_detection):
     return semantic_masks, instance_masks, color_masks, pre_detection, good_detection
 
 def detect_and_get_masks(model, data_path, num_frames):
-    classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/classes.txt'
-    class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/class_ids.txt'
-    # classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/classes.txt'
-    # class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/class_ids.txt'
+    classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/classes.txt'
+    class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/class_ids.txt'
     assign_first_pre_detect = True
-    for i in range(0, num_frames-1):
+    # Bad: 60
+    # Good:
+    # weird: 50
+    offset = 100
+    for i in range(offset, offset+num_frames-1):
         # assign_first_pre_detect = True
 
         ## ============== clutter ===================
-        # folder_to_load = '/data/Akeaveny/Datasets/part-affordance-dataset/bowl/'
-        # folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/bowl/'
-        folder_to_load = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/'
-        folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/test/'
+        folder_to_load = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_val/'
+        folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/masks/'
         # count = 100 + i
         # count = 1000000 + i
         str_num = str(i)
-        rgb_addr = folder_to_load + str_num + '_rgb.jpg'
+        rgb_addr = folder_to_load + str_num + '_rgb.png'
         depth_addr = folder_to_load + str_num + '_depth.png'
         # rgb_addr = folder_to_load + str_num + '.png'
         # depth_addr = folder_to_load + str_num + '.depth.16.png'
@@ -222,22 +224,22 @@ def detect_and_get_masks(model, data_path, num_frames):
                 mask_addr = folder_to_save + str_num + '.mask.png'
                 skimage.io.imsave(mask_addr, instance_masks)
 
-            # ========== tutorials ================
-            results = model.detect([image], verbose=1)
-            r = results[0]
-            class_names = np.loadtxt(classes_file_dir, dtype=np.str)
-            class_names = np.array(class_names)
-            class_ids = r['class_ids'] - 1
+                # ========== tutorials ================
+                results = model.detect([image], verbose=1)
+                r = results[0]
+                class_names = np.loadtxt(classes_file_dir, dtype=np.str)
+                class_names = np.array(class_names)
+                class_ids = r['class_ids'] - 1
 
-            print("-------------------------")
-            print("class_names: ", class_names)
+                print("-------------------------")
+                print("class_names: ", class_names)
 
-            # ========== detect model ============
-            results = model.detect([image], verbose=1)
-            r = results[0]
-            visualize.display_instances(image, r['rois'], r['masks'], class_ids,
-                                        class_names, r['scores'], figsize=(10, 10), ax=None,
-                                        title="Predictions", show_bbox=True, show_mask=True)
+                # ========== detect model ============
+                results = model.detect([image], verbose=1)
+                r = results[0]
+                visualize.display_instances(image, r['rois'], r['masks'], class_ids,
+                                            class_names, r['scores'], figsize=(10, 10), ax=None,
+                                            title="Predictions", show_bbox=True, show_mask=True)
 
             # # ========== plot ============
             # plt.subplot(2, 2, 1)

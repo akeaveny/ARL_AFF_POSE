@@ -13,13 +13,17 @@ import numpy.ma as ma
 import copy
 import scipy.misc
 import scipy.io as scio
+import matplotlib.pyplot as plt
+import cv2
 
 
 class PoseDataset(data.Dataset):
     def __init__(self, mode, num_pt, add_noise, root, noise_trans, refine):
         if mode == 'train':
+            # self.path = '/data/Akeaveny/Datasets/pringles/pringles_config/dataset_config/train_data_list.txt'
             self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/train_data_list_zed.txt'
         elif mode == 'test':
+            # self.path = '/data/Akeaveny/Datasets/pringles/pringles_config/dataset_config/test_data_list.txt'
             self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/test_data_list_zed.txt'
         self.num_pt = num_pt
         self.root = root
@@ -48,7 +52,8 @@ class PoseDataset(data.Dataset):
         self.len_real = len(self.real)
         self.len_syn = len(self.syn)
 
-        class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/classes.txt')
+        class_file = open('/data/Akeaveny/Datasets/pringles/pringles_config/dataset_config/classes.txt')
+        # TODO:
         class_id = 1
         self.cld = {}
         while 1:
@@ -57,7 +62,7 @@ class PoseDataset(data.Dataset):
                 break
 
             input_file = open(
-                '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/pringles/dataset_config/model_Pringles_20180815_173653581.xyz')
+                '/data/Akeaveny/Datasets/pringles/pringles_config/dataset_config/model_Pringles_20180815_173653581.xyz')
             self.cld[class_id] = []
             while 1:
                 input_line = input_file.readline()
@@ -75,15 +80,9 @@ class PoseDataset(data.Dataset):
         self.cam_fx_1 = 697.6871337890625
         self.cam_fy_1 = 697.6871337890625
 
-        # self.cam_cx_2 = 620.2407836914062
-        # self.cam_cy_2 = 353.91357421875
-        # self.cam_fx_2 = 697.6871337890625
-        # self.cam_fy_2 = 697.6871337890625
-
-        self.xmap = np.array([[j for i in range(720)] for j in range(1280)])
-        self.ymap = np.array([[i for i in range(720)] for j in range(1280)])
-        # self.xmap = np.array([[j for i in range(512)] for j in range(512)])
-        # self.ymap = np.array([[i for i in range(512)] for j in range(512)])
+        # TODO
+        self.xmap = np.array([[j for i in range(1280)] for j in range(1280)])
+        self.ymap = np.array([[i for i in range(1280)] for j in range(720)])
 
         self.trancolor = transforms.ColorJitter(0.2, 0.2, 0.2, 0.05)
         self.noise_img_loc = 0.0
@@ -92,7 +91,7 @@ class PoseDataset(data.Dataset):
         self.norm = transforms.Normalize(mean=[0.47486324, 0.47596024, 0.47596024],
                                          std=[0.10642694, 0.11272365, 0.09551936])
         # self.symmetry_obj_idx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-        self.symmetry_obj_idx = [1]
+        self.symmetry_obj_idx = [4]
         # self.num_pt_mesh_small = 118942
         # self.num_pt_mesh_large = 118942
         self.num_pt_mesh_small = 1000
@@ -144,19 +143,36 @@ class PoseDataset(data.Dataset):
 
         obj = meta['cls_indexes'].flatten().astype(np.int32)
 
-        while 1:
-            idx = np.random.randint(0, len(obj))
-            mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
-            # TODO: Change Object Index
-            mask_label = ma.getmaskarray(ma.masked_equal(label, 4))
-            mask = mask_label * mask_depth
-            if len(mask.nonzero()[0]) > self.minimum_num_pt:
-                break
+        # while 1:
+        idx = np.random.randint(0, len(obj))
+        mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
+        # TODO:
+        mask_label = ma.getmaskarray(ma.masked_equal(label, 4))
+        mask = mask_label * mask_depth
+        # if len(mask.nonzero()[0]) > self.minimum_num_pt:
+        #     break
 
         if self.add_noise:
             img = self.trancolor(img)
 
         rmin, rmax, cmin, cmax = get_bbox(mask)
+        print("\nbbox: ", rmin, rmax, cmin, cmax)
+        # rmin, rmax, cmin, cmax = meta['bbox'].flatten().astype(np.int32)
+        print("ground truth: ", meta['bbox'].flatten().astype(np.int32))
+        img_copy = np.array(img.copy())
+        img_name = '/data/Akeaveny/Datasets/pringles/temp/' + np.str(self.list[index]) + '.png'
+        print(img_name)
+        cv2.rectangle(img_copy, (cmin, cmax), (rmin, rmax), (100, 36, 12), 4)
+        cv2.imwrite(img_name, img_copy)
+        # ================ visualize =============
+        # plt.subplot(1, 3, 1)
+        # plt.imshow(img)
+        # plt.subplot(1, 3, 2)
+        # plt.imshow(depth)
+        # plt.subplot(1, 3, 3)
+        # plt.imshow(label)
+        # plt.ioff()
+        # plt.pause(50)
 
         img = np.transpose(np.array(img)[:, :, :3], (2, 0, 1))[:, rmin:rmax, cmin:cmax]
 
@@ -183,7 +199,6 @@ class PoseDataset(data.Dataset):
         add_t = np.array([random.uniform(-self.noise_trans, self.noise_trans) for i in range(3)])
 
         choose = mask[rmin:rmax, cmin:cmax].flatten().nonzero()[0]
-        print("mask: ", np.unique(mask[rmin:rmax, cmin:cmax].flatten()).sum())
         if len(choose) > self.num_pt:
             c_mask = np.zeros(len(choose), dtype=int)
             c_mask[:self.num_pt] = 1
@@ -254,19 +269,27 @@ class PoseDataset(data.Dataset):
 
 
 #
-# border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680]
-border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 500]
-img_width = 512
-img_length = 512
+# border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 500]
+border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680,
+               720, 760, 800, 840, 880, 920, 960, 1000, 1040, 1080, 1120, 1160, 1200, 1240, 1280]
+
+# border_list = []
+# border_list = [border_list.append(value) for value in range(0, 1280, 40)]
+# border_list.append(1280)
+# border_list = np.arange(0, 1320, 40)
+# print(border_list)
+
+# img_width = 512
+# img_length = 512
+img_width = 720
+img_length = 1280
 
 
 def get_bbox(label):
     rows = np.any(label, axis=1)
     cols = np.any(label, axis=0)
 
-    # print("--------------- rows -----------------")
-    # print("Rows: ", rows.shape)
-    # print(np.where(rows)[0])
+    print("\n Rows: ", np.where(rows)[0].shape)
 
     rmin, rmax = np.where(rows)[0][[0, -1]]
     cmin, cmax = np.where(cols)[0][[0, -1]]

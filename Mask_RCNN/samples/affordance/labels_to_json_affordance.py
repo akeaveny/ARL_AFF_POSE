@@ -163,7 +163,7 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
         obj_name = img_number + 'pringles'
         data[obj_name] = {}
         data[obj_name]['fileref'] = ""
-        data[obj_name]['size'] = 1024
+        data[obj_name]['size'] = 1280
         # data[obj_name]['filename'] = folder_to_save + img_number + '.png'
         # data[obj_name]['depthfilename'] = folder_to_save + img_number + 'depth.16.png'
         data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
@@ -188,14 +188,14 @@ class_id = [0, 1, 2]
 
 min_img = 0
 # max_img = 5
-max_img = 890
+max_img = 1690
 # max_img = 799
 
 data = {}
 count = 0
 # ===================== json ====================
 print('-------- TRAIN ---------------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_train.json'
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_train.json'
 for i in range(min_img, max_img + 1):
     print('\nImage: {}/{}'.format(i, max_img))
     # count = 1000000 + i
@@ -222,8 +222,6 @@ with open(json_addr, 'w') as outfile:
     json.dump(data, outfile, sort_keys=True)
 
 
-
-
 # ===================== val  ====================
 # data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_syn/'
 # folder_to_save = 'ndds_and_real/Kitchen_Knife_val_syn/'
@@ -239,14 +237,14 @@ class_id = [0, 1, 2]
 
 min_img = 0
 # max_img = 3
-max_img = 89
+max_img = 289
 # max_img = 199
 
 data = {}
 count = 0
 # ===================== json ====================
 print('-------- VAL ---------------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_val.json'
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_val.json'
 for i in range(min_img, max_img + 1):
     print('\nImage: {}/{}'.format(i, max_img))
     # count = 1000000 + i

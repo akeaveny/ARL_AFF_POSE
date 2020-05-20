@@ -62,22 +62,22 @@ class PringlesConfig(Config):
     bs = GPU_COUNT * IMAGES_PER_GPU
 
     # ===== dataset ======
-    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_train_syn/000???.png
-    # Loaded Images:  800
+    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_train/*_rgb.png
+    # Loaded Images:  1691
     # ---------stats---------------
     # Means:
-    #  [[169.16699019]
-    #  [164.5587391 ]
-    #  [170.56142267]]
+    #  [[112.60801508]
+    #  [108.68599223]
+    #  [109.72573544]]
     # STD:
-    #  [[24.74091172]
-    #  [26.44241505]
-    #  [25.5041049 ]]
-    # IMAGE_MAX_DIM = 1280
-    # IMAGE_MIN_DIM = 720
-    MEAN_PIXEL = np.array([169.16699019, 164.5587391, 170.56142267])
+    #  [[24.90194847]
+    #  [29.49686617]
+    #  [31.30800748]]
+    MEAN_PIXEL = np.array([112.60801508, 108.68599223, 109.72573544])
     BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
+    # IMAGE_MAX_DIM = 1280
+    # IMAGE_MIN_DIM = 720
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 2  # Background + objects
@@ -85,8 +85,8 @@ class PringlesConfig(Config):
     # Number of training steps per epoch
     # batch_size = 19773
     # train_split = 15818 # 80 %
-    STEPS_PER_EPOCH = 800 // bs
-    VALIDATION_STEPS = 200 // bs
+    STEPS_PER_EPOCH = 1691 // bs
+    VALIDATION_STEPS = 290 // bs
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.7
@@ -118,10 +118,10 @@ class PringlesDataset(utils.Dataset):
         # /data/Akeaveny/Datasets/pringles/Alex/train/via_region_data.json
         if subset == 'train':
             print("------------------TRAIN------------------")
-            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_train.json'))
+            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_train.json'))
         elif subset == 'val':
             print("------------------VAL--------------------")
-            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_val.json'))
+            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_val.json'))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -199,31 +199,35 @@ def train(model):
 
     print("Training network heads")
 
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=40,
-                layers='heads',
-                augmentation=imgaug.augmenters.OneOf([
-                                imgaug.augmenters.Fliplr(0.5),
-                                imgaug.augmenters.Flipud(0.5),
-                                imgaug.augmenters.Affine(rotate=(-90, 90))
-                                ]))
-
     # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/10,
-    #             epochs=160,
-    #             layers="all",
+    #             learning_rate=config.LEARNING_RATE,
+    #             epochs=40,
+    #             layers='heads',
     #             augmentation=imgaug.augmenters.OneOf([
-    #                 imgaug.augmenters.Fliplr(0.5),
-    #                 imgaug.augmenters.Flipud(0.5),
-    #                 imgaug.augmenters.Affine(rotate=(-90, 90))
-    #             ]))
+    #                             imgaug.augmenters.Fliplr(0.5),
+    #                             imgaug.augmenters.Flipud(0.5),
+    #                             imgaug.augmenters.Affine(rotate=(-90, 90))
+    #                             ]))
 
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=1,
-    #             # epochs=80,
-    #             layers="all")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/10,
+                epochs=80,
+                layers="all",
+                augmentation=imgaug.augmenters.OneOf([
+                    imgaug.augmenters.Fliplr(0.5),
+                    imgaug.augmenters.Flipud(0.5),
+                    imgaug.augmenters.Affine(rotate=(-90, 90))
+                ]))
+
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/100,
+                epochs=160,
+                layers="all",
+                augmentation=imgaug.augmenters.OneOf([
+                    imgaug.augmenters.Fliplr(0.5),
+                    imgaug.augmenters.Flipud(0.5),
+                    imgaug.augmenters.Affine(rotate=(-90, 90))
+                ]))
 
 ############################################################
 #  Training
