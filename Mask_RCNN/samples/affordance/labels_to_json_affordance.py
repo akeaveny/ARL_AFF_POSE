@@ -122,7 +122,7 @@ def find_region(img, classes_label, obj_id, row, col):
     return region, img, have_object
 
 
-def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
+def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, dataset_name):
     # print("Shape: ", img.shape)
     rows, cols = instance_img.shape
     regions = {}
@@ -160,12 +160,10 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
 
     if count > 0:
         # print("String Sequence: ", str_seq)
-        obj_name = img_number + 'pringles'
+        obj_name = img_number + dataset_name
         data[obj_name] = {}
         data[obj_name]['fileref'] = ""
-        data[obj_name]['size'] = 1280
-        # data[obj_name]['filename'] = folder_to_save + img_number + '.png'
-        # data[obj_name]['depthfilename'] = folder_to_save + img_number + 'depth.16.png'
+        data[obj_name]['size'] = 640
         data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
         data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
         data[obj_name]['base64_img_data'] = ""
@@ -174,10 +172,9 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
     return stop
 
 # ===================== train  ====================
-# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_train_syn/'
-# folder_to_save = 'ndds_and_real/Kitchen_Knife_train_syn/'
-data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_train/'
-folder_to_save = 'ndds_and_real/combined_train/'
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/formatted_syn_train/'
+folder_to_save = 'ndds_and_real/formatted_syn_train/'
+dataset_name = 'Affordance'
 
 if data_path[len(data_path) - 1] != '/':
     print(data_path)
@@ -186,28 +183,25 @@ if data_path[len(data_path) - 1] != '/':
 
 class_id = [0, 1, 2]
 
-min_img = 0
-# max_img = 5
-max_img = 1690
-# max_img = 799
+min_img = 1791
+max_img = 1791 + 14999
 
 data = {}
 count = 0
 # ===================== json ====================
 print('-------- TRAIN ---------------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_train.json'
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_train.json'
 for i in range(min_img, max_img + 1):
     print('\nImage: {}/{}'.format(i, max_img))
-    # count = 1000000 + i
-    # img_number = str(count)[1:]
-    img_number = str(i)
+    count = 100000 + i
+    img_number = str(count)[1:]
     label_addr = data_path + img_number + '_label.png'
 
     # print("img_number: ", img_number)
     # print("label_addr: ", label_addr)
 
     label_img = load_image(label_addr)
-    # print("Classes: ", np.unique(label_img))
+    print("Classes: ", np.unique(label_img))
     # plt.imshow(label_img)
     # plt.show()
 
@@ -215,18 +209,16 @@ for i in range(min_img, max_img + 1):
         print('\n ------------------ Pass! --------------------')
         pass
     else:
-        write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+        write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
     count += 1
 
 with open(json_addr, 'w') as outfile:
     json.dump(data, outfile, sort_keys=True)
 
-
 # ===================== val  ====================
-# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_syn/'
-# folder_to_save = 'ndds_and_real/Kitchen_Knife_val_syn/'
-data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_val/'
-folder_to_save = 'ndds_and_real/combined_val/'
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/formatted_syn_val/'
+folder_to_save = 'ndds_and_real/formatted_syn_val/'
+dataset_name = 'Affordance'
 
 if data_path[len(data_path) - 1] != '/':
     print(data_path)
@@ -235,21 +227,18 @@ if data_path[len(data_path) - 1] != '/':
 
 class_id = [0, 1, 2]
 
-min_img = 0
-# max_img = 3
-max_img = 289
-# max_img = 199
+min_img = 320
+max_img = 320 + 3499
 
 data = {}
 count = 0
 # ===================== json ====================
 print('-------- VAL ---------------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_val.json'
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_val.json'
 for i in range(min_img, max_img + 1):
     print('\nImage: {}/{}'.format(i, max_img))
-    # count = 1000000 + i
-    # img_number = str(count)[1:]
-    img_number = str(i)
+    count = 100000 + i
+    img_number = str(count)[1:]
     label_addr = data_path + img_number + '_label.png'
 
     # print("img_number: ", img_number)
@@ -264,7 +253,7 @@ for i in range(min_img, max_img + 1):
         print('\n ------------------ Pass! --------------------')
         pass
     else:
-        write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+        write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
     count += 1
 
 with open(json_addr, 'w') as outfile:

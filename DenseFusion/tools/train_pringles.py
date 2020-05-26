@@ -29,15 +29,16 @@ from lib.loss_refiner import Loss_refine
 from lib.utils import setup_logger
 
 # =========== ak =====================
-import warnings
-warnings.filterwarnings("ignore")
+# import warnings
+# warnings.filterwarnings("ignore")
+# from PIL import Image
+# import cv2
 # ========== GPU config ================
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str, default='ycb', help='ycb or warehouse or linemod')
-parser.add_argument('--dataset_root', type=str, default='',
-                    help='dataset root dir (''YCB_Video_Dataset'' or ''Warehouse_Dataset'' or ''Linemod_preprocessed'')')
+parser.add_argument('--dataset_root', type=str, default='', help='dataset root dir (''YCB_Video_Dataset'' or ''Warehouse_Dataset'' or ''Linemod_preprocessed'')')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
 parser.add_argument('--workers', type=int, default=10, help='number of data loading workers')
 parser.add_argument('--lr', default=0.00001, help='learning rate')
@@ -46,10 +47,9 @@ parser.add_argument('--w', default=0.015, help='learning rate')
 parser.add_argument('--w_rate', default=0.3, help='learning rate decay rate')
 parser.add_argument('--decay_margin', default=0.016, help='margin to decay lr & w')
 parser.add_argument('--refine_margin', default=0.013, help='margin to start the training of iterative refinement')
-parser.add_argument('--noise_trans', default=0.03,
-                    help='range of the random noise of translation added to the training data')
+parser.add_argument('--noise_trans', default=0.03, help='range of the random noise of translation added to the training data')
 parser.add_argument('--iteration', type=int, default=2, help='number of refinement iterations')
-parser.add_argument('--nepoch', type=int, default=10, help='max number of epochs to train')
+parser.add_argument('--nepoch', type=int, default=100, help='max number of epochs to train')
 parser.add_argument('--resume_posenet', type=str, default='', help='resume PoseNet model')
 parser.add_argument('--resume_refinenet', type=str, default='', help='resume PoseRefineNet model')
 parser.add_argument('--start_epoch', type=int, default=1, help='which epoch to start')
@@ -69,13 +69,25 @@ def main():
         opt.repeat_epoch = 1  # number of repeat times for one epoch training
     elif opt.dataset == 'pringles':
         opt.num_objects = 1
-        opt.num_points = 50
+        opt.num_points = 1000 # 118942
         opt.outf = 'trained_models/pringles'
         opt.log_dir = 'experiments/logs/pringles'
+        opt.nepoch = 1000
         opt.repeat_epoch = 1
+        # ================ ak ================
+        opt.batch_size = 1
+        opt.lr = 0.00001
+        opt.lr_Rate = 0.3
+        opt.w = 0.015
+        opt.w_rate = 0.3
+        opt.decay_margin = 100
+        opt.refine_margin = 100
     else:
         print('Unknown dataset')
         return
+
+    # TODO:
+    pathname = 'pringles_15k'
 
     estimator = PoseNet(num_points=opt.num_points, num_obj=opt.num_objects)
     estimator.cuda()
@@ -102,20 +114,27 @@ def main():
         dataset = PoseDataset_ycb('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'pringles':
         dataset = PoseDataset_pringles('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+
 
     if opt.dataset == 'ycb':
         test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'pringles':
         test_dataset = PoseDataset_pringles('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
-    testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
+
+    # TODO: Batch Size
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)
+    testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
 
     opt.sym_list = dataset.get_sym_list()
     opt.num_points_mesh = dataset.get_num_points_mesh()
 
     print(
-        '>>>>>>>>----------Dataset loaded!---------<<<<<<<<\nlength of the training set: {0}\nlength of the testing set: {1}\nnumber of sample points on mesh: {2}\nsymmetry object list: {3}'.format(
-            len(dataset), len(test_dataset), opt.num_points_mesh, opt.sym_list))
+        '>>>>>>>>----------Dataset loaded!---------<<<<<<<<'
+        '\nlength of the training set: {0}'
+        '\nlength of the testing set: {1}'
+        '\nnumber of sample points on mesh: {2}'
+        '\nsymmetry object list: {3}'
+            .format(len(dataset), len(test_dataset), opt.num_points_mesh, opt.sym_list))
 
     criterion = Loss(opt.num_points_mesh, opt.sym_list)
     criterion_refine = Loss_refine(opt.num_points_mesh, opt.sym_list)
@@ -220,9 +239,9 @@ def main():
         if test_dis <= best_test:
             best_test = test_dis
             if opt.refine_start:
-                torch.save(refiner.state_dict(), '{0}/pose_refine_model_{1}_{2}.pth'.format(opt.outf, epoch, test_dis))
+                torch.save(refiner.state_dict(), '{0}/small_batch_pose_refine_model_{1}_{2}.pth'.format(opt.outf, epoch, test_dis))
             else:
-                torch.save(estimator.state_dict(), '{0}/pose_model_{1}_{2}.pth'.format(opt.outf, epoch, test_dis))
+                torch.save(estimator.state_dict(), '{0}/small_batch_pose_model_{1}_{2}.pth'.format(opt.outf, epoch, test_dis))
             print(epoch, '>>>>>>>>----------BEST TEST MODEL SAVED---------<<<<<<<<')
 
         if best_test < opt.decay_margin and not opt.decay_start:
@@ -243,21 +262,26 @@ def main():
                 dataset = PoseDataset_pringles('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,
                                                 opt.refine_start)
 
-            dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
             if opt.dataset == 'ycb':
                 test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
             if opt.dataset == 'pringles':
                 test_dataset = PoseDataset_pringles('test', opt.num_points, False, opt.dataset_root, 0.0,
                                                      opt.refine_start)
-            testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False,
-                                                         num_workers=opt.workers)
+
+            # TODO: Batch Size
+            dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)
+            testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
 
             opt.sym_list = dataset.get_sym_list()
             opt.num_points_mesh = dataset.get_num_points_mesh()
 
             print(
-                '>>>>>>>>----------Dataset loaded!---------<<<<<<<<\nlength of the training set: {0}\nlength of the testing set: {1}\nnumber of sample points on mesh: {2}\nsymmetry object list: {3}'.format(
-                    len(dataset), len(test_dataset), opt.num_points_mesh, opt.sym_list))
+                '>>>>>>>>----------Dataset loaded!---------<<<<<<<<'
+                '\nlength of the training set: {0}'
+                '\nlength of the testing set: {1}'
+                '\nnumber of sample points on mesh: {2}'
+                '\nsymmetry object list: {3}'
+                    .format(len(dataset), len(test_dataset), opt.num_points_mesh, opt.sym_list))
 
             criterion = Loss(opt.num_points_mesh, opt.sym_list)
             criterion_refine = Loss_refine(opt.num_points_mesh, opt.sym_list)

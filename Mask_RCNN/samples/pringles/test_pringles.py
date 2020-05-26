@@ -53,7 +53,10 @@ class PringlesConfig(Config):
     #     [[35.41644638]
     #      [35.76902286]
     #      [29.51232762]]
+    IMAGE_MAX_DIM = 1280
+    IMAGE_MIN_DIM = 720
     MEAN_PIXEL = np.array([173.5312068, 174.31005366, 179.55561992])
+    BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
 
     # Number of classes (including background)
@@ -173,7 +176,7 @@ def detect_and_get_masks(model, data_path, num_frames):
         # print(rgb_addr, depth_addr)
 
         ## ============== Pringles ===================
-        folder_to_save = '/data/Akeaveny/Datasets/pringles/zed/sorted/'
+        folder_to_save = '/data/Akeaveny/Datasets/pringles/zed/inference/combined/'
         ## min_img = 000000
         count = 1000000 + i
         str_num = str(count)[1:]
@@ -210,30 +213,30 @@ def detect_and_get_masks(model, data_path, num_frames):
         if not assign_first_pre_detect:
             semantic_masks, instance_masks, color_masks, pre_detect, good_detect = seq_get_masks(image, pre_detect, cur_detect)
 
-            if good_detect:
-                mask_addr = folder_to_save + '/mask-color/' + str_num + '.png'
-                skimage.io.imsave(mask_addr, color_masks)
-                mask_addr = folder_to_save + '/mask/' + str_num + '.png'
-                skimage.io.imsave(mask_addr, instance_masks)
+            # if good_detect:
+            mask_addr = folder_to_save + str_num + '.mask.color.png'
+            skimage.io.imsave(mask_addr, color_masks)
+            mask_addr = folder_to_save + str_num + '.mask.png'
+            skimage.io.imsave(mask_addr, instance_masks)
 
-            # ========== tutorials ================
-            results = model.detect([image], verbose=1)
-            r = results[0]
-            class_names = np.loadtxt(classes_file_dir, dtype=np.str)
-            class_names = np.array([class_names])
-            class_ids = r['class_ids'] - 1
+            # # # ========== tutorials ================
+            # results = model.detect([image], verbose=1)
+            # r = results[0]
+            # class_names = np.loadtxt(classes_file_dir, dtype=np.str)
+            # class_names = np.array([class_names])
+            # class_ids = r['class_ids'] - 1
+            #
+            # # print("-------------------------")
+            # # print("class_names: ", class_names)
+            #
+            # # ========== detect model ============
+            # results = model.detect([image], verbose=1)
+            # r = results[0]
+            # visualize.display_instances(image, r['rois'], r['masks'], class_ids,
+            #                             class_names, r['scores'], figsize=(10, 10), ax=None,
+            #                             title="Predictions", show_bbox=True, show_mask=True)
 
-            # print("-------------------------")
-            # print("class_names: ", class_names)
-
-            # ========== detect model ============
-            results = model.detect([image], verbose=1)
-            r = results[0]
-            visualize.display_instances(image, r['rois'], r['masks'], class_ids,
-                                        class_names, r['scores'], figsize=(10, 10), ax=None,
-                                        title="Predictions", show_bbox=True, show_mask=True)
-
-            # # ========== plot ============
+            # ========== plot ============
             # plt.subplot(2, 2, 1)
             # plt.title('rgb')
             # plt.imshow(image)
@@ -248,7 +251,7 @@ def detect_and_get_masks(model, data_path, num_frames):
             # plt.imshow(semantic_masks)
             # plt.ioff()
             # plt.pause(0.001)
-        #plt.show()
+        # #plt.show()
 
     
 if __name__ == '__main__':

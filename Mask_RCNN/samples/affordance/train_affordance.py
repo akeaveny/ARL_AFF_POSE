@@ -22,7 +22,10 @@ import skimage.draw
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-import imgaug
+from imgaug import augmenters as iaa
+
+# ========= load dataset (optional) =========
+import setup_dataset_affordance as Affordance
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -42,192 +45,125 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 # import warnings
 # warnings.filterwarnings("ignore")
 
-##########################################################
-# Configurations
+# ##########################################################
+# # Configurations
+# ###########################################################
+#
+# class AffordanceConfig(Config):
+#     """Configuration for training on the toy  dataset.
+#     # Derives from the base Config class and overrides some values.
+#     # """
+#     # Give the configuration a recognizable name
+#     NAME = "Affordance"
+#
+#     # ========== GPU config ================
+#     os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+#     # We use a GPU with 12GB memory, which can fit two images.
+#     # Adjust down if you use a smaller GPU.
+#     GPU_COUNT = 1
+#     IMAGES_PER_GPU = 2
+#     bs = GPU_COUNT * IMAGES_PER_GPU
+#
+#     # ===== combined ======
+#     # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_train_15k/*_rgb.png
+#     # Loaded Images:  15891
+#     # ---------stats---------------
+#     # Means:
+#     #  [[135.42236743]
+#     #  [135.5095523 ]
+#     #  [136.98013335]]
+#     # STD:
+#     #  [[27.17498643]
+#     #  [27.91349685]
+#     #  [28.16875631]]
+#
+#     # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/temp7_train_real/*_rgb.png
+#     # Loaded Images:  891
+#     # ---------stats---------------
+#     # Means:
+#     #  [[100.88058092]
+#     #  [ 92.19536531]
+#     #  [ 93.97393321]]
+#     # STD:
+#     #  [[23.66287158]
+#     #  [32.95783879]
+#     #  [36.65833118]]
+#     MEAN_PIXEL = np.array([100.88058092, 92.19536531, 93.97393321])
+#
+#     BACKBONE = "resnet50"
+#     RESNET_ARCHITECTURE = "resnet50"
+#
+#     IMAGE_MAX_DIM = 640
+#     IMAGE_MIN_DIM = 480
+#     IMAGE_PADDING = True
+#
+#     IMAGE_RESIZE_MODE = "none"
+#
+#     # Number of classes (including background)
+#     NUM_CLASSES = 1 + 2  # Background + objects
+#
+#     # Number of training steps per epoch
+#     # batch_size = 19773
+#     # train_split = 15818 # 80 %
+#     # STEPS_PER_EPOCH = (15000 + 890) // bs
+#     # VALIDATION_STEPS = (3750 + 89) // bs
+#     STEPS_PER_EPOCH = (890) // bs
+#     VALIDATION_STEPS = (89) // bs
+#
+#     # TRAIN_BN = True # default is true
+#     # Skip detections with < 90% confidence
+#     DETECTION_MIN_CONFIDENCE = 0.7
+
+
+###########################################################
+# train
 ###########################################################
 
-class PringlesConfig(Config):
-    """Configuration for training on the toy  dataset.
-    # Derives from the base Config class and overrides some values.
-    # """
-    # Give the configuration a recognizable name
-    NAME = "Pringles"
-
-    # ========== GPU config ================
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-    # We use a GPU with 12GB memory, which can fit two images.
-    # Adjust down if you use a smaller GPU.
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
-    bs = GPU_COUNT * IMAGES_PER_GPU
-
-    # ===== dataset ======
-    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_train/*_rgb.png
-    # Loaded Images:  1691
-    # ---------stats---------------
-    # Means:
-    #  [[112.60801508]
-    #  [108.68599223]
-    #  [109.72573544]]
-    # STD:
-    #  [[24.90194847]
-    #  [29.49686617]
-    #  [31.30800748]]
-    MEAN_PIXEL = np.array([112.60801508, 108.68599223, 109.72573544])
-    BACKBONE = "resnet50"
-    RESNET_ARCHITECTURE = "resnet50"
-    # IMAGE_MAX_DIM = 1280
-    # IMAGE_MIN_DIM = 720
-
-    # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + objects
-
-    # Number of training steps per epoch
-    # batch_size = 19773
-    # train_split = 15818 # 80 %
-    STEPS_PER_EPOCH = 1691 // bs
-    VALIDATION_STEPS = 290 // bs
-
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.7
-
-###########################################################
-# Dataset
-###########################################################
-
-class PringlesDataset(utils.Dataset):
-
-    def load_Pringles(self, dataset_dir, subset):
-        """Load a subset of the Pringles dataset.
-        dataset_dir: Root directory of the dataset.
-        subset: Subset to load: train or val
-        """
-        # Add classes. We have only one class to add.
-        #  1 - 'grasp'
-        #   2 - 'cut'
-        #   3 - 'scoop'
-        #   4 - 'contain'
-        #   5 - 'pound'
-        #   6 - 'support'
-        #   7 - 'wrap-grasp'
-        self.add_class("Pringles", 1, "grasp")
-        self.add_class("Pringles", 2, "cut")
-
-        # Train or validation dataset?
-        assert subset in ["train", "val"]
-        # /data/Akeaveny/Datasets/pringles/Alex/train/via_region_data.json
-        if subset == 'train':
-            print("------------------TRAIN------------------")
-            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_train.json'))
-        elif subset == 'val':
-            print("------------------VAL--------------------")
-            annotations = json.load(open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_ndds_and_real_val.json'))
-
-        annotations = list(annotations.values())
-        # The VIA tool saves images in the JSON even if they don't have any
-        # annotations. Skip unannotated images.
-        annotations = [a for a in annotations if a['regions']]
-        annotations = [a for a in annotations if a['regions']]
-
-        # Add images
-        for a in annotations:
-            if type(a['regions']) is dict:
-                polygons = [r['shape_attributes'] for r in a['regions'].values()]
-            else:
-                polygons = [r['shape_attributes'] for r in a['regions']]
-
-            image_path = os.path.join(dataset_dir, a['filename'])
-            print(image_path)
-            image = skimage.io.imread(image_path)
-            height, width = image.shape[:2]
-
-            self.add_image(
-                "Pringles",
-                image_id=a['filename'],  # use file name as a unique image id
-                path=image_path,
-                width=width, height=height,
-                polygons=polygons)
-
-    def load_mask(self, image_id):
-        """Generate instance masks for an image.
-       Returns:
-        masks: A bool array of shape [height, width, instance count] with
-            one mask per instance.
-        class_ids: a 1D array of class IDs of the instance masks.
-        """
-        # If not a Pringles dataset image, delegate to parent class.
-        image_info = self.image_info[image_id]
-        if image_info["source"] != "Pringles":
-            return super(self.__class__, self).load_mask(image_id)
-
-        # Convert polygons to a bitmap mask of shape
-        # [height, width, instance_count]
-        info = self.image_info[image_id]
-        mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
-                        dtype=np.uint8)
-        class_IDs = np.zeros([len(info["polygons"])], dtype=np.int32)
-
-        for i, p in enumerate(info["polygons"]):
-            # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
-            mask[rr, cc, i] = 1
-            class_IDs[i] = p['class_id']
-
-        # Return mask, and array of class IDs of each instance. Since we have
-        # one class ID only, we return an array of 1s
-        return mask.astype(np.bool), class_IDs
-
-    def image_reference(self, image_id):
-        """Return the path of the image."""
-        info = self.image_info[image_id]
-        if info["source"] == "Pringles":
-            return info["path"]
-        else:
-            super(self.__class__, self).image_reference(image_id)
+############################################################
+#  Training
+############################################################
 
 def train(model):
+
     """Train the model."""
     # Training dataset.
-    dataset_train = PringlesDataset()
-    dataset_train.load_Pringles(args.dataset, "train")
+    dataset_train = Affordance.AffordanceDataset()
+    dataset_train.load_Affordance(args.dataset, "train")
     dataset_train.prepare()
 
     # Validation dataset
-    dataset_val = PringlesDataset()
-    dataset_val.load_Pringles(args.dataset, "val")
+    dataset_val = Affordance.AffordanceDataset()
+    dataset_val.load_Affordance(args.dataset, "val")
     dataset_val.prepare()
 
+    # Image augmentation
+    # http://imgaug.readthedocs.io/en/latest/source/augmenters.html
+    augmentation = iaa.SomeOf((0, 2), [
+        iaa.Fliplr(0.5),
+        iaa.Flipud(0.5),
+        iaa.OneOf([iaa.Affine(rotate=90),
+                   iaa.Affine(rotate=180),
+                   iaa.Affine(rotate=270)]),
+        iaa.Multiply((0.8, 1.5)),
+        iaa.GaussianBlur(sigma=(0.0, 5.0))
+    ])
+
     print("Training network heads")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=40,
+                # augmentation=augmentation,
+                layers="heads")
 
     # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE,
-    #             epochs=40,
-    #             layers='heads',
+    #             learning_rate=config.LEARNING_RATE/10,
+    #             epochs=80,
+    #             layers="head",
     #             augmentation=imgaug.augmenters.OneOf([
-    #                             imgaug.augmenters.Fliplr(0.5),
-    #                             imgaug.augmenters.Flipud(0.5),
-    #                             imgaug.augmenters.Affine(rotate=(-90, 90))
-    #                             ]))
-
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/10,
-                epochs=80,
-                layers="all",
-                augmentation=imgaug.augmenters.OneOf([
-                    imgaug.augmenters.Fliplr(0.5),
-                    imgaug.augmenters.Flipud(0.5),
-                    imgaug.augmenters.Affine(rotate=(-90, 90))
-                ]))
-
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/100,
-                epochs=160,
-                layers="all",
-                augmentation=imgaug.augmenters.OneOf([
-                    imgaug.augmenters.Fliplr(0.5),
-                    imgaug.augmenters.Flipud(0.5),
-                    imgaug.augmenters.Affine(rotate=(-90, 90))
-                ]))
+    #                 imgaug.augmenters.Fliplr(0.5),
+    #                 imgaug.augmenters.Flipud(0.5),
+    #                 imgaug.augmenters.Affine(rotate=(-90, 90))
+    #             ]))
 
 ############################################################
 #  Training
@@ -238,10 +174,10 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Train Mask R-CNN to detect Pringles.')
+        description='Train Mask R-CNN to detect Affordance.')
     parser.add_argument('--dataset', required=False,
-                        metavar="/path/to/Pringles/dataset/",
-                        help='Directory of the Pringles dataset')
+                        metavar="/path/to/Affordance/dataset/",
+                        help='Directory of the Affordance dataset')
     parser.add_argument('--weights', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
@@ -264,7 +200,7 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
 
     # Configurations
-    config = PringlesConfig()
+    config = Affordance.AffordanceConfig()
     config.display()
 
     # Create model
@@ -296,6 +232,9 @@ if __name__ == '__main__':
             "mrcnn_bbox", "mrcnn_mask"])
     else:
         model.load_weights(weights_path, by_name=True)
+
+    # ========== MODEL SUMMARY =========
+    model.keras_model.summary()
 
     # Train
     train(model)

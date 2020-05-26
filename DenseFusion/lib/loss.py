@@ -8,6 +8,9 @@ import random
 import torch.backends.cudnn as cudnn
 from lib.knn.__init__ import KNearestNeighbor
 
+from PIL import Image
+import cv2
+
 
 def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, w, refine, num_point_mesh, sym_list):
     knn = KNearestNeighbor(1)
@@ -54,6 +57,8 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
     how_max, which_max = torch.max(pred_c, 1)
     dis = dis.view(bs, num_p)
 
+    # print(pred_c)
+    print(how_max)
 
     t = ori_t[which_max[0]] + points[which_max[0]]
     points = points.view(1, bs * num_p, 3)

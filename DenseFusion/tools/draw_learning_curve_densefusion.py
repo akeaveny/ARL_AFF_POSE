@@ -13,10 +13,20 @@ import matplotlib.pyplot as plt
 #import matplotlib.rcsetup as rcsetup
 #print(rcsetup.all_backends)
 
+# =================== argparse ========================
+import argparse
+
+parser = argparse.ArgumentParser(description='Compute Image Mean and Stddev')
+parser.add_argument('--dataset', required=True,
+                    metavar="/path/to//dataset/",
+                    help='Directory of the dataset')
+args = parser.parse_args()
+root_dir = args.dataset
+
 # =============== DenseFusion config =========================
 first_id = 1
-last_id = 30
-root_dir = '/home/akeaveny/catkin_ws/src/DenseFusion/experiments/logs/ycb'
+last_id = 2
+# root_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/logs/ycb'
 save_img_nm = 'learning_curve_testdata{0}-{1}.png'.format(first_id, last_id)
 train_data_trend = []
 test_data_trend = []

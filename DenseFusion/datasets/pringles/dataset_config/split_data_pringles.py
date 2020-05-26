@@ -8,7 +8,7 @@ label_addrs = '/data/Akeaveny/Datasets/pringles/zed/train/*.cs.png'
 images = [label_images.append(file) for file in sorted(glob.glob(label_addrs))]
 print("Loaded Images: ", len(images))
 
-for label_image in label_images[0:10]:
+for label_image in label_images[0:500]:
     img_index_str = label_image.split("zed/")[1]
     img_index_str = img_index_str.split(".cs")[0]
     print(img_index_str)
@@ -22,7 +22,7 @@ label_addrs = '/data/Akeaveny/Datasets/pringles/zed/val/*.cs.png'
 images = [label_images.append(file) for file in sorted(glob.glob(label_addrs))]
 print("Loaded Images: ", len(images))
 
-for label_image in label_images[0:10]:
+for label_image in label_images[0:125]:
     img_index_str = label_image.split("zed/")[1]
     img_index_str = img_index_str.split(".cs")[0]
     print(img_index_str)

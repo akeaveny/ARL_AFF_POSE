@@ -6,41 +6,47 @@ import scipy.misc
 from PIL import Image
 import imageio
 import numpy as np
+import os
 
-# ===================== load mat ===========================
-# mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/*_label.mat'
+# # ===================== load mat ===========================
+# mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real4/*_label.mat'
 # print("Images: ", mat_path)
-# mats = [scipy.io.loadmat(mat) for mat in sorted(glob.glob(mat_path))]
+# mat_files = sorted(glob.glob(mat_path))
+#
+# mats = [scipy.io.loadmat(mat) for mat in mat_files]
 # print("Loaded Mats: ", len(mats))
-# # print("First Mat \n", mats[0])
 #
 # for idx, mat in enumerate(mats):
 #     data = np.asarray(mat['gt_label'])
 #     # ============ save png ============
-#     str_num = np.str(idx)
-#     # print(str_num)
+#     count = 100000 + idx
+#     str_num = str(count)[1:]
 #     # str_num = str_num[1:]
+#     print(str_num)
+#     print(mat_files[idx])
 #     label_filename = mat_path.split("*")[0] + str_num + '_label.png'
-#     # print(str_to_save)
+#     print(label_filename)
 #     im = Image.fromarray(data)
 #     im.save(label_filename)
 
-# ===================== check labels ===========================
-label_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/*_label.png'
-print("Images: ", label_path)
-label_imgs = [imageio.imread(label) for label in sorted(glob.glob(label_path))]
-print("Loaded Labels: ", len(label_imgs))
+# # ===================== check labels ===========================
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/temp_Kitchen_Knife_val_real4/'
+label_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/temp_Kitchen_Knife_val_real4/*_label.png'
+label_files = sorted(glob.glob(label_path))
+print("label_files: ", len(label_files))
 
-# /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/val/289_rgb.png
-rgb_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real/*_rgb.png'
-print("Images: ", label_path)
-rgb_imgs = [imageio.imread(label) for label in sorted(glob.glob(rgb_path))]
-print("Loaded RGBs: ", len(rgb_imgs))
+offset = 0
+for idx, mat in enumerate(label_files):
+    idx += offset
+    image_idx = label_files[idx].split("temp_Kitchen_Knife_val_real4/")[1]
+    image_idx = image_idx.split("_label.png")[0]
+    # print(image_idx)
 
-# f, (ax1, ax2) = plt.subplots(2, sharex=True, sharey=True)
-for idx, _ in enumerate(label_imgs):
-    # ax1.imshow(label_imgs[idx])
-    # ax2.imshow(rgb_imgs[idx])
+    label_path = data_path + image_idx + "_label.png"
+    label_img = imageio.imread(label_path)
+
+    rgb_path = data_path + image_idx + "_rgb.png"
+    rgb_img = imageio.imread(rgb_path)
 
     # ================ animation ================
     plt.cla()
@@ -48,5 +54,10 @@ for idx, _ in enumerate(label_imgs):
     plt.gcf().canvas.mpl_connect(
         'key_release_event',
         lambda event: [exit(0) if event.key == 'escape' else None])
-    plt.imshow(label_imgs[idx])
+    ax1 = plt.subplot(1, 2, 1)
+    im1 = ax1.imshow(label_img)
+    ax2 = plt.subplot(1, 2, 2)
+    im2 = ax2.imshow(rgb_img)
+    plt.tight_layout()
+    plt.title(np.str(image_idx))
     plt.show()

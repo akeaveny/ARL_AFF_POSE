@@ -4,14 +4,14 @@ import glob
 import os
 
 # =================== new directory ========================
-folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/temp6_val_syn/'
-offset = 89 + 1
+folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/trash/'
+offset = 0
 
 # =================== directories ========================
 # images_path1 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/bowl_0*/bowl_0*_*'
 # images_path2 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/cup_0*/cup_0*_*'
 # images_path3 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/hammer_0*/hammer_0*_*'
-# images_path4 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/knife_0*/knife_0*_0000011?'
+# images_path4 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/knife_0*/knife_0*_000002[0-3]?'
 # images_path5 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/ladle_0*/ladle_0*_*'
 # images_path6 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/mallet_0*/mallet_0*_*'
 # images_path7 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-tools/tools/mallet_0*/mug_0*_*'
@@ -25,9 +25,9 @@ offset = 89 + 1
 # images_path15 = '/data/Akeaveny/Datasets/part-affordance-dataset/part-affordance-clutter/clutter/scene_0*/scene_0*'
 # image_paths = [images_path1, images_path2, images_path3, images_path4, images_path5, images_path6, images_path7, images_path8,
 #                images_path9, images_path10, images_path11, images_path12, images_path13, images_path14, images_path15]
-# image_paths = [images_path4]
-image_paths = ['/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/temp6_val_syn/000***']
 
+image_paths_temp = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/formatted_syn_train/0?????'
+image_paths = [image_paths_temp]
 
 # =================== images ext ========================
 # image_ext1 = '_rgb.jpg'
@@ -37,7 +37,7 @@ image_ext4 = '.cs.png'
 image_ext5 = '.depth.16.png'
 image_ext6 = '.json'
 image_ext7 = '.png'
-image_exts = [image_ext4, image_ext5, image_ext6, image_ext7]
+image_exts = [image_ext6]
 
 # =================== new directory ========================
 for image_path in image_paths:
@@ -51,11 +51,21 @@ for image_path in image_paths:
         for idx, file in enumerate(files):
             old_file_name = file
 
-            image_num = offset + idx
-            new_file_name = folder_to_save + np.str(image_num) + image_ext
+            # image_num = offset + idx
+            count = 100000 + offset + idx
+            image_num = str(count)[1:]
 
-            # print("Old File: ", old_file_name)
-            # print("New File: ", new_file_name)
+            if image_ext == ".png":
+                new_file_name = folder_to_save + np.str(image_num) + '_rgb.png'
+            elif image_ext == ".cs.png":
+                new_file_name = folder_to_save + np.str(image_num) + '_label.png'
+            elif image_ext == ".depth.16.png":
+                new_file_name = folder_to_save + np.str(image_num) + '_depth.png'
+            else:
+                new_file_name = folder_to_save + np.str(image_num) + image_ext
+
+            print("Old File: ", old_file_name)
+            print("New File: ", new_file_name)
 
             shutil.copy(old_file_name, new_file_name)
             os.rename(old_file_name, new_file_name)
