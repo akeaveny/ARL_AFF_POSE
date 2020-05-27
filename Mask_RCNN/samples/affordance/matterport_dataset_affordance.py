@@ -57,20 +57,26 @@ class AffordanceConfig(Config):
     IMAGE_RESIZE_MODE = "none"
 
     # RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
+    # RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
     RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
+    #
+    # RPN_ANCHOR_RATIOS = [0.5, 1, 2]
+    # ROI_POSITIVE_RATIO = 0.33
+    # RPN_BBOX_STD_DEV = [0.1, 0.1, 0.2, 0.2]
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 2  # Background + objects
 
     # Number of training steps per epoch
-    # STEPS_PER_EPOCH = (15000 + 890) // bs
-    # VALIDATION_STEPS = (3750 + 89) // bs
-    STEPS_PER_EPOCH = (1791) // bs
-    VALIDATION_STEPS = (320) // bs
+    STEPS_PER_EPOCH = (15000 + 1791) // bs
+    VALIDATION_STEPS = (3750 + 320) // bs
+    # STEPS_PER_EPOCH = (1791) // bs
+    # VALIDATION_STEPS = (320) // bs
 
     # TRAIN_BN = True # default is true
     # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.7
+    DETECTION_MIN_CONFIDENCE = 0.9
+    DETECTION_MAX_INSTANCES = 2
 
 # ###########################################################
 # # Dataset
@@ -95,15 +101,24 @@ class AffordanceDataset(utils.Dataset):
         self.add_class("Affordance", 2, "cut")
 
         # Train or validation dataset?
-        assert subset in ["train", "val"]
+        assert subset in ["train", "val", "test"]
         if subset == 'train':
             print("------------------LOADING TRAIN!------------------")
             annotations = json.load(
                 open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_train.json'))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_train.json')))
         elif subset == 'val':
             print("------------------LOADING VAL!--------------------")
             annotations = json.load(
                 open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_val.json'))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_val.json')))
+        elif subset == 'test':
+            annotations = json.load(
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_test.json'))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_test.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -167,3 +182,32 @@ class AffordanceDataset(utils.Dataset):
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
+
+# ###########################################################
+# # Dataset
+# ###########################################################
+
+def color_map():
+    color_map_dic = {
+    0:  [0, 0, 0],
+    1:  [128, 128,   0],
+    2:  [  0, 128, 128],
+    3:  [128,   0, 128],
+    4:  [128,   0,   0],
+    5:  [  0, 128,   0],
+    6:  [  0,   0, 128],
+    7:  [255, 255,   0],
+    8:  [255,   0, 255],
+    9:  [  0, 255, 255],
+    10: [255,   0,   0],
+    11: [  0, 255,   0],
+    12: [  0,   0, 255],
+    13: [ 92,  112, 92],
+    14: [  0,   0,  70],
+    15: [  0,  60, 100],
+    16: [  0,  80, 100],
+    17: [  0,   0, 230],
+    18: [119,  11,  32],
+    19: [  0,   0, 121]
+    }
+    return color_map_dic

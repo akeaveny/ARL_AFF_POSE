@@ -41,6 +41,9 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+# ========== GPU config ================
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
 ############################################################
 #  train
 ############################################################

@@ -16,6 +16,10 @@ import matplotlib.image as mpimg
 
 import random
 
+# ========= load dataset (optional) =========
+import matterport_dataset_affordance as Affordance
+
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
 
@@ -29,85 +33,6 @@ import tensorflow as tf
 
 # Path to trained weights file
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-
-##########################################################
-# Configurations
-###########################################################
-
-class PringlesConfig(Config):
-    """Configuration for training on the toy  dataset.
-    # Derives from the base Config class and overrides some values.
-    # """
-    # Give the configuration a recognizable name
-    NAME = "Pringles"
-
-    # ========== GPU config ================
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-    # We use a GPU with 12GB memory, which can fit two images.
-    # Adjust down if you use a smaller GPU.
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
-    bs = GPU_COUNT * IMAGES_PER_GPU
-
-    # ===== dataset ======
-    # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_train_15k/*_rgb.png
-    # Loaded Images:  15891
-    # ---------stats---------------
-    # Means:
-    #  [[135.42236743]
-    #  [135.5095523 ]
-    #  [136.98013335]]
-    # STD:
-    #  [[27.17498643]
-    #  [27.91349685]
-    #  [28.16875631]]
-    MEAN_PIXEL = np.array([135.42236743, 135.5095523, 136.98013335])
-    BACKBONE = "resnet50"
-    RESNET_ARCHITECTURE = "resnet50"
-    IMAGE_MAX_DIM = 640
-    IMAGE_MIN_DIM = 480
-
-    # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + objects
-
-    # Number of training steps per epoch
-    # batch_size = 19773
-    # train_split = 15818 # 80 %
-    STEPS_PER_EPOCH = (15000 + 890) // bs
-    VALIDATION_STEPS = (3750 + 89) // bs
-
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
-
-###########################################################
-# Dataset
-###########################################################
-
-def color_map():
-    color_map_dic = {
-    0:  [0, 0, 0],
-    1:  [128, 128,   0],
-    2:  [  0, 128, 128],
-    3:  [128,   0, 128],
-    4:  [128,   0,   0], 
-    5:  [  0, 128,   0],
-    6:  [  0,   0, 128],
-    7:  [255, 255,   0],
-    8:  [255,   0, 255],
-    9:  [  0, 255, 255],
-    10: [255,   0,   0],
-    11: [  0, 255,   0],
-    12: [  0,   0, 255],
-    13: [ 92,  112, 92],
-    14: [  0,   0,  70],
-    15: [  0,  60, 100],
-    16: [  0,  80, 100],
-    17: [  0,   0, 230],
-    18: [119,  11,  32],
-    19: [  0,   0, 121]
-    }
-    return color_map_dic
-
 
 ###########################################################
 # Test
@@ -123,76 +48,113 @@ def get_ax(rows=1, cols=1, size=8):
     _, ax = plt.subplots(rows, cols, figsize=(size * cols, size * rows))
     return ax
 
-# Compute VOC-style Average Precision
-def compute_batch_ap(image_ids, dataset):
+def compute_batch_ap(dataset, image_ids, verbose=1):
     APs = []
     for image_id in image_ids:
         # Load image
-        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+        image, image_meta, gt_class_id, gt_bbox, gt_mask = \
             modellib.load_image_gt(dataset, config,
                                    image_id, use_mini_mask=False)
         # Run object detection
-        results = model.detect([image], verbose=0)
-        # Compute AP
+        results = model.detect_molded(image[np.newaxis], image_meta[np.newaxis], verbose=0)
+        # Compute AP over range 0.5 to 0.95
         r = results[0]
-        AP, precisions, recalls, overlaps =\
-            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                              r['rois'], r['class_ids'], r['scores'], r['masks'])
-        APs.append(AP)
+        ap = utils.compute_ap_range(
+            gt_bbox, gt_class_id, gt_mask,
+            r['rois'], r['class_ids'], r['scores'], r['masks'],
+            verbose=0)
+        APs.append(ap)
+        if verbose:
+            info = dataset.image_info[image_id]
+            meta = modellib.parse_image_meta(image_meta[np.newaxis, ...])
+            print("{:3} {}   AP: {:.2f}".format(
+                meta["image_id"][0], meta["original_image_shape"][0], ap))
     return APs
 
 def detect_and_get_masks(model, data_path, num_frames):
 
-    # ========= load dataset (optional) =========
-    from load_dataset_pringles import PringlesDataset
-    dataset = PringlesDataset()
-    dataset.load_Pringles(data_path, 'val')
+    dataset = Affordance.AffordanceDataset()
+    dataset.load_Affordance(data_path, 'test')
     dataset.prepare()
 
     print("Images: {}\nClasses: {}\n".format(len(dataset.image_ids), dataset.class_names))
 
     for _ in range(0, num_frames):
-        # ========== detect model part 2 ============
+
+        #  [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+        #  24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42]
+        print("\n", dataset.image_ids)
         image_id = random.choice(dataset.image_ids)
+        # image_id = 10
+
+        # ''' ==================== DETECT ==================== '''
         image, image_meta, gt_class_id, gt_bbox, gt_mask = \
             modellib.load_image_gt(dataset, config, image_id, use_mini_mask=False)
+
+        # ## ============== SYNTHETIC ===================
+        if image.shape[-1] == 4:
+            image = image[..., :3]
+
         info = dataset.image_info[image_id]
         print("image ID: {}.{} ({}) {}".format(info["source"], info["id"], image_id,
                                                dataset.image_reference(image_id)))
+        print("Original image shape: ",
+              modellib.parse_image_meta(image_meta[np.newaxis, ...])["original_image_shape"][0])
 
-        ''' ==================== DETECT ==================== '''
         # Run object detection
-        results = model.detect([image], verbose=0)
+        results = model.detect_molded(np.expand_dims(image, 0), np.expand_dims(image_meta, 0), verbose=1)
 
         # Display results
-        # ax = get_ax(1)
         r = results[0]
-        # visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
-        #                             dataset.class_names, r['scores'], ax=ax,
-        #                             title="Predictions")
-
         log("gt_class_id", gt_class_id)
         log("gt_bbox", gt_bbox)
         log("gt_mask", gt_mask)
 
-        ''' ==================== METRICS ==================== '''
-        # ========== precision-recall ============
-        # AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-        #                                                      r['rois'], r['class_ids'], r['scores'], r['masks'])
-        # # visualize.plot_precision_recall(AP, precisions, recalls)
-        # # visualize.plot_overlaps(gt_class_id, r['class_ids'], r['scores'],
-        # #                         overlaps, dataset.class_names)
-        #
-        # # ========== APs ============
-        # # Pick a set of random images
-        # image_ids = np.random.choice(dataset.image_ids, 10)
-        # APs = compute_batch_ap(image_ids, dataset)
-        # print("mAP @ IoU=50: ", np.mean(APs))
+        # Compute AP over range 0.5 to 0.95 and print it
+        utils.compute_ap_range(gt_bbox, gt_class_id, gt_mask,
+                               r['rois'], r['class_ids'], r['scores'], r['masks'],
+                               verbose=1)
+
+        visualize.display_differences(
+            image,
+            gt_bbox, gt_class_id, gt_mask,
+            r['rois'], r['class_ids'], r['scores'], r['masks'],
+            dataset.class_names, ax=get_ax(),
+            show_box=False, show_mask=False,
+            iou_threshold=0.5, score_threshold=0.5)
+
+        # # ================================
+        # Display Ground Truth only
+        visualize.display_instances(image, gt_bbox, gt_mask, gt_class_id,
+                                    dataset.class_names, ax=get_ax(1),
+                                    show_bbox=False, show_mask=False,
+                                    title="Ground Truth")
+
+        # # ================================
+        # Display OG
+        # ax = get_ax(1)
+        # visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+        #                             dataset.class_names, r['scores'], ax=ax,
+        #                             title="Predictions")
+
+        # # ========== precision-recall ============
+        AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                                                             r['rois'], r['class_ids'], r['scores'], r['masks'])
+
+        # visualize.plot_precision_recall(AP, precisions, recalls)
+        visualize.plot_overlaps(gt_class_id, r['class_ids'], r['scores'],
+                                overlaps, dataset.class_names)
+
+        # # # ========== batch mAP ============
+        # # Run on validation set
+        # limit = 5
+        # APs = compute_batch_ap(dataset, dataset.image_ids[:limit])
+        # print("Mean AP overa {} images: {:.4f}".format(len(APs), np.mean(APs)))
 
         ''' ==================== RPN ==================== '''
-        # # Generate RPN trainig targets
-        # # target_rpn_match is 1 for positive anchors, -1 for negative anchors
-        # # and 0 for neutral anchors.
+        # Generate RPN trainig targets
+        # target_rpn_match is 1 for positive anchors, -1 for negative anchors
+        # and 0 for neutral anchors.
         # target_rpn_match, target_rpn_bbox = modellib.build_rpn_targets(
         #     image.shape, model.anchors, gt_class_id, gt_bbox, model.config)
         # log("target_rpn_match", target_rpn_match)
@@ -332,33 +294,33 @@ def detect_and_get_masks(model, data_path, num_frames):
         # model.keras_model.summary()
         # ==============================
         # Get activations of a few sample layers
-        activations = model.run_graph([image], [
-            ("input_image", tf.identity(model.keras_model.get_layer("input_image").output)),
-            ("res2c_out", model.keras_model.get_layer("res2c_out").output),
-            ("res3c_out", model.keras_model.get_layer("res3c_out").output),
-            ("res4f_out", model.keras_model.get_layer("res4f_out").output),  # for resnet50
-            ("res5c_out", model.keras_model.get_layer("res5c_out").output),  # for resnet50
-            ("rpn_bbox", model.keras_model.get_layer("rpn_bbox").output),
-            ("roi", model.keras_model.get_layer("ROI").output),
-        ])
-
-        # # ==============================
-        # Backbone feature map
-        # Input image (normalized)
-        _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
-        display_images(np.transpose(activations["res2c_out"][0, :, :, :4], [2, 0, 1]), cols=4)
-
-        # Input image (normalized)
-        _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
-        display_images(np.transpose(activations["res3c_out"][0, :, :, :4], [2, 0, 1]), cols=4)
-
-        # Input image (normalized)
-        _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
-        display_images(np.transpose(activations["res4f_out"][0, :, :, :4], [2, 0, 1]), cols=4)
-
-        # Input image (normalized)
-        _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
-        display_images(np.transpose(activations["res5c_out"][0, :, :, :4], [2, 0, 1]), cols=4)
+        # activations = model.run_graph([image], [
+        #     ("input_image", tf.identity(model.keras_model.get_layer("input_image").output)),
+        #     ("res2c_out", model.keras_model.get_layer("res2c_out").output),
+        #     ("res3c_out", model.keras_model.get_layer("res3c_out").output),
+        #     ("res4f_out", model.keras_model.get_layer("res4f_out").output),  # for resnet50
+        #     ("res5c_out", model.keras_model.get_layer("res5c_out").output),  # for resnet50
+        #     ("rpn_bbox", model.keras_model.get_layer("rpn_bbox").output),
+        #     ("roi", model.keras_model.get_layer("ROI").output),
+        # ])
+        #
+        # # # ==============================
+        # # Backbone feature map
+        # # Input image (normalized)
+        # _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
+        # display_images(np.transpose(activations["res2c_out"][0, :, :, :4], [2, 0, 1]), cols=4)
+        #
+        # # Input image (normalized)
+        # _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
+        # display_images(np.transpose(activations["res3c_out"][0, :, :, :4], [2, 0, 1]), cols=4)
+        #
+        # # Input image (normalized)
+        # _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
+        # display_images(np.transpose(activations["res4f_out"][0, :, :, :4], [2, 0, 1]), cols=4)
+        #
+        # # Input image (normalized)
+        # _ = plt.imshow(modellib.unmold_image(activations["input_image"][0], config))
+        # display_images(np.transpose(activations["res5c_out"][0, :, :, :4], [2, 0, 1]), cols=4)
 
         plt.show()
 
@@ -383,7 +345,7 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-    class InferenceConfig(PringlesConfig):
+    class InferenceConfig(Affordance.AffordanceConfig):
         GPU_COUNT = 1
         IMAGES_PER_GPU = 1
     config = InferenceConfig()

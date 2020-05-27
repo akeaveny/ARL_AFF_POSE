@@ -30,85 +30,6 @@ from mrcnn.model import log
 
 # Path to trained weights file
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-#
-# ##########################################################
-# # Configurations
-# ###########################################################
-#
-# class PringlesConfig(Config):
-#     """Configuration for training on the toy  dataset.
-#     # Derives from the base Config class and overrides some values.
-#     # """
-#     # Give the configuration a recognizable name
-#     NAME = "Pringles"
-#
-#     # ========== GPU config ================
-#     os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-#     # We use a GPU with 12GB memory, which can fit two images.
-#     # Adjust down if you use a smaller GPU.
-#     GPU_COUNT = 1
-#     IMAGES_PER_GPU = 2
-#     bs = GPU_COUNT * IMAGES_PER_GPU
-#
-#     # ===== dataset ======
-#     # Images:  /data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_train_15k/*_rgb.png
-#     # Loaded Images:  15891
-#     # ---------stats---------------
-#     # Means:
-#     #  [[135.42236743]
-#     #  [135.5095523 ]
-#     #  [136.98013335]]
-#     # STD:
-#     #  [[27.17498643]
-#     #  [27.91349685]
-#     #  [28.16875631]]
-#     MEAN_PIXEL = np.array([135.42236743, 135.5095523, 136.98013335])
-#     BACKBONE = "resnet50"
-#     RESNET_ARCHITECTURE = "resnet50"
-#     IMAGE_MAX_DIM = 640
-#     IMAGE_MIN_DIM = 480
-#
-#     # Number of classes (including background)
-#     NUM_CLASSES = 1 + 2  # Background + objects
-#
-#     # Number of training steps per epoch
-#     # batch_size = 19773
-#     # train_split = 15818 # 80 %
-#     STEPS_PER_EPOCH = (15000 + 890) // bs
-#     VALIDATION_STEPS = (3750 + 89) // bs
-#
-#     # Skip detections with < 90% confidence
-#     DETECTION_MIN_CONFIDENCE = 0.9
-#
-# ###########################################################
-# # Dataset
-# ###########################################################
-#
-# def color_map():
-#     color_map_dic = {
-#     0:  [0, 0, 0],
-#     1:  [128, 128,   0],
-#     2:  [  0, 128, 128],
-#     3:  [128,   0, 128],
-#     4:  [128,   0,   0],
-#     5:  [  0, 128,   0],
-#     6:  [  0,   0, 128],
-#     7:  [255, 255,   0],
-#     8:  [255,   0, 255],
-#     9:  [  0, 255, 255],
-#     10: [255,   0,   0],
-#     11: [  0, 255,   0],
-#     12: [  0,   0, 255],
-#     13: [ 92,  112, 92],
-#     14: [  0,   0,  70],
-#     15: [  0,  60, 100],
-#     16: [  0,  80, 100],
-#     17: [  0,   0, 230],
-#     18: [119,  11,  32],
-#     19: [  0,   0, 121]
-#     }
-#     return color_map_dic
-#
 
 ###########################################################
 # Test
@@ -164,7 +85,7 @@ def seq_get_masks(image, pre_detection, cur_detection):
     #print('old rois: \n {}'.format(cur_rois))
     #print('new rois: \n {}'.format(new_rois))
 
-    instance_to_color = color_map()
+    instance_to_color = Affordance.color_map()
     color_masks = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.uint8)
     for key in instance_to_color.keys():
         color_masks[instance_masks == key] = instance_to_color[key]
@@ -180,14 +101,15 @@ def detect_and_get_masks(model, data_path, num_frames):
     classes_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/classes.txt'
     class_id_file_dir = '/data/Akeaveny/Datasets/part-affordance-dataset/class_ids.txt'
     offset = 0
+    skip = 10
 
-    for i in range(offset, offset+num_frames-1):
+    for i in range(0, num_frames):
         assign_first_pre_detect = True
 
         ## ============== clutter ===================
         # folder_to_load = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/combined_val_375k/'
         folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/masks/'
-        count = 100000 + i
+        count = 100000 + (i*skip + offset)
         str_num = str(count)[1:]
         rgb_addr = data_path + str_num + '_rgb.png'
         depth_addr = data_path + str_num + '_depth.png'
@@ -207,7 +129,7 @@ def detect_and_get_masks(model, data_path, num_frames):
             image = image[..., :3]
 
         # Detect objects
-        cur_detect = model.detect([image], verbose=1)[0]
+        cur_detect = model.detect([image], verbose=0)[0]
         if assign_first_pre_detect and cur_detect['masks'].shape[-1] > 0:
             assign_first_pre_detect = False
             pre_detect = cur_detect
