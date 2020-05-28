@@ -6,7 +6,7 @@ import re
 import numpy as np
 from imantics import Polygons, Mask
 
-visual = True  # only use True with 1 image for testing because there is a bug in openCV drawing
+visual = False  # only use True with 1 image for testing because there is a bug in openCV drawing
 stop = True
 data = None
 
@@ -172,102 +172,105 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
         data[obj_name]['regions'] = regions
     return stop
 
-# # ===================== train  ====================
-# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/formatted_syn_train/'
-# folder_to_save = 'ndds_and_real/formatted_syn_train/'
-# dataset_name = 'Affordance'
-#
-# if data_path[len(data_path) - 1] != '/':
-#     print(data_path)
-#     print('The data path should have / in the end')
-#     exit()
-#
-# class_id = [0, 1, 2]
-#
-# min_img = 1791
-# max_img = 1791 + 100
+# ===================== train  ====================
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_selected_train_real1/'
+folder_to_save = 'ndds_and_real/Kitchen_Knife_selected_train_real1/'
+dataset_name = 'Affordance'
+
+if data_path[len(data_path) - 1] != '/':
+    print(data_path)
+    print('The data path should have / in the end')
+    exit()
+
+class_id = [0, 1, 2]
+
+min_img = 0
+max_img = 1392
 # img_list = np.arange(1791, 1791+100+1, 10)
-#
-# data = {}
-# count = 0
-# # ===================== json ====================
-# print('-------- TRAIN --------')
-# json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_test.json'
-# # for i in range(min_img, max_img + 1):
+
+data = {}
+count = 0
+# ===================== json ====================
+print('-------- TRAIN --------')
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_train.json'
+for i in range(min_img, max_img + 1):
 # for i in img_list:
-#     print('\nImage: {}/{}'.format(i, max_img))
-#     count = 100000 + i
-#     img_number = str(count)[1:]
-#     label_addr = data_path + img_number + '_label.png'
-#
-#     # print("img_number: ", img_number)
-#     print("label_addr: ", label_addr)
-#
-#     label_img = load_image(label_addr)
-#     print("Classes: ", np.unique(label_img))
-#     # plt.imshow(label_img)
-#     # plt.show()
-#
-#     if label_img.size == 0:
-#         print('\n ------------------ Pass! --------------------')
-#         pass
-#     else:
-#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
-#     count += 1
-#
-# with open(json_addr, 'w') as outfile:
-#     json.dump(data, outfile, sort_keys=True)
-#
-# # ===================== val  ====================
-# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/formatted_real_val/'
-# folder_to_save = 'ndds_and_real/formatted_real_val/'
-# dataset_name = 'Affordance'
-#
-# if data_path[len(data_path) - 1] != '/':
-#     print(data_path)
-#     print('The data path should have / in the end')
-#     exit()
-#
-# class_id = [0, 1, 2]
-#
-# min_img = 0
-# max_img = 319
+    print('\nImage: {}/{}'.format(i, max_img))
+    count = 100000 + i
+    img_number = str(count)[1:]
+    label_addr = data_path + img_number + '_label.png'
+
+    # print("img_number: ", img_number)
+    print("label_addr: ", label_addr)
+
+    label_img = load_image(label_addr)
+    print("Classes: ", np.unique(label_img))
+    # plt.imshow(label_img)
+    # plt.show()
+
+    if label_img.size == 0:
+        print('\n ------------------ Pass! --------------------')
+        pass
+    else:
+        write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
+    count += 1
+
+with open(json_addr, 'w') as outfile:
+    json.dump(data, outfile, sort_keys=True)
+
+# ===================== val  ====================
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_selected_val_real1/'
+folder_to_save = 'ndds_and_real/Kitchen_Knife_selected_val_real1/'
+dataset_name = 'Affordance'
+
+if data_path[len(data_path) - 1] != '/':
+    print(data_path)
+    print('The data path should have / in the end')
+    exit()
+
+class_id = [0, 1, 2]
+
+min_img = 0
+max_img = 239
 # img_list = np.arange(0, 319+1, 10)
 # print(img_list)
-#
-# data = {}
-# count = 0
-# # ===================== json ====================
-# print('-------- VAL --------')
-# json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_test.json'
-# # for i in range(min_img, max_img + 1):
+
+data = {}
+count = 0
+# ===================== json ====================
+print('-------- VAL --------')
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_val.json'
+for i in range(min_img, max_img + 1):
 # for i in img_list:
-#     print('\nImage: {}/{}'.format(i, max_img))
-#     count = 100000 + i
-#     img_number = str(count)[1:]
-#     label_addr = data_path + img_number + '_label.png'
-#
-#     # print("img_number: ", img_number)
-#     print("label_addr: ", label_addr)
-#
-#     label_img = load_image(label_addr)
-#     # print("Classes: ", np.unique(label_img))
-#     # plt.imshow(label_img)
-#     # plt.show()
-#
-#     if label_img.size == 0:
-#         print('\n ------------------ Pass! --------------------')
-#         pass
-#     else:
-#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
-#     count += 1
-#
-# with open(json_addr, 'w') as outfile:
-#     json.dump(data, outfile, sort_keys=True)
+    print('\nImage: {}/{}'.format(i, max_img))
+    count = 100000 + i
+    img_number = str(count)[1:]
+    label_addr = data_path + img_number + '_label.png'
+
+    # print("img_number: ", img_number)
+    print("label_addr: ", label_addr)
+
+    label_img = load_image(label_addr)
+    # print("Classes: ", np.unique(label_img))
+    # plt.imshow(label_img)
+    # plt.show()
+
+    if label_img.size == 0:
+        print('\n ------------------ Pass! --------------------')
+        pass
+    else:
+        write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
+    count += 1
+
+with open(json_addr, 'w') as outfile:
+    json.dump(data, outfile, sort_keys=True)
+
+
+
 
 # # ===================== TEST ====================
-# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/formatted_syn_train/'
-# folder_to_save = 'ndds_and_real/formatted_real_val/'
+# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_selected_val_real1/'
+# folder_to_save = 'ndds_and_real/Kitchen_Knife_selected_val_real1/'
 # dataset_name = 'Affordance'
 #
 # if data_path[len(data_path) - 1] != '/':
@@ -277,13 +280,13 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
 #
 # class_id = [0, 1, 2]
 #
-# img_list = np.arange(2000, 2000+200+1, 10)
+# img_list = np.arange(0, 239+1, 10)
 #
 # data = {}
 # count = 0
 # # ===================== json ====================
 # print('-------- VAL --------')
-# json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/test.json'
+# json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_val.json'
 # # for i in range(min_img, max_img):
 # for i in img_list:
 #     print('\nImage: {}/{}'.format(i, img_list[-1]))
@@ -299,6 +302,13 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
 #     # plt.imshow(label_img)
 #     # plt.show()
 #
+#     if label_img.size == 0:
+#         print('\n ------------------ Pass! --------------------')
+#         pass
+#     else:
+#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
+#     count += 1
+#
 #     ''' ============ imantics ============ '''
 #     # print(np.unique(label_img))
 #     # polygons = Mask(label_img).polygons()
@@ -307,13 +317,7 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
 #     # x = polygons.mask()
 #     # plt.imshow(x)
 #
-#     if label_img.size == 0:
-#         print('\n ------------------ Pass! --------------------')
-#         pass
-#     else:
-#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
-#     count += 1
-#
+#     ''' ============ find_contours ============ '''
 #     # ================
 #     # contours = find_contours(label_img, 0)
 #     # # print(contours)

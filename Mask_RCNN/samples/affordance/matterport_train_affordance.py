@@ -66,38 +66,38 @@ def train(model):
     augmentation = iaa.Sometimes(0.9, [
         iaa.Fliplr(0.5),
         iaa.Flipud(0.5),
-        iaa.Multiply((0.8, 1.2)),
-        iaa.GaussianBlur(sigma=(0.0, 5.0)),
-        iaa.OneOf([iaa.Affine(rotate=90),
-                   iaa.Affine(rotate=180),
-                   iaa.Affine(rotate=270)]),
+        # iaa.Multiply((0.8, 1.2)),
+        # iaa.GaussianBlur(sigma=(0.0, 5.0)),
+        # iaa.OneOf([iaa.Affine(rotate=90),
+        #            iaa.Affine(rotate=180),
+        #            iaa.Affine(rotate=270)]),
     ])
 
-    # augmentation = iaa.Sometimes(0.9, [
-    #     iaa.Fliplr(0.5),
-    #     iaa.Flipud(0.5),
-    #     iaa.Multiply((0.8, 1.2)),
-    #     iaa.GaussianBlur(sigma=(0.0, 5.0))
-    # ])
-
-    print("Training network heads")
+    # Training - Stage 1
+    #  Heads
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=40,
+                epochs=100,
                 augmentation=augmentation,
-                layers="heads")
+                layers='heads')
 
+    # Training - Stage 2
+    # Finetune layers from ResNet stage 4 and up
+    print("\nFine tune Resnet stage 4 and up")
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/10,
-                epochs=80,
+                learning_rate=config.LEARNING_RATE,
+                epochs=160,
                 augmentation=augmentation,
-                layers="heads")
+                layers='4+')
 
+    # Training - Stage 3
+    # Fine tune all layers
+    print("\nFine tune all layers")
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/100,
-                epochs=120,
+                learning_rate=config.LEARNING_RATE / 10,
+                epochs=170,
                 augmentation=augmentation,
-                layers="heads")
+                layers='all')
 
 
 ############################################################

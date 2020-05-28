@@ -11,8 +11,7 @@ from scipy.spatial.transform import Rotation as R  # scipy>=1.3
 '''
 =================== TRAIN =================== 
 '''
-
-data_dir = '/data/Akeaveny/Datasets/pringles/zed/train/'
+data_dir = '/data/Akeaveny/Datasets/pringles/zed/densefusion/train/'
 folder_to_save = 'train/'
 
 output = {}
@@ -20,7 +19,7 @@ output['cls_indexes'] = []
 
 # ============= load json ==================
 json_files = []
-json_addrs = '/data/Akeaveny/Datasets/pringles/zed/train/*.json'
+json_addrs = '/data/Akeaveny/Datasets/pringles/zed/densefusion/train/*.json'
 images = [json_files.append(file) for file in sorted(glob.glob(json_addrs))]
 
 # ============ output file ================
@@ -97,7 +96,7 @@ for json_file in json_files:
 =================== VAL ===================
 '''
 
-data_dir = '/data/Akeaveny/Datasets/pringles/zed/val/'
+data_dir = '/data/Akeaveny/Datasets/pringles/zed/densefusion/val/'
 folder_to_save = 'val/'
 
 output = {}
@@ -105,7 +104,7 @@ output['cls_indexes'] = []
 
 # ============= load json ==================
 json_files = []
-json_addrs = '/data/Akeaveny/Datasets/pringles/zed/val/*.json'
+json_addrs = '/data/Akeaveny/Datasets/pringles/zed/densefusion/val/*.json'
 images = [json_files.append(file) for file in sorted(glob.glob(json_addrs))]
 
 # ============ output file ================

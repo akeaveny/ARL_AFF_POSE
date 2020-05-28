@@ -38,7 +38,7 @@ class PringlesConfig(Config):
     NAME = "Pringles"
 
     # ========== GPU config ================
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     GPU_COUNT = 1
@@ -176,12 +176,13 @@ def detect_and_get_masks(model, data_path, num_frames):
         # print(rgb_addr, depth_addr)
 
         ## ============== Pringles ===================
-        folder_to_save = '/data/Akeaveny/Datasets/pringles/zed/inference/combined/'
+        folder_to_save = '/data/Akeaveny/Datasets/pringles/zed/densefusion/val/'
         ## min_img = 000000
         count = 1000000 + i
         str_num = str(count)[1:]
         rgb_addr = data_path + str_num + ".png"
         depth_addr = data_path + str_num + ".depth.16.png"
+        label_addr = data_path + str_num + ".cs.png"
         print(rgb_addr, depth_addr)
 
         if os.path.isfile(rgb_addr) == False: 
@@ -192,6 +193,14 @@ def detect_and_get_masks(model, data_path, num_frames):
         # Read image
         image = skimage.io.imread(rgb_addr)
         depth = skimage.io.imread(depth_addr)
+        label = skimage.io.imread(label_addr)
+        #save image
+        temp_addr = folder_to_save + str_num + ".png"
+        skimage.io.imsave(temp_addr, image)
+        temp_addr = folder_to_save + str_num + ".depth.16.png"
+        skimage.io.imsave(temp_addr, depth)
+        temp_addr = folder_to_save + str_num + ".cs.png"
+        skimage.io.imsave(temp_addr, label)
 
         # ## ============== SYNTHETIC ===================
         if image.shape[-1] == 4:
@@ -219,17 +228,17 @@ def detect_and_get_masks(model, data_path, num_frames):
             mask_addr = folder_to_save + str_num + '.mask.png'
             skimage.io.imsave(mask_addr, instance_masks)
 
-            # # # ========== tutorials ================
-            # results = model.detect([image], verbose=1)
-            # r = results[0]
-            # class_names = np.loadtxt(classes_file_dir, dtype=np.str)
-            # class_names = np.array([class_names])
-            # class_ids = r['class_ids'] - 1
-            #
-            # # print("-------------------------")
-            # # print("class_names: ", class_names)
-            #
-            # # ========== detect model ============
+            # # ========== tutorials ================
+            results = model.detect([image], verbose=1)
+            r = results[0]
+            class_names = np.loadtxt(classes_file_dir, dtype=np.str)
+            class_names = np.array([class_names])
+            class_ids = r['class_ids'] - 1
+
+            # print("-------------------------")
+            # print("class_names: ", class_names)
+
+            # ========== detect model ============
             # results = model.detect([image], verbose=1)
             # r = results[0]
             # visualize.display_instances(image, r['rois'], r['masks'], class_ids,

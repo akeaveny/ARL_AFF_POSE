@@ -42,41 +42,55 @@ class AffordanceConfig(Config):
     IMAGES_PER_GPU = 2
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    # Color   mean (RGB): 94.58 92.69 101.30
-    MEAN_PIXEL = np.array([94.58, 92.69, 101.30])
-
-    BACKBONE = "resnet50"
-    RESNET_ARCHITECTURE = "resnet50"
-
-    IMAGE_PADDING = True
-    IMAGE_MAX_DIM = 640
-    IMAGE_MIN_DIM = 480
-    # IMAGE_MAX_DIM = 256
-    # IMAGE_MIN_DIM = 256
-
-    IMAGE_RESIZE_MODE = "none"
-
-    # RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
-    # RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
-    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
-    #
-    # RPN_ANCHOR_RATIOS = [0.5, 1, 2]
-    # ROI_POSITIVE_RATIO = 0.33
-    # RPN_BBOX_STD_DEV = [0.1, 0.1, 0.2, 0.2]
-
     # Number of classes (including background)
     NUM_CLASSES = 1 + 2  # Background + objects
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = (15000 + 1791) // bs
-    VALIDATION_STEPS = (3750 + 320) // bs
-    # STEPS_PER_EPOCH = (1791) // bs
-    # VALIDATION_STEPS = (320) // bs
+    # STEPS_PER_EPOCH = (14988) // bs
+    # VALIDATION_STEPS = (3498) // bs
+    STEPS_PER_EPOCH = (15000 + 1393) // bs
+    VALIDATION_STEPS = (3498 + 240) // bs
+    # STEPS_PER_EPOCH = (1393) // bs
+    # VALIDATION_STEPS = (240) // bs
 
-    # TRAIN_BN = True # default is true
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
-    DETECTION_MAX_INSTANCES = 2
+    # =============== REAL ==============
+    # MEAN_PIXEL = np.array([97.45, 95.18, 103.75])
+    # ============== Combined ==============
+    MEAN_PIXEL = np.array([135.98, 134.46, 134.63])
+
+    BACKBONE = "resnet50"
+    RESNET_ARCHITECTURE = "resnet50"
+
+    IMAGE_MAX_DIM = 640
+    IMAGE_MIN_DIM = 480
+    IMAGE_PADDING = True
+    IMAGE_RESIZE_MODE = "none"
+
+    LEARNING_RATE = 1e-03
+    WEIGHT_DECAY = 0.0001
+
+    # DETECTION_MAX_INSTANCES = 10
+
+    TRAIN_ROIS_PER_IMAGE = 32 # 32
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 300 # 320
+
+    # RPN_ANCHOR_SCALES = (32, 32, 64, 64, 128)
+    # RPN_ANCHOR_RATIOS = [0.5, 1, 1.25, 2, 2.5, 3, 3.5, 4]
+
+    RPN_ANCHOR_SCALES = (32, 64, 128)
+    RPN_ANCHOR_RATIOS = [0.5, 1, 1.25, 2]
+
+    RPN_NMS_THRESHOLD = 0.7
+    DETECTION_MIN_CONFIDENCE = 0.7
+    DETECTION_NMS_THRESHOLD = 0.3
+
+    ROI_POSITIVE_RATIO = 0.33
+
+    USE_MINI_MASK = True
+    # MINI_MASK_SHAPE = (56, 56)
+
+    # POST_NMS_ROIS_TRAINING = 2000
+    # POST_NMS_ROIS_INFERENCE = 2000
 
 # ###########################################################
 # # Dataset
@@ -105,20 +119,23 @@ class AffordanceDataset(utils.Dataset):
         if subset == 'train':
             print("------------------LOADING TRAIN!------------------")
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_train.json'))
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_train.json'))
+            # annotations = {}
             annotations.update(json.load(
                 open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_train.json')))
         elif subset == 'val':
             print("------------------LOADING VAL!--------------------")
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_val.json'))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_val.json')))
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_val.json'))
+            # annotations = {}
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_val.json')))
         elif subset == 'test':
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_real_test.json'))
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_test.json')))
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_test.json'))
+            # annotations = {}
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_test.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

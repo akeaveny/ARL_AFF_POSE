@@ -58,7 +58,7 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
     dis = dis.view(bs, num_p)
 
     # print(pred_c)
-    print(how_max)
+    print("how_max: {:.5f}\n".format(how_max.detach().cpu().numpy()[0]))
 
     t = ori_t[which_max[0]] + points[which_max[0]]
     points = points.view(1, bs * num_p, 3)

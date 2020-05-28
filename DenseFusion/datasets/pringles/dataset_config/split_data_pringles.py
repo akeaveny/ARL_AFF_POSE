@@ -4,7 +4,7 @@ import numpy as np
 f_train = open("train_data_list_zed.txt", 'w')
 # ============= training ==================
 label_images = []
-label_addrs = '/data/Akeaveny/Datasets/pringles/zed/train/*.cs.png'
+label_addrs = '/data/Akeaveny/Datasets/pringles/zed/densefusion/train/*.cs.png'
 images = [label_images.append(file) for file in sorted(glob.glob(label_addrs))]
 print("Loaded Images: ", len(images))
 
@@ -18,7 +18,7 @@ for label_image in label_images[0:500]:
 f_val = open("test_data_list_zed.txt", 'w')
 # ============= training ==================
 label_images = []
-label_addrs = '/data/Akeaveny/Datasets/pringles/zed/val/*.cs.png'
+label_addrs = '/data/Akeaveny/Datasets/pringles/zed/densefusion/val/*.cs.png'
 images = [label_images.append(file) for file in sorted(glob.glob(label_addrs))]
 print("Loaded Images: ", len(images))
 

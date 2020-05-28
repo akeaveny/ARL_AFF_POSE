@@ -1,4 +1,0 @@
-train/images/000008
-train/images/000003
-train/images/000000
-train/images/000006

@@ -43,7 +43,7 @@ class PoseDataset(data.Dataset):
                 input_line = input_line[:-1]
             # TODO:
             self.real.append(input_line)
-            self.syn.append(input_line)
+            # self.syn.append(input_line)
             self.list.append(input_line)
         input_file.close()
 
@@ -61,8 +61,7 @@ class PoseDataset(data.Dataset):
             class_input = class_file.readline()
             if not class_input:
                 break
-
-            input_file = open('/data/Akeaveny/Datasets/pringles/pringles_config/dataset_config/pringles_low_mesh.xyz')
+            input_file = open('/data/Akeaveny/Datasets/pringles/pringles_config/dataset_config/{1}/points.xyz'.format(self.root, class_input[:-1]))
             self.cld[class_id] = []
             while 1:
                 input_line = input_file.readline()
@@ -108,16 +107,6 @@ class PoseDataset(data.Dataset):
         print("Loaded: ", len(self.list))
         print("Real Images: ", len(self.real))
 
-    def project_points_to_screen(self, points, intrinsics, translation, rotation, confidence=None):
-        extrinsics = np.hstack((rotation, translation.reshape(3, -1)))
-
-        _points = np.hstack((points, np.ones((points.shape[0], 1))))
-        screen_points = np.dot(np.dot(intrinsics, extrinsics), _points.T).T
-
-        screen_points /= np.repeat(screen_points[:, 2].reshape(points.shape[0], -1), 3, axis=1)
-
-        return screen_points
-
     def __getitem__(self, index):
         img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
         depth = np.array(Image.open('{0}/{1}.depth.16.png'.format(self.root, self.list[index])))
@@ -127,17 +116,22 @@ class PoseDataset(data.Dataset):
 
         obj = meta['cls_indexes'].flatten().astype(np.int32)
 
-        # while 1:
-        idx = np.random.randint(0, len(obj))
-        mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
-        mask_label = ma.getmaskarray(ma.masked_equal(label, self.object_id))
-        mask = mask_label * mask_depth
-        # if len(mask.nonzero()[0]) > self.minimum_num_pt:
-        #     break
+        while 1:
+            idx = np.random.randint(0, len(obj))
+            mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
+            mask_label = ma.getmaskarray(ma.masked_equal(label, self.object_id))
+            mask = mask_label * mask_depth
+            if len(mask.nonzero()[0]) > self.minimum_num_pt:
+                break
 
         # ========== ADD TINT ==========
         if self.add_noise:
             img = self.trancolor(img)
+
+        # ## ============== SYNTHETIC ===================
+        img = np.array(img)
+        if img.shape[-1] == 4:
+            image = img[..., :3]
 
         rmin, rmax, cmin, cmax = get_bbox(mask)
         # print("\nbbox: ", rmin, rmax, cmin, cmax)
@@ -159,13 +153,26 @@ class PoseDataset(data.Dataset):
         img_masked = img
 
         choose = mask[rmin:rmax, cmin:cmax].flatten().nonzero()[0]
+
+        if len(choose) == 0:
+            cc = torch.LongTensor([0])
+            return(cc, cc, cc, cc, cc, cc)
+
         if len(choose) > self.num_pt:
             c_mask = np.zeros(len(choose), dtype=int)
             c_mask[:self.num_pt] = 1
             np.random.shuffle(c_mask)
             choose = choose[c_mask.nonzero()]
         else:
-            choose = np.pad(choose, (0, self.num_pt - len(choose)), 'wrap')
+            choose = np.pad(choose, (0, self.num - len(choose)), 'wrap')
+        #
+        # if len(choose) > self.num_pt:
+        #     c_mask = np.zeros(len(choose), dtype=int)
+        #     c_mask[:self.num_pt] = 1
+        #     np.random.shuffle(c_mask)
+        #     choose = choose[c_mask.nonzero()]
+        # else:
+        #     choose = np.pad(choose, (0, self.num_pt - len(choose)), 'wrap')
 
         depth_masked = depth[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         xmap_masked = self.xmap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
@@ -230,35 +237,35 @@ class PoseDataset(data.Dataset):
         # fw.close()
 
         # ===================== SCREEN POINTS =====================
-        cam_mat = np.array([[cam_fx[0], 0, cam_cx[0]], [0, cam_fy[0], cam_cy[0]], [0, 0, 1]])
-        dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
-
-        cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
-        imgpts, jac = cv2.projectPoints(cloud, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
-        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.cloud.png', cv2_img)
-
-        imgpts, jac = cv2.projectPoints(target, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
-        cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
-        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.target.png', cv2_img)
-
-        imgpts, jac = cv2.projectPoints(model_points, cam_rotation4.T, cam_translation / 10, cam_mat, dist)
-        cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
-        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.model4.png', cv2_img)
-
-        # # =========== save images ================
+        # cam_mat = np.array([[cam_fx[0], 0, cam_cx[0]], [0, cam_fy[0], cam_cy[0]], [0, 0, 1]])
+        # dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+        #
+        # cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
+        # imgpts, jac = cv2.projectPoints(cloud, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.cloud.png', cv2_img)
+        #
+        # imgpts, jac = cv2.projectPoints(target, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
+        # cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.target.png', cv2_img)
+        #
+        # imgpts, jac = cv2.projectPoints(model_points, cam_rotation4.T, cam_translation / 10, cam_mat, dist)
+        # cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.model4.png', cv2_img)
+        #
+        # # # =========== save images ================
         # p_img = np.transpose(img_masked, (1, 2, 0))
         # scipy.misc.imsave('/data/Akeaveny/Datasets/pringles/temp/input.png', p_img)
         # scipy.misc.imsave('/data/Akeaveny/Datasets/pringles/temp/label.png',
         #                   mask[rmin:rmax, cmin:cmax].astype(np.int32))
 
-        return torch.from_numpy(cloud.astype(np.float32)), \
+        return torch.from_numpy(cloud.astype(np.float32)/1000), \
                    torch.LongTensor(choose.astype(np.int32)), \
                    self.norm(torch.from_numpy(img_masked.astype(np.float32))), \
-                   torch.from_numpy(target.astype(np.float32)), \
-                   torch.from_numpy(model_points.astype(np.float32)), \
+                   torch.from_numpy(target.astype(np.float32)/1000), \
+                   torch.from_numpy(model_points.astype(np.float32)/1000), \
                    torch.LongTensor([int(obj[idx]) - 1])
 
     def __len__(self):

@@ -34,6 +34,9 @@ import tensorflow as tf
 # Path to trained weights file
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+# ========== GPU config ================
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 ###########################################################
 # Test
 ###########################################################
@@ -55,6 +58,10 @@ def compute_batch_ap(dataset, image_ids, verbose=1):
         image, image_meta, gt_class_id, gt_bbox, gt_mask = \
             modellib.load_image_gt(dataset, config,
                                    image_id, use_mini_mask=False)
+
+        if image.shape[-1] == 4:
+            image = image[..., :3]
+
         # Run object detection
         results = model.detect_molded(image[np.newaxis], image_meta[np.newaxis], verbose=0)
         # Compute AP over range 0.5 to 0.95
@@ -81,11 +88,15 @@ def detect_and_get_masks(model, data_path, num_frames):
 
     for _ in range(0, num_frames):
 
+        # ================== REAL ==================
+        #  [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+        #  24 25 26 27 28 29 30 31]
+        # ================== COMBINED ==================
         #  [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
         #  24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42]
-        print("\n", dataset.image_ids)
+        # print("\n", dataset.image_ids)
         image_id = random.choice(dataset.image_ids)
-        # image_id = 10
+        image_id = 10
 
         # ''' ==================== DETECT ==================== '''
         image, image_meta, gt_class_id, gt_bbox, gt_mask = \
@@ -115,20 +126,20 @@ def detect_and_get_masks(model, data_path, num_frames):
                                r['rois'], r['class_ids'], r['scores'], r['masks'],
                                verbose=1)
 
-        visualize.display_differences(
-            image,
-            gt_bbox, gt_class_id, gt_mask,
-            r['rois'], r['class_ids'], r['scores'], r['masks'],
-            dataset.class_names, ax=get_ax(),
-            show_box=False, show_mask=False,
-            iou_threshold=0.5, score_threshold=0.5)
+        # visualize.display_differences(
+        #     image,
+        #     gt_bbox, gt_class_id, gt_mask,
+        #     r['rois'], r['class_ids'], r['scores'], r['masks'],
+        #     dataset.class_names, ax=get_ax(),
+        #     show_box=False, show_mask=False,
+        #     iou_threshold=0.5, score_threshold=0.5)
 
         # # ================================
         # Display Ground Truth only
-        visualize.display_instances(image, gt_bbox, gt_mask, gt_class_id,
-                                    dataset.class_names, ax=get_ax(1),
-                                    show_bbox=False, show_mask=False,
-                                    title="Ground Truth")
+        # visualize.display_instances(image, gt_bbox, gt_mask, gt_class_id,
+        #                             dataset.class_names, ax=get_ax(1),
+        #                             show_bbox=False, show_mask=False,
+        #                             title="Ground Truth")
 
         # # ================================
         # Display OG
@@ -142,14 +153,15 @@ def detect_and_get_masks(model, data_path, num_frames):
                                                              r['rois'], r['class_ids'], r['scores'], r['masks'])
 
         # visualize.plot_precision_recall(AP, precisions, recalls)
-        visualize.plot_overlaps(gt_class_id, r['class_ids'], r['scores'],
-                                overlaps, dataset.class_names)
+        # visualize.plot_overlaps(gt_class_id, r['class_ids'], r['scores'],
+        #                         overlaps, dataset.class_names)
 
         # # # ========== batch mAP ============
-        # # Run on validation set
-        # limit = 5
-        # APs = compute_batch_ap(dataset, dataset.image_ids[:limit])
-        # print("Mean AP overa {} images: {:.4f}".format(len(APs), np.mean(APs)))
+        # Run on validation set
+        limit = len(dataset.image_ids)
+        # limit = 29 # real images
+        APs = compute_batch_ap(dataset, dataset.image_ids[:limit])
+        print("Mean AP over {} REAL images: {:.4f}".format(len(APs), np.mean(APs)))
 
         ''' ==================== RPN ==================== '''
         # Generate RPN trainig targets
@@ -341,7 +353,7 @@ if __name__ == '__main__':
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
-    parser.add_argument('--num_frames', type=int, default=100, help='number of images')
+    parser.add_argument('--num_frames', type=int, default=1, help='number of images')
     
     args = parser.parse_args()
 

@@ -61,27 +61,16 @@ def main():
     random.seed(opt.manualSeed)
     torch.manual_seed(opt.manualSeed)
 
-    if opt.dataset == 'ycb':
-        opt.num_objects = 21  # number of object classes in the dataset
-        opt.num_points = 1000  # number of points on the input pointcloud
-        opt.outf = 'trained_models/ycb'  # folder to save trained models
-        opt.log_dir = 'experiments/logs/ycb'  # folder to save logs
-        opt.repeat_epoch = 1  # number of repeat times for one epoch training
-    elif opt.dataset == 'pringles':
+    if opt.dataset == 'pringles':
         opt.num_objects = 1
         opt.num_points = 1000 # 118942
         opt.outf = 'trained_models/pringles'
         opt.log_dir = 'experiments/logs/pringles'
-        opt.nepoch = 1000
+        opt.nepoch = 500
         opt.repeat_epoch = 1
-        # ================ ak ================
         opt.batch_size = 1
-        opt.lr = 0.00001
-        opt.lr_Rate = 0.3
-        opt.w = 0.015
-        opt.w_rate = 0.3
-        opt.decay_margin = 100
-        opt.refine_margin = 100
+        # ============ ak ============
+        # opt.w = 0.010
     else:
         print('Unknown dataset')
         return
@@ -162,6 +151,14 @@ def main():
         for rep in range(opt.repeat_epoch):
             for i, data in enumerate(dataloader, 0):
                 points, choose, img, target, model_points, idx = data
+
+                # fw = open('/data/Akeaveny/Datasets/linemod/test/pringles_dump.txt', 'w')
+                # fw.write(
+                #     'Points\n{0}\n\nchoose\n{1}\n\nimg\n{2}\n\ntarget\n{3}\n\nmodel_points\n{4}'.format(points, choose,
+                #                                                                                         img, target,
+                #                                                                                         model_points))
+                # fw.close()
+
                 points, choose, img, target, model_points, idx = Variable(points).cuda(), \
                                                                  Variable(choose).cuda(), \
                                                                  Variable(img).cuda(), \
@@ -255,6 +252,8 @@ def main():
             opt.batch_size = int(opt.batch_size / opt.iteration)
             optimizer = optim.Adam(refiner.parameters(), lr=opt.lr)
 
+            optimizer = optim.Adam(refiner.parameters(), lr=opt.lr)
+
             if opt.dataset == 'ycb':
                 dataset = PoseDataset_ycb('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,
                                           opt.refine_start)
@@ -269,6 +268,7 @@ def main():
                                                      opt.refine_start)
 
             # TODO: Batch Size
+            print(opt.batch_size)
             dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)
             testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
 
