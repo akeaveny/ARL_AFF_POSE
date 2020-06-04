@@ -46,7 +46,7 @@ parser.add_argument('--lr_rate', default=0.3, help='learning rate decay rate')
 parser.add_argument('--w', default=0.015, help='learning rate')
 parser.add_argument('--w_rate', default=0.3, help='learning rate decay rate')
 parser.add_argument('--decay_margin', default=0.016, help='margin to decay lr & w')
-parser.add_argument('--refine_margin', default=0.013, help='margin to start the training of iterative refinement')
+parser.add_argument('--refine_margin', default=0.03, help='margin to start the training of iterative refinement')
 parser.add_argument('--noise_trans', default=0.03, help='range of the random noise of translation added to the training data')
 parser.add_argument('--iteration', type=int, default=2, help='number of refinement iterations')
 parser.add_argument('--nepoch', type=int, default=100, help='max number of epochs to train')
@@ -54,7 +54,6 @@ parser.add_argument('--resume_posenet', type=str, default='', help='resume PoseN
 parser.add_argument('--resume_refinenet', type=str, default='', help='resume PoseRefineNet model')
 parser.add_argument('--start_epoch', type=int, default=1, help='which epoch to start')
 opt = parser.parse_args()
-
 
 def main():
     opt.manualSeed = random.randint(1, 100)
@@ -68,15 +67,12 @@ def main():
         opt.log_dir = 'experiments/logs/pringles'
         opt.nepoch = 500
         opt.repeat_epoch = 1
-        opt.batch_size = 1
         # ============ ak ============
         # opt.w = 0.010
+        # TODO: change small_batch_pose_refine_model_ for logs
     else:
         print('Unknown dataset')
         return
-
-    # TODO:
-    pathname = 'pringles_15k'
 
     estimator = PoseNet(num_points=opt.num_points, num_obj=opt.num_objects)
     estimator.cuda()
@@ -104,15 +100,13 @@ def main():
     elif opt.dataset == 'pringles':
         dataset = PoseDataset_pringles('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
 
-
     if opt.dataset == 'ycb':
         test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'pringles':
         test_dataset = PoseDataset_pringles('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
 
-    # TODO: Batch Size
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)
-    testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+    testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
 
     opt.sym_list = dataset.get_sym_list()
     opt.num_points_mesh = dataset.get_num_points_mesh()
@@ -183,7 +177,7 @@ def main():
                 train_count += 1
 
                 if train_count % opt.batch_size == 0:
-                    logger.info('Train time {0} Epoch {1} Batch {2} Frame {3} Avg_dis:{4}'.format(
+                    logger.info('Train time {0} Epoch {1} Batch {2} Frame {3} Avg_dis:{4}\n'.format(
                         time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - st_time)), epoch,
                         int(train_count / opt.batch_size), train_count, train_dis_avg / opt.batch_size))
                     optimizer.step()
@@ -267,10 +261,8 @@ def main():
                 test_dataset = PoseDataset_pringles('test', opt.num_points, False, opt.dataset_root, 0.0,
                                                      opt.refine_start)
 
-            # TODO: Batch Size
-            print(opt.batch_size)
-            dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)
-            testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
+            dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+            testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
 
             opt.sym_list = dataset.get_sym_list()
             opt.num_points_mesh = dataset.get_num_points_mesh()

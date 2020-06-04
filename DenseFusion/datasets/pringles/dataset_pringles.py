@@ -184,14 +184,15 @@ class PoseDataset(data.Dataset):
         cam_fx = meta['fx'][0]
         cam_fy = meta['fy'][0]
 
+        cam_rotation4 = np.array(meta['rot'])
+        cam_translation = np.array(meta['cam_translation'][0])
+
         # cam_rotation = np.array(meta['obj2cam_rotation'])
         # cam_rotation1 = np.array(meta['obj2cam_rotation1'])
         # cam_rotation2 = np.array(meta['obj2world_rotation'])
         # cam_rotation3 = np.array(meta['obj2world_rotation1'])
-        cam_rotation4 = np.array(meta['rot'])
         # cam_rotation5 = np.array(meta['rot1'])
 
-        cam_translation = np.array(meta['cam_translation'][0])
         # cam_translation1 = np.array(meta['trans'][0], dtype="float64")
 
         translation_noise = np.array([random.uniform(-self.noise_trans, self.noise_trans) for i in range(3)])

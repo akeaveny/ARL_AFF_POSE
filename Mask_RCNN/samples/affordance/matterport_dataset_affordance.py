@@ -42,21 +42,26 @@ class AffordanceConfig(Config):
     IMAGES_PER_GPU = 2
     bs = GPU_COUNT * IMAGES_PER_GPU
 
+    # ========== DEPTH IMAGES ================
+    # IMAGE_CHANNEL_COUNT = 1
+
     # Number of classes (including background)
     NUM_CLASSES = 1 + 2  # Background + objects
 
     # Number of training steps per epoch
-    # STEPS_PER_EPOCH = (14988) // bs
-    # VALIDATION_STEPS = (3498) // bs
-    STEPS_PER_EPOCH = (15000 + 1393) // bs
-    VALIDATION_STEPS = (3498 + 240) // bs
+    STEPS_PER_EPOCH = (800) // bs
+    VALIDATION_STEPS = (200) // bs
+    # STEPS_PER_EPOCH = (15000 + 1393) // bs
+    # VALIDATION_STEPS = (3498 + 240) // bs
     # STEPS_PER_EPOCH = (1393) // bs
     # VALIDATION_STEPS = (240) // bs
 
     # =============== REAL ==============
     # MEAN_PIXEL = np.array([97.45, 95.18, 103.75])
-    # ============== Combined ==============
-    MEAN_PIXEL = np.array([135.98, 134.46, 134.63])
+    # =============== REAL ==============
+    MEAN_PIXEL = np.array([136.54, 135.74, 136.24])
+    # ============== Combined ===========
+    # MEAN_PIXEL = np.array([135.98, 134.46, 134.63])
 
     BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
@@ -71,7 +76,7 @@ class AffordanceConfig(Config):
 
     # DETECTION_MAX_INSTANCES = 10
 
-    TRAIN_ROIS_PER_IMAGE = 32 # 32
+    TRAIN_ROIS_PER_IMAGE = 320 # 32
     RPN_TRAIN_ANCHORS_PER_IMAGE = 300 # 320
 
     # RPN_ANCHOR_SCALES = (32, 32, 64, 64, 128)
@@ -87,7 +92,7 @@ class AffordanceConfig(Config):
     ROI_POSITIVE_RATIO = 0.33
 
     USE_MINI_MASK = True
-    # MINI_MASK_SHAPE = (56, 56)
+    MINI_MASK_SHAPE = (56, 56)
 
     # POST_NMS_ROIS_TRAINING = 2000
     # POST_NMS_ROIS_INFERENCE = 2000
@@ -119,23 +124,25 @@ class AffordanceDataset(utils.Dataset):
         if subset == 'train':
             print("------------------LOADING TRAIN!------------------")
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_train.json'))
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/depth_data_selected_real_train.json'))
             # annotations = {}
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_train.json')))
+            # annotations.update(json.load(
+                # open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_train.json')))
+                # open('/data/Akeaveny/Datasets/part-affordance-dataset/syn_test_train.json')))
         elif subset == 'val':
             print("------------------LOADING VAL!--------------------")
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_val.json'))
-            # annotations = {}
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_val.json')))
-        elif subset == 'test':
-            annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_test.json'))
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/depth_data_selected_real_val.json'))
             # annotations = {}
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_test.json')))
+                # open('/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_syn_val.json')))
+                # open('/data/Akeaveny/Datasets/part-affordance-dataset/syn_test_val.json')))
+        elif subset == 'test':
+            annotations = json.load(
+                open('/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/test.json'))
+            # annotations = {}
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance-dataset/syn_test.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

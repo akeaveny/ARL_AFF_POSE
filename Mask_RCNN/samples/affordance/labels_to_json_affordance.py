@@ -186,13 +186,14 @@ class_id = [0, 1, 2]
 
 min_img = 0
 max_img = 1392
+# max_img = 2000 + 800
 # img_list = np.arange(1791, 1791+100+1, 10)
 
 data = {}
 count = 0
 # ===================== json ====================
 print('-------- TRAIN --------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_train.json'
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/depth_data_selected_real_train.json'
 for i in range(min_img, max_img + 1):
 # for i in img_list:
     print('\nImage: {}/{}'.format(i, max_img))
@@ -232,6 +233,7 @@ class_id = [0, 1, 2]
 
 min_img = 0
 max_img = 239
+# max_img = 320 + 200
 # img_list = np.arange(0, 319+1, 10)
 # print(img_list)
 
@@ -239,7 +241,7 @@ data = {}
 count = 0
 # ===================== json ====================
 print('-------- VAL --------')
-json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/via_region_data_selected_real_val.json'
+json_addr = '/data/Akeaveny/Datasets/part-affordance-dataset/depth_data_selected_real_val.json'
 for i in range(min_img, max_img + 1):
 # for i in img_list:
     print('\nImage: {}/{}'.format(i, max_img))
@@ -264,9 +266,6 @@ for i in range(min_img, max_img + 1):
 
 with open(json_addr, 'w') as outfile:
     json.dump(data, outfile, sort_keys=True)
-
-
-
 
 # # ===================== TEST ====================
 # data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_selected_val_real1/'

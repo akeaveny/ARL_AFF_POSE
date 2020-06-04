@@ -35,7 +35,7 @@ import tensorflow as tf
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 # ========== GPU config ================
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 ###########################################################
 # Test

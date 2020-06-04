@@ -2527,7 +2527,7 @@ class MaskRCNN():
         # Process detections
         results = []
         for i, image in enumerate(images):
-            print('cuong')
+            print('ak')
             print(detections[i])
             print(molded_images[i].shape)
             final_rois, final_class_ids, final_scores, final_masks =\
