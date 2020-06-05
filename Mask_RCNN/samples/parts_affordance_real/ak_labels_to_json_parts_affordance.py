@@ -6,7 +6,7 @@ import re
 import numpy as np
 from imantics import Polygons, Mask
 
-visual = False  # only use True with 1 image for testing because there is a bug in openCV drawing
+visual = True  # only use True with 1 image for testing because there is a bug in openCV drawing
 stop = True
 data = None
 
@@ -173,8 +173,8 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
     return stop
 
 # ===================== LOAD DATA ====================
-data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-clutter/clutter_combined/'
-folder_to_save = 'real/part-affordance-clutter/clutter_combined/'
+data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real5/'
+folder_to_save = 'ndds_and_real/Kitchen_Knife_selected_val_real1/'
 dataset_name = 'PartsAffordance'
 
 if data_path[len(data_path) - 1] != '/':
@@ -185,7 +185,7 @@ if data_path[len(data_path) - 1] != '/':
 class_id = [0, 1, 2, 3, 4, 5, 6, 7]
 
 min_img = 0
-max_img = 867
+max_img = 15
 
 # ============== split into train and test data ===========
 train_split = 0.8
@@ -214,8 +214,8 @@ for i in train_idx:
 
     label_img = load_image(label_addr)
     print("Classes: ", np.unique(label_img))
-    # plt.imshow(label_img)
-    # plt.show()
+    plt.imshow(label_img)
+    plt.show()
 
     if label_img.size == 0:
         print('\n ------------------ Pass! --------------------')

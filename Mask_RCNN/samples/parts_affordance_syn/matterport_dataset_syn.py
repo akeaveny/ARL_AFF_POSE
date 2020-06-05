@@ -43,25 +43,22 @@ class AffordanceConfig(Config):
     bs = GPU_COUNT * IMAGES_PER_GPU
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + objects
+    NUM_CLASSES = 1 + 7  # Background + objects
 
     # Number of training steps per epoch
-    # STEPS_PER_EPOCH = (800) // bs
-    # VALIDATION_STEPS = (200) // bs
-    STEPS_PER_EPOCH = (15000) // bs
-    VALIDATION_STEPS = (3498) // bs
+    STEPS_PER_EPOCH = (560) // bs
+    VALIDATION_STEPS = (140) // bs
 
-    IMAGE_CHANNEL_COUNT = 4
+    # IMAGE_CHANNEL_COUNT = 4
     # =============== RGB + D ==============
-    MEAN_PIXEL = np.array([139.56, 138.11, 137.50, 254.08])
+    MEAN_PIXEL = np.array([53.84, 59.45, 117.49])
 
     BACKBONE = "resnet50"
     RESNET_ARCHITECTURE = "resnet50"
 
-    IMAGE_RESIZE_MODE = "none"
-    IMAGE_MAX_DIM = 640
-    IMAGE_MIN_DIM = 480
     # IMAGE_PADDING = True
+    IMAGE_MAX_DIM = 1280
+    # IMAGE_MIN_DIM = 480
 
     LEARNING_RATE = 1e-03
     WEIGHT_DECAY = 0.0001
@@ -108,29 +105,40 @@ class AffordanceDataset(utils.Dataset):
         #   7 - 'wrap-grasp'
         self.add_class("Affordance", 1, "grasp")
         self.add_class("Affordance", 2, "cut")
+        self.add_class("Affordance", 3, "scoop")
+        self.add_class("Affordance", 4, "contain-grasp")
+        self.add_class("Affordance", 5, "pound")
+        self.add_class("Affordance", 6, "support")
+        self.add_class("Affordance", 7, "wrap-grasp")
+
 
         # Train or validation dataset?
         assert subset in ["train", "val", "test"]
         if subset == 'train':
             print("------------------LOADING TRAIN!------------------")
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/fused_syn_train1.json'))
-            # annotations = {}
-            # annotations.update(json.load(
-                # open('/data/Akeaveny/Datasets/part-affordance-dataset/fused_syn_train.json')))
-        elif subset == 'val':
-            print("------------------LOADING VAL!--------------------")
-            annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/fused_syn_val1.json'))
-        elif subset == 'test':
-            annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/syn_test.json'))
+                open('/data/Akeaveny/Datasets/test4/json_files/missing_Kinetic_train.json'))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/test4/json_files/knife_01_Kinetic_train.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/test4/json_files/cup_01_Kinetic_train.json')))
+        # elif subset == 'val':
+        #     print("------------------LOADING VAL!--------------------")
+        #     annotations = json.load(
+        #         open('/data/Akeaveny/Datasets/test4/json_files/missing_Kinetic_val.json'))
+        #     annotations.update(json.load(
+        #         open('/data/Akeaveny/Datasets/test4/json_files/knife_01_Kinetic_val.json')))
+        #     annotations.update(json.load(
+        #         open('/data/Akeaveny/Datasets/test4/json_files/cup_01_Kinetic_val.json')))
+        # elif subset == 'test':
+        #     annotations = json.load(
+        #         open('/data/Akeaveny/Datasets/test4/test_val.json'))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
         # annotations. Skip unannotated images.
-        annotations = [a for a in annotations if a['regions']]
-        annotations = [a for a in annotations if a['regions']]
+        # annotations = [a for a in annotations if a['regions']]
+        annotations = [a for a in annotations]
 
         # Add images
         for a in annotations:

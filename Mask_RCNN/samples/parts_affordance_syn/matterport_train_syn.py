@@ -166,7 +166,8 @@ if __name__ == '__main__':
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
     else:
-        model.load_weights(weights_path, by_name=True, exclude=["conv1"])
+        # model.load_weights(weights_path, by_name=True, exclude=["conv1"])
+        model.load_weights(weights_path, by_name=True)
 
     # ========== MODEL SUMMARY =========
     # model.keras_model.summary()

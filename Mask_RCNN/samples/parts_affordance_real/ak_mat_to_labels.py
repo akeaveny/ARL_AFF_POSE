@@ -12,7 +12,7 @@ from skimage import io
 import skimage.draw
 
 # # ===================== load mat ===========================
-mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools_combined3/*_label*'
+mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real5/*_label*'
 # mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-clutter/clutter_combined/*_label*'
 print("Images: ", mat_path)
 mat_files = sorted(glob.glob(mat_path))

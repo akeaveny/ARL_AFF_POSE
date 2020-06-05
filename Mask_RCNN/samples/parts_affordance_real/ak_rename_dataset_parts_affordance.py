@@ -4,32 +4,27 @@ import glob
 import os
 
 # =================== new directory ========================
-folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools_combined3/'
+folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real5/'
 # folder_to_save = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-clutter/clutter_combined/'
 offset = 0
 
 # =================== single objects ========================
-images_path1 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/bowl_0/bowl_0*_*'
-images_path2 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/cup_0*/cup_0*_*'
-images_path3 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/hammer_0*/hammer_0*_*'
-images_path4 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/knife_*/knife_*_00000[0-1]??'
-images_path4 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/knife_*/knife_*_000002[0-3]?'
-images_path5 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/ladle_0*/ladle_0*_*'
-images_path6 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/mallet_0*/mallet_0*_*'
-images_path7 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/mallet_0*/mug_0*_*'
-images_path8 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/saw_0*/saw_0*_*'
-images_path9 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/scoop_0*/scoop_0*_*'
-images_path10 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/shears_0*/shears_0*_*'
-images_path11 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/spoon_0*/spoon_0*_*'
-images_path12 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/tenderizer_0*/tenderizer_0*_*'
-images_path13 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/trowel_0*/trowel_0*_*'
-images_path14 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/turner_0*/turner_0*_*'
-image_paths = [images_path1, images_path2, images_path3, images_path4, images_path5, images_path6, images_path7, images_path8,
-               images_path9, images_path10, images_path11, images_path12, images_path13, images_path14]
-
-# =================== clutter ========================
-# images_path15 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-clutter/clutter/scene_0*/scene_0*'
-# image_paths = [images_path15]
+images_path1 = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real5/*'
+# images_path2 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/cup_0*/cup_0*_*'
+# images_path3 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/hammer_0*/hammer_0*_*'
+# images_path4 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/knife_*/knife_*_00000[0-1]??'
+# images_path4 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/knife_*/knife_*_000002[0-3]?'
+# images_path5 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/ladle_0*/ladle_0*_*'
+# images_path6 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/mallet_0*/mallet_0*_*'
+# images_path7 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/mallet_0*/mug_0*_*'
+# images_path8 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/saw_0*/saw_0*_*'
+# images_path9 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/scoop_0*/scoop_0*_*'
+# images_path10 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/shears_0*/shears_0*_*'
+# images_path11 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/spoon_0*/spoon_0*_*'
+# images_path12 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/tenderizer_0*/tenderizer_0*_*'
+# images_path13 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/trowel_0*/trowel_0*_*'
+# images_path14 = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-dataset/tools/turner_0*/turner_0*_*'
+image_paths = [images_path1]
 
 # =================== images ext ========================
 image_ext1 = '_rgb.jpg'
