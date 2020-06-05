@@ -5,6 +5,7 @@ dist/
 *log.txt
 *.pth
 *.h5
+*.uwarl-deep-learner
 
 
 # Byte-compiled / optimized / DLL files
