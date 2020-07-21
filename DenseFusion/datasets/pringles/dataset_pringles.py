@@ -215,6 +215,7 @@ class PoseDataset(data.Dataset):
         else:
             dellist = random.sample(dellist, len(self.cld[obj[idx]]) - self.num_pt_mesh_small)
         model_points = np.delete(self.cld[obj[idx]], dellist, axis=0)
+        # print("model_points: ", model_points*1e12)
 
         target = np.dot(model_points, cam_rotation4)
         if self.add_noise:
@@ -238,29 +239,29 @@ class PoseDataset(data.Dataset):
         # fw.close()
 
         # ===================== SCREEN POINTS =====================
-        # cam_mat = np.array([[cam_fx[0], 0, cam_cx[0]], [0, cam_fy[0], cam_cy[0]], [0, 0, 1]])
-        # dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
-        #
-        # cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
-        # imgpts, jac = cv2.projectPoints(cloud, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
-        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        # cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.cloud.png', cv2_img)
-        #
+        cam_mat = np.array([[cam_fx[0], 0, cam_cx[0]], [0, cam_fy[0], cam_cy[0]], [0, 0, 1]])
+        dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+
+        cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
+        imgpts, jac = cv2.projectPoints(cloud, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
+        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.cloud.png', cv2_img)
+
         # imgpts, jac = cv2.projectPoints(target, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
         # cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
         # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
         # cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.target.png', cv2_img)
-        #
-        # imgpts, jac = cv2.projectPoints(model_points, cam_rotation4.T, cam_translation / 10, cam_mat, dist)
-        # cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
-        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        # cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.model4.png', cv2_img)
-        #
-        # # # =========== save images ================
-        # p_img = np.transpose(img_masked, (1, 2, 0))
-        # scipy.misc.imsave('/data/Akeaveny/Datasets/pringles/temp/input.png', p_img)
-        # scipy.misc.imsave('/data/Akeaveny/Datasets/pringles/temp/label.png',
-        #                   mask[rmin:rmax, cmin:cmax].astype(np.int32))
+
+        imgpts, jac = cv2.projectPoints(self.cld[obj[idx]], cam_rotation4.T, cam_translation / 10, cam_mat, dist)
+        cv2_img = Image.open('{0}/{1}.png'.format(self.root, self.list[index]))
+        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        cv2.imwrite('/data/Akeaveny/Datasets/pringles/temp/cv2.cld[obj[idx]].png', cv2_img)
+
+        # # =========== save images ================
+        p_img = np.transpose(img_masked, (1, 2, 0))
+        scipy.misc.imsave('/data/Akeaveny/Datasets/pringles/temp/input.png', p_img)
+        scipy.misc.imsave('/data/Akeaveny/Datasets/pringles/temp/label.png',
+                          mask[rmin:rmax, cmin:cmax].astype(np.int32))
 
         return torch.from_numpy(cloud.astype(np.float32)/1000), \
                    torch.LongTensor(choose.astype(np.int32)), \

@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     config = Affordance.AffordanceConfig()
     dataset = Affordance.AffordanceDataset()
-    dataset.load_Affordance(args.dataset, subset="train") # TODO
+    dataset.load_Affordance(args.dataset, subset="val") # TODO
     # Must call before using the dataset
     dataset.prepare()
     config.display()
@@ -130,7 +130,6 @@ if __name__ == '__main__':
     image_color = np.array([s['color'] for s in stats])
     print("Image Count: ", image_shape.shape[0])
     print("Color mean (RGB+D) -> RGB:{:.2f} {:.2f} {:.2f}".format(*np.mean(image_color, axis=0)))
-    # print("Color   mean (RGB+D) -> RGB:{:.2f} {:.2f} {:.2f}, Depth:{:.2f}".format(*np.mean(image_color, axis=0)))
 
     '''================= DISPLAY ================='''
     # image_ids = np.random.choice(dataset.image_ids, 1)
@@ -149,8 +148,8 @@ if __name__ == '__main__':
         image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(
             dataset, config, image_id, use_mini_mask=False)
         log("molded_image", image)
-        log("mask", mask)
-        log("class_ids", class_ids)
+        # log("mask", mask)
+        # log("class_ids", class_ids)
         visualize.display_instances(image, bbox, mask, class_ids, dataset.class_names,
                                     show_bbox=False)
 

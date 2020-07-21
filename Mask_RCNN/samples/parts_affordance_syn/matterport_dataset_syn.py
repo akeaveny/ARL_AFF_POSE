@@ -16,12 +16,20 @@ import matplotlib.image as mpimg
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
-
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
+
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils, visualize
 from mrcnn.model import log
+
+# ========== GPU config ================
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.Session(config=config)
 
 # ###########################################################
 # # Dataset
@@ -34,8 +42,6 @@ class AffordanceConfig(Config):
     # Give the configuration a recognizable name
     NAME = "Affordance"
 
-    # ========== GPU config ================
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     GPU_COUNT = 1
@@ -43,28 +49,32 @@ class AffordanceConfig(Config):
     bs = GPU_COUNT * IMAGES_PER_GPU
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 7  # Background + objects
+    NUM_CLASSES = 1 + 205  # Background + objects
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = (560) // bs
-    VALIDATION_STEPS = (140) // bs
+    STEPS_PER_EPOCH = (5000) // bs
+    VALIDATION_STEPS = (1250) // bs
+    # STEPS_PER_EPOCH = (17133 + 400) // bs
+    # VALIDATION_STEPS = (7308) // bs
+    # STEPS_PER_EPOCH = (17133 + 17347) // bs
+    # VALIDATION_STEPS = (7308 + 7342) // bs
 
-    # IMAGE_CHANNEL_COUNT = 4
     # =============== RGB + D ==============
-    MEAN_PIXEL = np.array([53.84, 59.45, 117.49])
+    MEAN_PIXEL = np.array([111.96, 112.30, 131.78]) # TODO:
 
-    BACKBONE = "resnet50"
-    RESNET_ARCHITECTURE = "resnet50"
+    # BACKBONE = "resnet50"
+    # RESNET_ARCHITECTURE = "resnet50"
 
     # IMAGE_PADDING = True
     IMAGE_MAX_DIM = 1280
+    # IMAGE_MAX_DIM = 640
     # IMAGE_MIN_DIM = 480
 
     LEARNING_RATE = 1e-03
     WEIGHT_DECAY = 0.0001
 
-    MAX_GT_INSTANCES = 25
-    DETECTION_MAX_INSTANCES = 25
+    MAX_GT_INSTANCES = 3
+    DETECTION_MAX_INSTANCES = 3
 
     TRAIN_ROIS_PER_IMAGE = 200 # 32
     # RPN_TRAIN_ANCHORS_PER_IMAGE = 300 # 320
@@ -72,14 +82,10 @@ class AffordanceConfig(Config):
     RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     # RPN_ANCHOR_RATIOS = [0.5, 1, 1.25, 2]
 
-    RPN_NMS_THRESHOLD = 0.7
-    DETECTION_MIN_CONFIDENCE = 0.7
-    DETECTION_NMS_THRESHOLD = 0.3
-
-    # ROI_POSITIVE_RATIO = 0.33
-
-    # USE_MINI_MASK = True
-    # MINI_MASK_SHAPE = (56, 56)
+    # MASK_POOL_SIZE = 28
+    # MASK_SHAPE = [56, 56]
+    # MINI_MASK_SHAPE = (224, 224)
+    # USE_MINI_MASK = False
 
     # POST_NMS_ROIS_TRAINING = 2000
     # POST_NMS_ROIS_INFERENCE = 2000
@@ -95,44 +101,40 @@ class AffordanceDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
         """
-        # Add classes. We have only one class to add.
-        #  1 - 'grasp'
-        #   2 - 'cut'
-        #   3 - 'scoop'
-        #   4 - 'contain'
-        #   5 - 'pound'
-        #   6 - 'support'
-        #   7 - 'wrap-grasp'
-        self.add_class("Affordance", 1, "grasp")
-        self.add_class("Affordance", 2, "cut")
-        self.add_class("Affordance", 3, "scoop")
-        self.add_class("Affordance", 4, "contain-grasp")
-        self.add_class("Affordance", 5, "pound")
-        self.add_class("Affordance", 6, "support")
-        self.add_class("Affordance", 7, "wrap-grasp")
-
+        # self.add_class("Affordance", 1, "grasp")
+        # self.add_class("Affordance", 2, "cut")
+        # self.add_class("Affordance", 3, "scoop")
+        # self.add_class("Affordance", 4, "contain-grasp")
+        # self.add_class("Affordance", 5, "pound")
+        # self.add_class("Affordance", 6, "support")
+        # self.add_class("Affordance", 7, "wrap-grasp")
 
         # Train or validation dataset?
         assert subset in ["train", "val", "test"]
         if subset == 'train':
             print("------------------LOADING TRAIN!------------------")
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/test4/json_files/missing_Kinetic_train.json'))
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/dr/train_3000.json'))
+            ### annotations = {}
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/test4/json_files/knife_01_Kinetic_train.json')))
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/missing/missing.json')))
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/test4/json_files/cup_01_Kinetic_train.json')))
-        # elif subset == 'val':
-        #     print("------------------LOADING VAL!--------------------")
-        #     annotations = json.load(
-        #         open('/data/Akeaveny/Datasets/test4/json_files/missing_Kinetic_val.json'))
-        #     annotations.update(json.load(
-        #         open('/data/Akeaveny/Datasets/test4/json_files/knife_01_Kinetic_val.json')))
-        #     annotations.update(json.load(
-        #         open('/data/Akeaveny/Datasets/test4/json_files/cup_01_Kinetic_val.json')))
-        # elif subset == 'test':
-        #     annotations = json.load(
-        #         open('/data/Akeaveny/Datasets/test4/test_val.json'))
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/bench/train_1000.json')))
+            annotations.update(json.load(
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/floor/train_1000.json')))
+            annotations.update(json.load(
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/turn_table/train_1000.json')))
+        elif subset == 'val':
+            print("------------------LOADING VAL!--------------------")
+            # annotations = json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/dr/val_1285.json'))
+            annotations = {}
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/bench/val_425.json')))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/floor/val_425.json')))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/turn_table/val_425.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -159,6 +161,244 @@ class AffordanceDataset(utils.Dataset):
                 path=image_path,
                 width=width, height=height,
                 polygons=polygons)
+
+        self.add_class("Affordance", 1, "bowl-contain")
+        self.add_class("Affordance", 2, "bowl-contain")
+        self.add_class("Affordance", 3, "bowl-contain")
+        self.add_class("Affordance", 4, "bowl-contain")
+        self.add_class("Affordance", 5, "bowl-contain")
+        self.add_class("Affordance", 6, "bowl-contain")
+        self.add_class("Affordance", 7, "bowl-contain")
+
+        self.add_class("Affordance", 8, "cup-contain")
+        self.add_class("Affordance", 10, "cup-contain")
+        self.add_class("Affordance", 12, "cup-contain")
+        self.add_class("Affordance", 14, "cup-contain")
+        self.add_class("Affordance", 16, "cup-contain")
+        self.add_class("Affordance", 18, "cup-contain")
+        # cup
+        self.add_class("Affordance", 8+1, "cup-wrap_grasp")
+        self.add_class("Affordance", 10+1, "cup-wrap_grasp")
+        self.add_class("Affordance", 12+1, "cup-wrap_grasp")
+        self.add_class("Affordance", 14+1, "cup-wrap_grasp")
+        self.add_class("Affordance", 16+1, "cup-wrap_grasp")
+        self.add_class("Affordance", 18+1, "cup-wrap_grasp")
+
+        self.add_class("Affordance", 20, "hammer-grasp")
+        self.add_class("Affordance", 22, "hammer-grasp")
+        self.add_class("Affordance", 24, "hammer-grasp")
+        self.add_class("Affordance", 26, "hammer-grasp")
+        # hammer
+        self.add_class("Affordance", 20+1, "hammer-pound")
+        self.add_class("Affordance", 22+1, "hammer-pound")
+        self.add_class("Affordance", 24+1, "hammer-pound")
+        self.add_class("Affordance", 26+1, "hammer-pound")
+
+        self.add_class("Affordance", 28, "knife-grasp")
+        self.add_class("Affordance", 30, "knife-grasp")
+        self.add_class("Affordance", 32, "knife-grasp")
+        self.add_class("Affordance", 34, "knife-grasp")
+        self.add_class("Affordance", 36, "knife-grasp")
+        self.add_class("Affordance", 38, "knife-grasp")
+        self.add_class("Affordance", 40, "knife-grasp")
+        self.add_class("Affordance", 42, "knife-grasp")
+        self.add_class("Affordance", 44, "knife-grasp")
+        self.add_class("Affordance", 46, "knife-grasp")
+        self.add_class("Affordance", 48, "knife-grasp")
+        self.add_class("Affordance", 50, "knife-grasp")
+        # knife
+        self.add_class("Affordance", 28+1, "knife-cut")
+        self.add_class("Affordance", 30+1, "knife-cut")
+        self.add_class("Affordance", 32+1, "knife-cut")
+        self.add_class("Affordance", 34+1, "knife-cut")
+        self.add_class("Affordance", 36+1, "knife-cut")
+        self.add_class("Affordance", 38+1, "knife-cut")
+        self.add_class("Affordance", 40+1, "knife-cut")
+        self.add_class("Affordance", 42+1, "knife-cut")
+        self.add_class("Affordance", 44+1, "knife-cut")
+        self.add_class("Affordance", 46+1, "knife-cut")
+        self.add_class("Affordance", 48+1, "knife-cut")
+        self.add_class("Affordance", 50+1, "knife-cut")
+
+        self.add_class("Affordance", 52, "ladle-grasp")
+        self.add_class("Affordance", 54, "ladle-grasp")
+        self.add_class("Affordance", 56, "ladle-grasp")
+        # ladle
+        self.add_class("Affordance", 52+1, "ladle-contain")
+        self.add_class("Affordance", 54+1, "ladle-contain")
+        self.add_class("Affordance", 56+1, "ladle-contain")
+
+        self.add_class("Affordance", 58, "mallet-grasp")
+        self.add_class("Affordance", 60, "mallet-grasp")
+        self.add_class("Affordance", 62, "mallet-grasp")
+        self.add_class("Affordance", 64, "mallet-grasp")
+        # mallet
+        self.add_class("Affordance", 58+1, "mallet-pound")
+        self.add_class("Affordance", 60+1, "mallet-pound")
+        self.add_class("Affordance", 62+1, "mallet-pound")
+        self.add_class("Affordance", 64+1, "mallet-pound")
+
+        self.add_class("Affordance", 66, "mug-grasp")
+        self.add_class("Affordance", 69, "mug-grasp")
+        self.add_class("Affordance", 72, "mug-grasp")
+        self.add_class("Affordance", 75, "mug-grasp")
+        self.add_class("Affordance", 78, "mug-grasp")
+        self.add_class("Affordance", 81, "mug-grasp")
+        self.add_class("Affordance", 84, "mug-grasp")
+        self.add_class("Affordance", 87, "mug-grasp")
+        self.add_class("Affordance", 90, "mug-grasp")
+        self.add_class("Affordance", 93, "mug-grasp")
+        self.add_class("Affordance", 96, "mug-grasp")
+        self.add_class("Affordance", 99, "mug-grasp")
+        self.add_class("Affordance", 102, "mug-grasp")
+        self.add_class("Affordance", 105, "mug-grasp")
+        self.add_class("Affordance", 108, "mug-grasp")
+        self.add_class("Affordance", 111, "mug-grasp")
+        self.add_class("Affordance", 114, "mug-grasp")
+        self.add_class("Affordance", 117, "mug-grasp")
+        self.add_class("Affordance", 120, "mug-grasp")
+        self.add_class("Affordance", 123, "mug-grasp")
+        # mug
+        self.add_class("Affordance", 66+1, "mug-contain")
+        self.add_class("Affordance", 69+1, "mug-contain")
+        self.add_class("Affordance", 72+1, "mug-contain")
+        self.add_class("Affordance", 75+1, "mug-contain")
+        self.add_class("Affordance", 78+1, "mug-contain")
+        self.add_class("Affordance", 81+1, "mug-contain")
+        self.add_class("Affordance", 84+1, "mug-contain")
+        self.add_class("Affordance", 87+1, "mug-contain")
+        self.add_class("Affordance", 90+1, "mug-contain")
+        self.add_class("Affordance", 93+1, "mug-contain")
+        self.add_class("Affordance", 96+1, "mug-contain")
+        self.add_class("Affordance", 99+1, "mug-contain")
+        self.add_class("Affordance", 102+1, "mug-contain")
+        self.add_class("Affordance", 105+1, "mug-contain")
+        self.add_class("Affordance", 108+1, "mug-contain")
+        self.add_class("Affordance", 111+1, "mug-contain")
+        self.add_class("Affordance", 114+1, "mug-contain")
+        self.add_class("Affordance", 117+1, "mug-contain")
+        self.add_class("Affordance", 120+1, "mug-contain")
+        self.add_class("Affordance", 123+1, "mug-contain")
+        # mug
+        self.add_class("Affordance", 66+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 69+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 72+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 75+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 78+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 81+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 84+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 87+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 90+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 93+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 96+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 99+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 102+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 105+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 108+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 111+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 114+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 117+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 120+2, "mug-wrap_grasp")
+        self.add_class("Affordance", 123+2, "mug-wrap_grasp")
+
+        self.add_class("Affordance", 126, "pot-contain")
+        self.add_class("Affordance", 128, "pot-contain")
+        # pot
+        self.add_class("Affordance", 126+1, "pot-wrap_grasp")
+        self.add_class("Affordance", 128+1, "pot-wrap_grasp")
+
+        self.add_class("Affordance", 130, "saw-grasp")
+        self.add_class("Affordance", 132, "saw-grasp")
+        self.add_class("Affordance", 134, "saw-grasp")
+        # saw
+        self.add_class("Affordance", 130+1, "saw-cut")
+        self.add_class("Affordance", 132+1, "saw-cut")
+        self.add_class("Affordance", 134+1, "saw-cut")
+
+        self.add_class("Affordance", 136, "scissors-grasp")
+        self.add_class("Affordance", 138, "scissors-grasp")
+        self.add_class("Affordance", 140, "scissors-grasp")
+        self.add_class("Affordance", 142, "scissors-grasp")
+        self.add_class("Affordance", 144, "scissors-grasp")
+        self.add_class("Affordance", 146, "scissors-grasp")
+        self.add_class("Affordance", 148, "scissors-grasp")
+        self.add_class("Affordance", 150, "scissors-grasp")
+        # scissors
+        self.add_class("Affordance", 136 + 1, "scissors-cut")
+        self.add_class("Affordance", 138 + 1, "scissors-cut")
+        self.add_class("Affordance", 140 + 1, "scissors-cut")
+        self.add_class("Affordance", 142 + 1, "scissors-cut")
+        self.add_class("Affordance", 144 + 1, "scissors-cut")
+        self.add_class("Affordance", 146 + 1, "scissors-cut")
+        self.add_class("Affordance", 148 + 1, "scissors-cut")
+        self.add_class("Affordance", 150 + 1, "scissors-cut")
+
+        self.add_class("Affordance", 152, "scoop-grasp")
+        self.add_class("Affordance", 154, "scoop-grasp")
+        # scoop
+        self.add_class("Affordance", 152 + 1, "scoop-scoop")
+        self.add_class("Affordance", 154 + 1, "scoop-scoop")
+
+        self.add_class("Affordance", 156, "shears-grasp")
+        self.add_class("Affordance", 158, "shears-grasp")
+        # shears
+        self.add_class("Affordance", 156 + 1, "shears-cut")
+        self.add_class("Affordance", 158 + 1, "shears-cut")
+
+        self.add_class("Affordance", 160, "shovel-grasp")
+        self.add_class("Affordance", 162, "shovel-grasp")
+        # shovel
+        self.add_class("Affordance", 160 + 1, "shovel-scoop")
+        self.add_class("Affordance", 162 + 1, "shovel-scoop")
+
+        self.add_class("Affordance", 164, "spoon-grasp")
+        self.add_class("Affordance", 166, "spoon-grasp")
+        self.add_class("Affordance", 168, "spoon-grasp")
+        self.add_class("Affordance", 170, "spoon-grasp")
+        self.add_class("Affordance", 172, "spoon-grasp")
+        self.add_class("Affordance", 174, "spoon-grasp")
+        self.add_class("Affordance", 176, "spoon-grasp")
+        self.add_class("Affordance", 178, "spoon-grasp")
+        self.add_class("Affordance", 180, "spoon-grasp")
+        self.add_class("Affordance", 182, "spoon-grasp")
+        # spoon
+        self.add_class("Affordance", 164 + 1, "spoon-scoop")
+        self.add_class("Affordance", 166 + 1, "spoon-scoop")
+        self.add_class("Affordance", 168 + 1, "spoon-scoop")
+        self.add_class("Affordance", 170 + 1, "spoon-scoop")
+        self.add_class("Affordance", 172 + 1, "spoon-scoop")
+        self.add_class("Affordance", 174 + 1, "spoon-scoop")
+        self.add_class("Affordance", 176 + 1, "spoon-scoop")
+        self.add_class("Affordance", 178 + 1, "spoon-scoop")
+        self.add_class("Affordance", 180 + 1, "spoon-scoop")
+        self.add_class("Affordance", 182 + 1, "spoon-scoop")
+
+        self.add_class("Affordance", 184, "tenderizer-grasp")
+        self.add_class("Affordance", 184+1, "tenderizer-pound")
+
+        self.add_class("Affordance", 186, "trowel-grasp")
+        self.add_class("Affordance", 188, "trowel-grasp")
+        self.add_class("Affordance", 190, "trowel-grasp")
+        # trowel
+        self.add_class("Affordance", 186 + 1, "trowel-scoop")
+        self.add_class("Affordance", 188 + 1, "trowel-scoop")
+        self.add_class("Affordance", 190 + 1, "trowel-scoop")
+
+        self.add_class("Affordance", 192, "turner-grasp")
+        self.add_class("Affordance", 194, "turner-grasp")
+        self.add_class("Affordance", 196, "turner-grasp")
+        self.add_class("Affordance", 198, "turner-grasp")
+        self.add_class("Affordance", 200, "turner-grasp")
+        self.add_class("Affordance", 202, "turner-grasp")
+        self.add_class("Affordance", 204, "turner-grasp")
+        # turner
+        self.add_class("Affordance", 192 + 1, "turner-support")
+        self.add_class("Affordance", 194 + 1, "turner-support")
+        self.add_class("Affordance", 196 + 1, "turner-support")
+        self.add_class("Affordance", 198 + 1, "turner-support")
+        self.add_class("Affordance", 200 + 1, "turner-support")
+        self.add_class("Affordance", 202 + 1, "turner-support")
+        self.add_class("Affordance", 204 + 1, "turner-support")
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.

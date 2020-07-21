@@ -12,8 +12,9 @@ from skimage import io
 import skimage.draw
 
 # # ===================== load mat ===========================
-mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_val_real5/*_label*'
-# mat_path = '/data/Akeaveny/Datasets/part-affordance-dataset/real/part-affordance-clutter/clutter_combined/*_label*'
+# folder_to_save = '/data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools/'
+folder_to_save = '/data/Akeaveny/Datasets/part-affordance_combined/real/combined_clutter/'
+mat_path = folder_to_save + '*_label.mat'
 print("Images: ", mat_path)
 mat_files = sorted(glob.glob(mat_path))
 
@@ -23,7 +24,8 @@ print("Loaded Mats: ", len(mats))
 for idx, mat in enumerate(mats):
     data = np.asarray(mat['gt_label'])
     # ============ save png ============
-    count = 100000 + idx
+    # count = 1000000 + offset + idx
+    count = 1000000 + idx
     str_num = str(count)[1:]
     label_filename = mat_path.split("*")[0] + str_num + '_label.png'
     # print(str_num)
@@ -33,9 +35,9 @@ for idx, mat in enumerate(mats):
     im.save(label_filename)
 
 # # # ===================== check labels ===========================
-# folder_to_load = 'Kitchen_Knife_selected_train_real1/'
-# data_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_selected_train_real1/'
-# label_path = '/data/Akeaveny/Datasets/part-affordance-dataset/ndds_and_real/Kitchen_Knife_selected_train_real1/*_label.png'
+# folder_to_load = 'combined_tools/'
+# data_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools/'
+# label_path = data_path + '*_label.png'
 # label_files = sorted(glob.glob(label_path))
 # print("label_files: ", len(label_files))
 #
@@ -49,7 +51,7 @@ for idx, mat in enumerate(mats):
 #     label_path = data_path + image_idx + "_label.png"
 #     label_img = imageio.imread(label_path)
 #
-#     rgb_path = data_path + image_idx + "_rgb.png"
+#     rgb_path = data_path + image_idx + "_rgb.jpg"
 #     rgb_img = imageio.imread(rgb_path)
 #
 #     # ================ animation ================

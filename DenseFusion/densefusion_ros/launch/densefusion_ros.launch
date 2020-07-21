@@ -1,0 +1,83 @@
+<launch>
+
+  <!-- DenseFusion -->
+  <arg name="pose_model" default="$(find densefusion_ros)/models/pose_model_5_0.09450025089477782.pth" />
+  <arg name="refine_model" default="$(find densefusion_ros)/models/pose_refine_model_247_0.04728509413062927.pth" />
+
+  <arg name="num_points" default='100' />
+  <arg name="num_points_mesh" default='100' />
+  <arg name="iteration" default='5' />
+  <arg name="bs" default='1' />
+  <arg name="num_obj" default='205' />
+
+  <!-- MaskRCNN -->
+  <arg name="model" default="$(find densefusion_ros)/models/mask_rcnn_affordance_0040.h5" />
+  <arg name="class_labels" default="$(find densefusion_ros)/models/mask_rcnn_classes.txt" />
+  <arg name="detection_threshold" default="0.5" />
+
+  <!-- 3D Models -->
+  <arg name="classes" default="$(find densefusion_ros)/models/classes.txt" />
+  <arg name="class_ids" default="$(find densefusion_ros)/models/class_ids.txt" />
+
+  <!-- ZED Camera -->
+  <arg name="rgb_image" default='/zed/zed_node/left/image_rect_color' />
+  <arg name="rgb_encoding" default='bgr8' />
+  <arg name="depth_image" default='/zed/zed_node/depth/depth_registered' />
+  <arg name="depth_encoding" default='32FC1' />
+
+  <arg name="cam_width" default='1280' />
+  <arg name="cam_height" default='720' />
+  <arg name="cam_scale" default='1' />
+  <arg name="cam_fx" default='697.6871337890625' />
+  <arg name="cam_fy" default='697.6871337890625' />
+  <arg name="cam_cx" default='620.2407836914062' />
+  <arg name="cam_cy" default='353.91357421875' />
+
+  <!-- Testing -->
+  <arg name="debug" default="False" />
+  <arg name="visualize" default="True" />
+  <arg name="use_synthetic_images" default="True" />
+  <arg name="check_pose" default="True" />
+
+  <node pkg="densefusion_ros" type="densefusion_node.py" name="densefusion_ros" output="screen" >
+    <!-- DenseFusion -->
+    <param name="pose_model" value="$(arg pose_model)" />
+    <param name="refine_model" value="$(arg refine_model)" />
+
+    <param name="num_points" value="$(arg num_points)" />
+    <param name="num_points_mesh" value="$(arg num_points_mesh)" />
+    <param name="iteration" value="$(arg iteration)" />
+    <param name="bs" value="$(arg bs)" />
+    <param name="num_obj" value="$(arg num_obj)" />
+
+    <!-- MaskRCNN -->
+    <param name="model" value="$(arg model)" />
+    <param name="class_labels" value="$(arg class_labels)" />
+    <param name="detection_threshold" value="$(arg detection_threshold)" />
+
+    <!-- 3D Models -->
+    <param name="classes" value="$(arg classes)" />
+    <param name="class_ids" value="$(arg class_ids)" />
+
+    <!-- ZED Camera -->
+    <param name="rgb_image" value="$(arg rgb_image)" />
+    <param name="rgb_encoding" value="$(arg rgb_encoding)" />
+    <param name="depth_image" value="$(arg depth_image)" />
+    <param name="depth_encoding" value="$(arg depth_encoding)" />
+
+    <param name="cam_width" value="$(arg cam_width)" />
+    <param name="cam_height" value="$(arg cam_height)" />
+    <param name="cam_scale" value="$(arg cam_scale)" />
+    <param name="cam_fx" value="$(arg cam_fx)" />
+    <param name="cam_fy" value="$(arg cam_fy)" />
+    <param name="cam_cx" value="$(arg cam_cx)" />
+    <param name="cam_cy" value="$(arg cam_cy)" />
+
+    <!-- Testing -->
+    <param name="debug" value="$(arg debug)" />
+    <param name="visualize" value="$(arg visualize)" />
+    <param name="use_synthetic_images" value="$(arg use_synthetic_images)" />
+    <param name="check_pose" value="$(arg check_pose)" />
+
+  </node>
+</launch>

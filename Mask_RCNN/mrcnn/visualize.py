@@ -20,8 +20,6 @@ from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
 
-from IPython.display import display, HTML
-
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 
@@ -55,7 +53,7 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
         plt.imshow(image.astype(np.uint8), cmap=cmap,
                    norm=norm, interpolation=interpolation)
         i += 1
-    plt.show()
+    ### plt.show()
 
 
 def random_colors(N, bright=True):
@@ -146,8 +144,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             caption = "{} {:.3f}".format(label, score) if score else label
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+            ax.text(x1, y1 + 8, caption, color='w', size=11, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
@@ -166,8 +163,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    if auto_show:
-        plt.show()
+    # if auto_show:
+    #     plt.show()
 
 
 def display_differences(image,
@@ -473,8 +470,7 @@ def display_table(table):
             row_html += "<td>{:40}</td>".format(str(col))
         html += "<tr>" + row_html + "</tr>"
     html = "<table>" + html + "</table>"
-    IPython.display.HTML(html)
-    # IPython.display.display(IPython.display.HTML(html))
+    IPython.display.display(IPython.display.HTML(html))
 
 
 def display_weight_stats(model):
@@ -503,9 +499,3 @@ def display_weight_stats(model):
                 "{:+9.4f}".format(w.std()),
             ])
     display_table(table)
-
-    # from IPython.display import display, HTML
-    # IPython.display.display(IPython.display.HTML(html))
-    # print(table)
-    # plt.imshow(table)
-    # plt.ioff()

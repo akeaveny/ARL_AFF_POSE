@@ -131,9 +131,9 @@ def main():
             for i, data in enumerate(dataloader, 0):
                 points, choose, img, target, model_points, idx = data
 
-                # fw = open('/data/Akeaveny/Datasets/linemod/test/linemod_dump.txt', 'w')
-                # fw.write('Points\n{0}\n\nchoose\n{1}\n\nimg\n{2}\n\ntarget\n{3}\n\nmodel_points\n{4}'.format(points, choose, img, target, model_points))
-                # fw.close()
+                fw = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/check_linemod.txt', 'w')
+                fw.write('Points\n{0}\n\nchoose\n{1}\n\nimg\n{2}\n\ntarget\n{3}\n\nmodel_points\n{4}'.format(points, choose, img, target, model_points))
+                fw.close()
 
                 points, choose, img, target, model_points, idx = Variable(points).cuda(), \
                                                                  Variable(choose).cuda(), \

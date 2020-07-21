@@ -20,12 +20,19 @@ import numpy as np
 import skimage.draw
 
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+# import matplotlib.image as mpimg
 
 from imgaug import augmenters as iaa
 
 # ========= CONFIG =========
 import matterport_dataset_syn as Affordance
+# ========== GPU config ================
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.Session(config=config)
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -40,9 +47,6 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-
-# ========== GPU config ================
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 ############################################################
 #  train
@@ -81,20 +85,20 @@ def train(model):
                 augmentation=augmentation,
                 layers='heads')
 
-    # Training - Stage 2
-    # Finetune layers from ResNet stage 4 and up
+   # Training - Stage 2
+   # Finetune layers from ResNet stage 4 and up
     print("\nFine tune Resnet stage 4 and up")
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=160,
-                augmentation=augmentation,
-                layers='4+')
+               learning_rate=config.LEARNING_RATE,
+               epochs=160,
+               augmentation=augmentation,
+               layers='4+')
 
     # Training - Stage 3
     # Fine tune all layers
     print("\nFine tune all layers")
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE / 10,
+                learning_rate=config.LEARNING_RATE/10,
                 epochs=170,
                 augmentation=augmentation,
                 layers='all')
@@ -167,7 +171,7 @@ if __name__ == '__main__':
             "mrcnn_bbox", "mrcnn_mask"])
     else:
         # model.load_weights(weights_path, by_name=True, exclude=["conv1"])
-        model.load_weights(weights_path, by_name=True)
+        model.load_weights(weights_path, by_name=True) # TODO: Change load image
 
     # ========== MODEL SUMMARY =========
     # model.keras_model.summary()

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import re
 import numpy as np
 
-visual = False  # only use True with 1 image for testing because there is a bug in openCV drawing
+visual = True  # only use True with 1 image for testing because there is a bug in openCV drawing
 
 data = {}
 stop = True
@@ -178,10 +178,15 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save):
     return stop
 
 # ===================== Synthetic data ====================
-data_path = '/data/Akeaveny/Datasets/pringles/zed/train/'
-json_addr = '/data/Akeaveny/Datasets/pringles/zed/via_region_data_train.json'
-folder_to_save = 'train/'
-class_id = 4
+# data_path = '/data/Akeaveny/Datasets/pringles/zed/train/'
+# json_addr = '/data/Akeaveny/Datasets/pringles/zed/via_region_data_train.json'
+# folder_to_save = 'train/'
+# class_id = 4
+
+data_path = '/data/Akeaveny/Datasets/test/'
+json_addr = '/data/Akeaveny/Datasets/test/via_region_data_train.json'
+folder_to_save = 'test/'
+class_id = [0, 1 , 2 , 3, 4, 5, 6, 7, 8]
 
 if data_path[len(data_path) - 1] != '/':
     print(data_path)
@@ -217,42 +222,42 @@ for i in range(min_img, max_img):
 with open(json_addr, 'w') as outfile:
     json.dump(data, outfile, sort_keys=True)
 
-# ===================== Synthetic data ====================
-data_path = '/data/Akeaveny/Datasets/pringles/zed/val/'
-json_addr = '/data/Akeaveny/Datasets/pringles/zed/via_region_data_val.json'
-folder_to_save = 'val/'
-class_id = 4
-
-if data_path[len(data_path) - 1] != '/':
-    print(data_path)
-    print('The data path should have / in the end')
-    exit()
-
-min_img = 0
-max_img = 3
-
-data = {}
-# ===================== val ====================
-print('\n-------- Val json! ---------------')
-count = 0
-for i in range(min_img, max_img):
-    print('Image: {}/{}'.format(i, max_img))
-    count = 1000000 + i
-    img_number = str(count)[1:]
-    label_addr = data_path + img_number + '.cs.png'
-
-    # print("img_number: ", img_number)
-    # print("label_addr: ", label_addr)
-
-    label_img = load_image(label_addr)
-    print("Classes: ", np.unique(label_img))
-
-    if label_img.size == 0:
-        print('\n ------------------ Pass! --------------------')
-        pass
-    else:
-        write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
-    count += 1
-
-with open(json_addr, 'w') as outfile:
-    json.dump(data, outfile, sort_keys=True)
+# # ===================== Synthetic data ====================
+# data_path = '/data/Akeaveny/Datasets/pringles/zed/val/'
+# json_addr = '/data/Akeaveny/Datasets/pringles/zed/via_region_data_val.json'
+# folder_to_save = 'val/'
+# class_id = 4
+#
+# if data_path[len(data_path) - 1] != '/':
+#     print(data_path)
+#     print('The data path should have / in the end')
+#     exit()
+#
+# min_img = 0
+# max_img = 3
+#
+# data = {}
+# # ===================== val ====================
+# print('\n-------- Val json! ---------------')
+# count = 0
+# for i in range(min_img, max_img):
+#     print('Image: {}/{}'.format(i, max_img))
+#     count = 1000000 + i
+#     img_number = str(count)[1:]
+#     label_addr = data_path + img_number + '.cs.png'
+#
+#     # print("img_number: ", img_number)
+#     # print("label_addr: ", label_addr)
+#
+#     label_img = load_image(label_addr)
+#     print("Classes: ", np.unique(label_img))
+#
+#     if label_img.size == 0:
+#         print('\n ------------------ Pass! --------------------')
+#         pass
+#     else:
+#         write_to_json(label_img, label_img, class_id, img_number, folder_to_save)
+#     count += 1
+#
+# with open(json_addr, 'w') as outfile:
+#     json.dump(data, outfile, sort_keys=True)
