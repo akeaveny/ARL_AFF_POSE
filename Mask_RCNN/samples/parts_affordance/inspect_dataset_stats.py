@@ -182,7 +182,7 @@ if __name__ == '__main__':
     image_color = np.array([s['color'] for s in stats])
     print("Class Count: {}".format(dataset.num_classes))
     print("Image Count: ", image_shape.shape[0])
-    print("Color mean (RGB+D):{:.2f} {:.2f} {:.2f} {:.2f}".format(*np.mean(image_color, axis=0)))
+    # print("Color mean (RGB+D):{:.2f} {:.2f} {:.2f}".format(*np.mean(image_color, axis=0)))
 
     ##################################
     ###  Display Samples
@@ -283,14 +283,14 @@ if __name__ == '__main__':
     ##################################
     print('\n --------------- IMGAUG ---------------')
 
-    augmentation = iaa.Sometimes(0.5, [
+    augmentation = iaa.Sometimes(0.9, [
         iaa.Fliplr(0.5),
         iaa.Flipud(0.5),
-        iaa.Multiply((0.8, 1.2)),
-        iaa.GaussianBlur(sigma=(0.0, 3.0)),
-        iaa.OneOf([iaa.Affine(rotate=90),
-                   iaa.Affine(rotate=180),
-                  iaa.Affine(rotate=270)]),
+        # iaa.Multiply((0.8, 1.2)),
+        # iaa.GaussianBlur(sigma=(0.0, 5.0)),
+        # iaa.OneOf([iaa.Affine(rotate=90),
+        #            iaa.Affine(rotate=180),
+        #            iaa.Affine(rotate=270)]),
     ])
 
     # Load the image multiple times to show augmentations
@@ -325,38 +325,40 @@ if __name__ == '__main__':
     ##################################
     # Masks
     ##################################
-    print('\n --------------- Masks ---------------')
+    for i in range(4):
+        print('\n --------------- Masks ---------------')
 
-    image = dataset.load_image(image_id)
-    mask, class_ids = dataset.load_mask(image_id)
-    original_shape = image.shape
+        image_id_ = int(np.random.choice(len(dataset.image_ids), size=1))
+        image = dataset.load_image(image_id_)
+        mask, class_ids = dataset.load_mask(image_id_)
+        original_shape = image.shape
 
-    ### config = RandomCropConfig()
-    print("Min: ", config.IMAGE_MIN_DIM)
-    print("Max: ", config.IMAGE_MAX_DIM)
-    print("Resize Mode: ", config.IMAGE_RESIZE_MODE)
+        ### config = RandomCropConfig()
+        print("Min: ", config.IMAGE_MIN_DIM)
+        print("Max: ", config.IMAGE_MAX_DIM)
+        print("Resize Mode: ", config.IMAGE_RESIZE_MODE)
 
-    # Resize
-    image, window, scale, padding, _ = utils.resize_image(
-        image, min_dim=config.IMAGE_MIN_DIM, max_dim=config.IMAGE_MAX_DIM, mode=config.IMAGE_RESIZE_MODE)
-    mask = utils.resize_mask(mask, scale, padding)
-    # Compute Bounding box
-    bbox = utils.extract_bboxes(mask)
+        # Resize
+        image, window, scale, padding, _ = utils.resize_image(
+            image, min_dim=config.IMAGE_MIN_DIM, max_dim=config.IMAGE_MAX_DIM, mode=config.IMAGE_RESIZE_MODE)
+        mask = utils.resize_mask(mask, scale, padding)
+        # Compute Bounding box
+        bbox = utils.extract_bboxes(mask)
 
-    image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(
-        dataset, config, image_id, use_mini_mask=False)
-    log("Original mask: ", mask)
+        image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(
+            dataset, config, image_id_, use_mini_mask=False)
+        log("Original mask: ", mask)
 
-    display_images([image] + [mask[:, :, i] for i in range(min(mask.shape[-1], 7))])
-    plt.savefig(os.getcwd() + save_to_folder + "mask_og.png", bbox_inches='tight')
+        display_images([image] + [mask[:, :, i] for i in range(min(mask.shape[-1], 7))])
+        plt.savefig(os.getcwd() + save_to_folder + "masks/mask_og_" + np.str(i) +".png", bbox_inches='tight')
 
-    # Add augmentation and mask resizing.
-    image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(
-        dataset, config, image_id, use_mini_mask=True)
-    log("Mini Mask", mask)
+        # Add augmentation and mask resizing.
+        image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(
+            dataset, config, image_id_, use_mini_mask=True)
+        log("Mini Mask", mask)
 
-    display_images([image] + [mask[:, :, i] for i in range(min(mask.shape[-1], 7))])
-    plt.savefig(os.getcwd() + save_to_folder + "mask_mini.png", bbox_inches='tight')
+        display_images([image] + [mask[:, :, i] for i in range(min(mask.shape[-1], 7))])
+        plt.savefig(os.getcwd() + save_to_folder + "masks/mask_mini_" + np.str(i) +".png", bbox_inches='tight')
 
     ##################################
     # Anchors

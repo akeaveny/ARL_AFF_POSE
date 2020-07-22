@@ -40,6 +40,9 @@ import argparse
 #  Parse command line arguments
 ############################################################
 parser = argparse.ArgumentParser( description='Train Mask R-CNN to detect Affordance.')
+parser.add_argument('--train', required=False, default='rgb',
+                    type=str,
+                    metavar="Train RGB or RGB+D")
 parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds2/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
@@ -83,7 +86,10 @@ elif args.dataset_type == 'hammer':
 # ### gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
 
 from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+if args.train == 'rgb':
+    from mrcnn import model as modellib, utils
+if args.train == 'rgbd':
+    from mrcnn import modeldepth as modellib, utils # TODO: fix loading RGB+D from config file
 
 ############################################################
 #  train
@@ -119,6 +125,7 @@ def train(model, args):
         #            iaa.Affine(rotate=180),
         #            iaa.Affine(rotate=270)]),
     ])
+
     # elif args.dataset_type == 'syn' or args.dataset_type == 'syn1':
     #    augmentation = None
 
@@ -131,53 +138,27 @@ def train(model, args):
     print("\n************* trainining HEADS *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=80,
-                augmentation=augmentation,
-                layers='heads')
-
-    print("\n************* trainining HEADS *************")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/10,
                 epochs=100,
                 augmentation=augmentation,
                 layers='heads')
 
     # Training - Stage 2
     # Finetune layers from ResNet stage 4 and up
-    # print("\n************* trainining ResNET 4+ *************")
-    # model.train(dataset_train, dataset_val,
-    #           learning_rate=config.LEARNING_RATE/10,
-    #           epochs=160,
-    #           augmentation=augmentation,
-    #           layers='4+')
+    print("\n************* trainining ResNET 4+ *************")
+    model.train(dataset_train, dataset_val,
+              learning_rate=config.LEARNING_RATE,
+              epochs=160,
+              augmentation=augmentation,
+              layers='4+')
 
     # Training - Stage 3
     # Fine tune all layers
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE/10,
-                epochs=170,
+                epochs=240,
                 augmentation=augmentation,
                 layers='all')
-
-    # print("\n************* trainining ALL LR:{}*************".format(config.LEARNING_RATE))
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE,
-    #             epochs=40,
-    #             augmentation=augmentation,
-    #             layers='all')
-    # print("\n************* trainining ALL LR:{}*************".format(config.LEARNING_RATE/10))
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE / 10,
-    #             epochs=80,
-    #             augmentation=augmentation,
-    #             layers="all")
-    # print("\n************* trainining ALL LR:{}*************".format(config.LEARNING_RATE/100))
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE / 100,
-    #             epochs=120,
-    #             augmentation=augmentation,
-    #             layers='all')
 
 ############################################################
 #  Training
@@ -217,11 +198,10 @@ if __name__ == '__main__':
         # Exclude the last layers because they require a matching
         # number of classes
         model.load_weights(weights_path, by_name=True, exclude=[
-            "conv1", "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
     else:
-        model.load_weights(weights_path, by_name=True, exclude=["conv1"])
-        ### model.load_weights(weights_path, by_name=True) # TODO: Change load image
+        model.load_weights(weights_path, by_name=True)
 
     # Train
     train(model, args)

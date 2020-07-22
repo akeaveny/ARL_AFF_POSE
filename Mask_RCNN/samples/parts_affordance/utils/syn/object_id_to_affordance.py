@@ -7,6 +7,8 @@ import skimage.io
 
 import matplotlib.pyplot as plt
 
+debug = False
+
 ###########################################################
 # FOR SYTHENTIC IMAGES
 # LOOKUP FROM OBJECT ID TO AFFORDANCE LABEL
@@ -323,11 +325,11 @@ if __name__ == '__main__':
     # =================== new directory ========================
     # 0.
     ### data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/parts_affordance1/'
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_'
+    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_'
 
     # =================== load from ========================
     # 1.
-    folder_to_object = 'combined_tools_/'
+    folder_to_object = 'combined_tools_hammer_/'
 
     # 2.
     scenes = [
@@ -372,13 +374,14 @@ if __name__ == '__main__':
                     affordance_label_addr = data_path + split + scene + filenum + '_gt_affordance.png'
                     skimage.io.imsave(affordance_label_addr, affordance_label)
 
+                    if debug:
                     ### check
-                    ## plt.subplot(2, 1, 1)
-                    ## plt.title("og")
-                    ## plt.imshow(object_id_label*255/2)
-                    ## plt.subplot(2, 1, 2)
-                    ## plt.title("affordance")
-                    ## plt.imshow(affordance_label * 255 / 2)
-                    ## plt.show()
+                        plt.subplot(2, 1, 1)
+                        plt.title("og")
+                        plt.imshow(object_id_label*255/2)
+                        plt.subplot(2, 1, 2)
+                        plt.title("affordance")
+                        plt.imshow(affordance_label * 255 / 2)
+                        plt.show()
 
             offset += len(files)

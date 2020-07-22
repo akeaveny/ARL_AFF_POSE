@@ -196,7 +196,7 @@ data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/'
 train_path = 'combined_tools_train/'
 val_path = 'combined_tools_val/'
 
-image_ext = '_label.png' ### object ids or affordances
+image_ext = '_gt_affordance.png' ### object ids or affordances
 
 class_id = np.arange(0, 205+1, 1)
 ### class_id = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -212,7 +212,7 @@ num_test = 25
 #=====================
 
 # 0.
-json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/syn/'
+json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer1/'
 
 # 1.
 scenes = [
@@ -230,54 +230,54 @@ for scene in scenes:
     ###########################################################
     # VALIDATION
     ###########################################################
-    # print('\n ------------------ VAL ------------------')
-    #
-    # # =====================
-    # ### config
-    # # =====================
-    #
-    # folder_to_save = val_path + scene
-    # labels = data_path + folder_to_save + '??????' + image_ext
-    #
-    # files = np.array(sorted(glob.glob(labels)))
-    # print("Loaded files: ", len(files))
-    #
-    # if use_random_idx:
-    #     val_idx = np.random.choice(np.arange(0, len(files)+1, 1), size=int(num_val), replace=False)
-    #     print("Chosen Files \n", val_idx)
-    #     files = files[val_idx]
-    # else:
-    #     num_val = len(files)
-    #
-    # data = {}
-    # iteration = 0
-    #
-    # # =====================
-    # ###
-    # # =====================
-    #
-    # json_addr = json_path + scene + 'val' + np.str(num_val) + '.json'
-    # for file in files:
-    #
-    #     str_num = file.split(data_path + folder_to_save)[1]
-    #     img_number = str_num.split(image_ext)[0]
-    #     label_addr = file
-    #
-    #     ### print("label_addr: ", label_addr)
-    #     print('Image: {}/{}'.format(iteration, len(files)))
-    #
-    #     label_img = load_image(label_addr)
-    #     print("GT Affordances:", np.unique(np.array(label_img)))
-    #
-    #     if label_img.size == 0:
-    #         print('\n ------------------ Pass! --------------------')
-    #         pass
-    #     else:
-    #         write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
-    #     iteration += 1
-    #
-    # with open(json_addr, 'w') as outfile:
-    #     json.dump(data, outfile, sort_keys=True)
+    print('\n ------------------ VAL ------------------')
+
+    # =====================
+    ### config
+    # =====================
+
+    folder_to_save = val_path + scene
+    labels = data_path + folder_to_save + '??????' + image_ext
+
+    files = np.array(sorted(glob.glob(labels)))
+    print("Loaded files: ", len(files))
+
+    if use_random_idx:
+        val_idx = np.random.choice(np.arange(0, len(files)+1, 1), size=int(num_val), replace=False)
+        print("Chosen Files \n", val_idx)
+        files = files[val_idx]
+    else:
+        num_val = len(files)
+
+    data = {}
+    iteration = 0
+
+    # =====================
+    ###
+    # =====================
+
+    json_addr = json_path + scene + 'val' + np.str(num_val) + '.json'
+    for file in files:
+
+        str_num = file.split(data_path + folder_to_save)[1]
+        img_number = str_num.split(image_ext)[0]
+        label_addr = file
+
+        ### print("label_addr: ", label_addr)
+        print('Image: {}/{}'.format(iteration, len(files)))
+
+        label_img = load_image(label_addr)
+        print("GT Affordances:", np.unique(np.array(label_img)))
+
+        if label_img.size == 0:
+            print('\n ------------------ Pass! --------------------')
+            pass
+        else:
+            write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
+        iteration += 1
+
+    with open(json_addr, 'w') as outfile:
+        json.dump(data, outfile, sort_keys=True)
 
     ###########################################################
     # TRAIN

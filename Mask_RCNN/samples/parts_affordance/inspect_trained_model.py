@@ -59,31 +59,28 @@ assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset
 if args.dataset_type == 'real':
     import dataset_real as Affordance
     save_to_folder = '/images/test_images_real/'
-    MEAN_PIXEL = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    IMAGE_RESIZE_MODE_ = "none"
-    IMAGE_MIN_DIM_ = 480
+    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
 elif args.dataset_type == 'syn':
     import dataset_syn as Affordance
     save_to_folder = '/images/test_images_syn/'
-    MEAN_PIXEL = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    IMAGE_RESIZE_MODE_ = "none"
-    IMAGE_MIN_DIM_ = 480
+    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
 elif args.dataset_type == 'syn1':
     import dataset_syn1 as Affordance
     save_to_folder = '/images/test_images_syn1/'
-    MEAN_PIXEL = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    IMAGE_RESIZE_MODE_ = "none"
-    IMAGE_MIN_DIM_ = 480
+    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
 elif args.dataset_type == 'hammer':
     import dataset_syn_hammer as Affordance
     save_to_folder = '/images/test_images_syn_hammer/'
-    MEAN_PIXEL = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    #IMAGE_RESIZE_MODE_ = "none"
-    #IMAGE_MIN_DIM_ = 480
-    #IMAGE_MAX_DIM_ = 640
+    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     IMAGE_RESIZE_MODE_ = "square"
     IMAGE_MIN_DIM_ = 1280
     IMAGE_MAX_DIM_ = 1280
@@ -508,9 +505,10 @@ if __name__ == '__main__':
     class InferenceConfig(Affordance.AffordanceConfig):
         GPU_COUNT = 1
         IMAGES_PER_GPU = 1
+        MEAN_PIXEL = MEAN_PIXEL_
+        IMAGE_RESIZE_MODE = IMAGE_RESIZE_MODE_
         IMAGE_MIN_DIM = IMAGE_MIN_DIM_
         IMAGE_MAX_DIM = IMAGE_MAX_DIM_
-        IMAGE_RESIZE_MODE = IMAGE_RESIZE_MODE_
     config = InferenceConfig()
     # config.display()
 
