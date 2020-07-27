@@ -20,12 +20,12 @@ def seq_get_masks(og_mask):
     instance_mask_one = np.ones((og_mask.shape[0], og_mask.shape[1]), dtype=np.uint8)
 
     object_id_labels = np.unique(og_mask)
-    print("GT Object ID:", np.unique(object_id_labels))
+    # print("GT Object ID:", np.unique(object_id_labels))
 
     for i, object_id in enumerate(object_id_labels):
         if object_id != 0:
             affordance_id = map_affordance_label(object_id)
-            print("Affordance Label:", affordance_id)
+            # print("Affordance Label:", affordance_id)
 
             instance_mask = instance_mask_one * affordance_id
             instance_masks = np.where(og_mask==object_id, instance_mask, instance_masks).astype(np.uint8)
@@ -325,11 +325,11 @@ if __name__ == '__main__':
     # =================== new directory ========================
     # 0.
     ### data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/parts_affordance1/'
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_'
+    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_15k_'
 
     # =================== load from ========================
     # 1.
-    folder_to_object = 'combined_tools_hammer_/'
+    folder_to_object = 'combined_tools_hammer_15k_/'
 
     # 2.
     scenes = [
@@ -366,7 +366,7 @@ if __name__ == '__main__':
 
                     object_id_label = np.array(skimage.io.imread(file))
                     affordance_label = seq_get_masks(object_id_label)
-                    print("Affordance_label:", np.unique(affordance_label))
+                    # print("Affordance_label:", np.unique(affordance_label))
 
                     filenum = file.split(data_path + split + scene)[1]
                     filenum = filenum.split(image_ext)[0]

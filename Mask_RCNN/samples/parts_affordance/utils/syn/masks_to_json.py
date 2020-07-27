@@ -137,7 +137,6 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
     data[obj_name]['size'] = instance_img.shape[1]
     data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
     data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
-    data[obj_name]['fusedfilename'] = folder_to_save + img_number + '_fused.png'
     data[obj_name]['base64_img_data'] = ""
     data[obj_name]['file_attributes'] = {}
     data[obj_name]['regions'] = {}
@@ -193,9 +192,10 @@ np.random.seed(1)
 
 dataset_name = 'Affordance'
 data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/'
-train_path = 'combined_tools_train/'
-val_path = 'combined_tools_val/'
+train_path = 'combined_tools_hammer_15k_train/'
+val_path = 'combined_tools_hammer_15k_val/'
 
+### image_ext = '_label.png'
 image_ext = '_gt_affordance.png' ### object ids or affordances
 
 class_id = np.arange(0, 205+1, 1)
@@ -203,16 +203,15 @@ class_id = np.arange(0, 205+1, 1)
 print("Affordance IDs: \n{}\n".format(class_id))
 
 use_random_idx = False
-# num_val = int(300 / (2 * 3))
-# num_train = int(700 / (2 * 3))
-num_test = 25
+num_val = int(300 / (2 * 3))
+num_train = int(700 / (2 * 3))
 
 #=====================
 # JSON FILES
 #=====================
 
 # 0.
-json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer1/'
+json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer15k/'
 
 # 1.
 scenes = [

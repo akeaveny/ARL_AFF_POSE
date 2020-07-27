@@ -1,0 +1,77 @@
+class AffordanceConfig(Config):
+    """Configuration for training on the toy  dataset.
+    # Derives from the base Config class and overrides some values.
+    # """
+    # Give the configuration a recognizable name
+    NAME = "Affordance"
+
+    # Number of classes (including background)
+    NUM_CLASSES = 1 + 205  # Background + objects
+
+    ##################################
+    ###  GPU
+    ##################################
+
+    GPU_COUNT = 2
+    IMAGES_PER_GPU = 1
+    bs = GPU_COUNT * IMAGES_PER_GPU
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+
+    config_ = tf.ConfigProto()
+    ## gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.9)
+    ## config_ = tf.ConfigProto(gpu_options=gpu_options)
+    config_.gpu_options.allow_growth = True
+    sess = tf.Session(config=config_)
+
+    ##################################
+    ###  Backbone
+    ##################################
+
+    ### BACKBONE = "resnet50"
+    ### RESNET_ARCHITECTURE = "resnet50"
+
+    ##################################
+    ###
+    ##################################
+
+    LEARNING_RATE = 1e-03
+    WEIGHT_DECAY = 0.0001
+
+    ##################################
+    ###  NUM OF IMAGES
+    ##################################
+
+    # Number of training steps per epoch
+    STEPS_PER_EPOCH = (1584) // bs
+    VALIDATION_STEPS = (721) // bs
+
+    ##################################
+    ###  FROM DATASET STATS
+    ##################################
+    ''' --- run datasetstats for all params below --- '''
+
+    MAX_GT_INSTANCES = 20 # really only have 1 obj/image or max 3 labels/object
+    DETECTION_MAX_INSTANCES = 20
+
+    DETECTION_MIN_CONFIDENCE = 0.9
+    # DETECTION_NMS_THRESHOLD = 0.7
+
+    MEAN_PIXEL = np.array([113.45, 112.19, 130.92]) ### SYN RGB
+    # MEAN_PIXEL = np.array([183.77, 183.77, 183.77])  ### SYN DEPTH
+
+    IMAGE_RESIZE_MODE = "square"
+    IMAGE_MIN_DIM = 1024
+    IMAGE_MAX_DIM = 1024
+
+    USE_MINI_MASK = True
+    MINI_MASK_SHAPE = (56, 56)
+
+    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
+
+    TRAIN_ROIS_PER_IMAGE = 100 # TODO: DS bowl 512
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 128
+
+    MASK_SHAPE = [56, 56]  # TODO: AFFORANCENET TRIED 14, 28, 56, 112, 224
+
+    # TRAIN_BN=None # TODO: small batch size

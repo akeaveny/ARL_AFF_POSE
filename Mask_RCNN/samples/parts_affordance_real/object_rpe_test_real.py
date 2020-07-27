@@ -120,8 +120,8 @@ def seq_get_masks(image, pre_detection, cur_detection):
 
 def detect_and_get_masks(model, data_path, num_frames):
 
-    classes_file_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance_syn/dataset_config/object_rpe_classes_.txt'
-    class_id_file_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance_syn/dataset_config/object_rpe_class_ids_.txt'
+    ## classes_file_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance_syn/dataset_config/object_rpe_classes_.txt'
+    ## class_id_file_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance_syn/dataset_config/object_rpe_class_ids_.txt'
 
     gt_label_addr = data_path + '??????' + '_label.png'
     files = sorted(glob.glob(gt_label_addr))
@@ -161,22 +161,24 @@ def detect_and_get_masks(model, data_path, num_frames):
         # object_id = meta['Object_ID'].flatten().astype(np.int32)[0]
 
         # Detect objects
+        print("image: ", image.shape)
         cur_detect = model.detect([image], verbose=0)[0]
+        print("cur_detect: ", cur_detect['masks'].shape)
         if assign_first_pre_detect and cur_detect['masks'].shape[-1] > 0:
             assign_first_pre_detect = False
             pre_detect = cur_detect
-            with open(class_id_file_dir, 'w') as the_file:
-                # print("object_id: ", object_id)
-                # the_file.write(str(object_id))
-                # the_file.write('\n')
-
-                for idx, affordance_label in enumerate(cur_detect['class_ids']):
-                # for j in range(cur_detect['class_ids']):
-                    if affordance_label != 2 and affordance_label != 3 and affordance_label != 4 and affordance_label != 5 and affordance_label != 6:
-                        print("object idx: ", str(idx))
-                        print("affordance_label: ", str(affordance_label))
-                        the_file.write(str(idx))
-                        the_file.write('\n')
+            # with open(class_id_file_dir, 'w') as the_file:
+            #     # print("object_id: ", object_id)
+            #     # the_file.write(str(object_id))
+            #     # the_file.write('\n')
+            #
+            #     for idx, affordance_label in enumerate(cur_detect['class_ids']):
+            #     # for j in range(cur_detect['class_ids']):
+            #         if affordance_label != 2 and affordance_label != 3 and affordance_label != 4 and affordance_label != 5 and affordance_label != 6:
+            #             print("object idx: ", str(idx))
+            #             print("affordance_label: ", str(affordance_label))
+            #             the_file.write(str(idx))
+            #             the_file.write('\n')
 
         # get instance_masks
         if not assign_first_pre_detect:

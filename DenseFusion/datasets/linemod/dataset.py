@@ -23,7 +23,7 @@ import cv2
 
 class PoseDataset(data.Dataset):
     def __init__(self, mode, num, add_noise, root, noise_trans, refine):
-        self.objlist = [1]
+        self.objlist = [1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15]
         self.mode = mode
 
         self.list_rgb = []
@@ -55,17 +55,18 @@ class PoseDataset(data.Dataset):
                 self.list_rgb.append('{0}/data/{1}/rgb/{2}.png'.format(self.root, '%02d' % item, input_line))
                 self.list_depth.append('{0}/data/{1}/depth/{2}.png'.format(self.root, '%02d' % item, input_line))
                 if self.mode == 'eval':
-                    self.list_label.append('{0}/segnet_results/{1}_label/{2}_label.png'.format(self.root, '%02d' % item, input_line))
+                    self.list_label.append(
+                        '{0}/segnet_results/{1}_label/{2}_label.png'.format(self.root, '%02d' % item, input_line))
                 else:
                     self.list_label.append('{0}/data/{1}/mask/{2}.png'.format(self.root, '%02d' % item, input_line))
-                
+
                 self.list_obj.append(item)
                 self.list_rank.append(int(input_line))
 
             meta_file = open('{0}/data/{1}/gt.yml'.format(self.root, '%02d' % item), 'r')
             self.meta[item] = yaml.load(meta_file)
             self.pt[item] = ply_vtx('{0}/models/obj_{1}.ply'.format(self.root, '%02d' % item))
-            
+
             print("Object {0} buffer loaded".format(item))
 
         self.length = len(self.list_rgb)
@@ -77,7 +78,7 @@ class PoseDataset(data.Dataset):
 
         self.xmap = np.array([[j for i in range(640)] for j in range(480)])
         self.ymap = np.array([[i for i in range(640)] for j in range(480)])
-        
+
         self.num = num
         self.add_noise = add_noise
         self.trancolor = transforms.ColorJitter(0.2, 0.2, 0.2, 0.05)
@@ -93,7 +94,7 @@ class PoseDataset(data.Dataset):
         depth = np.array(Image.open(self.list_depth[index]))
         label = np.array(Image.open(self.list_label[index]))
         obj = self.list_obj[index]
-        rank = self.list_rank[index]        
+        rank = self.list_rank[index]
 
         if obj == 2:
             for i in range(0, len(self.meta[obj][rank])):
@@ -108,7 +109,7 @@ class PoseDataset(data.Dataset):
             mask_label = ma.getmaskarray(ma.masked_equal(label, np.array(255)))
         else:
             mask_label = ma.getmaskarray(ma.masked_equal(label, np.array([255, 255, 255])))[:, :, 0]
-        
+
         mask = mask_label * mask_depth
 
         if self.add_noise:
@@ -124,8 +125,8 @@ class PoseDataset(data.Dataset):
             rmin, rmax, cmin, cmax = get_bbox(meta['obj_bb'])
 
         img_masked = img_masked[:, rmin:rmax, cmin:cmax]
-        #p_img = np.transpose(img_masked, (1, 2, 0))
-        #scipy.misc.imsave('evaluation_result/{0}_input.png'.format(index), p_img)
+        # p_img = np.transpose(img_masked, (1, 2, 0))
+        # scipy.misc.imsave('evaluation_result/{0}_input.png'.format(index), p_img)
 
         target_r = np.resize(np.array(meta['cam_R_m2c']), (3, 3))
         target_t = np.array(meta['cam_t_m2c'])
@@ -134,7 +135,7 @@ class PoseDataset(data.Dataset):
         choose = mask[rmin:rmax, cmin:cmax].flatten().nonzero()[0]
         if len(choose) == 0:
             cc = torch.LongTensor([0])
-            return(cc, cc, cc, cc, cc, cc)
+            return (cc, cc, cc, cc, cc, cc)
 
         if len(choose) > self.num:
             c_mask = np.zeros(len(choose), dtype=int)
@@ -143,7 +144,7 @@ class PoseDataset(data.Dataset):
             choose = choose[c_mask.nonzero()]
         else:
             choose = np.pad(choose, (0, self.num - len(choose)), 'wrap')
-        
+
         depth_masked = depth[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         xmap_masked = self.xmap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         ymap_masked = self.ymap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
@@ -159,20 +160,20 @@ class PoseDataset(data.Dataset):
         if self.add_noise:
             cloud = np.add(cloud, add_t)
 
-        #fw = open('evaluation_result/{0}_cld.xyz'.format(index), 'w')
-        #for it in cloud:
+        # fw = open('evaluation_result/{0}_cld.xyz'.format(index), 'w')
+        # for it in cloud:
         #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
-        #fw.close()
+        # fw.close()
 
         model_points = self.pt[obj] / 1000.0
         dellist = [j for j in range(0, len(model_points))]
         dellist = random.sample(dellist, len(model_points) - self.num_pt_mesh_small)
         model_points = np.delete(model_points, dellist, axis=0)
 
-        #fw = open('evaluation_result/{0}_model_points.xyz'.format(index), 'w')
-        #for it in model_points:
+        # fw = open('evaluation_result/{0}_model_points.xyz'.format(index), 'w')
+        # for it in model_points:
         #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
-        #fw.close()
+        # fw.close()
 
         target = np.dot(model_points, target_r.T)
         if self.add_noise:
@@ -182,35 +183,10 @@ class PoseDataset(data.Dataset):
             target = np.add(target, target_t / 1000.0)
             out_t = target_t / 1000.0
 
-        #fw = open('evaluation_result/{0}_tar.xyz'.format(index), 'w')
-        #for it in target:
+        # fw = open('evaluation_result/{0}_tar.xyz'.format(index), 'w')
+        # for it in target:
         #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
-        #fw.close()
-
-        # ===================== SCREEN POINTS =====================
-        cam_mat = np.array([[self.cam_fx, 0, self.cam_cx], [0, self.cam_fy, self.cam_cy], [0, 0, 1]])
-        dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
-
-        cv2_img = img = Image.open(self.list_rgb[index])
-        imgpts, jac = cv2.projectPoints(cloud, np.eye(3), np.zeros(shape=target_t.shape), cam_mat, dist)
-        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        cv2.imwrite('/data/Akeaveny/Datasets/linemod/test/cv2.cloud.png', cv2_img)
-
-        imgpts, jac = cv2.projectPoints(target, np.eye(3), np.zeros(shape=target_t.shape), cam_mat, dist)
-        cv2_img = img = Image.open(self.list_rgb[index])
-        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        cv2.imwrite('/data/Akeaveny/Datasets/linemod/test/cv2.target.png', cv2_img)
-
-        imgpts, jac = cv2.projectPoints(model_points, target_r.T, target_t, cam_mat, dist)
-        cv2_img = img = Image.open(self.list_rgb[index])
-        cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-        cv2.imwrite('/data/Akeaveny/Datasets/linemod/test/cv2.model4.png', cv2_img)
-
-        # # =========== save images ================
-        p_img = np.transpose(img_masked, (1, 2, 0))
-        scipy.misc.imsave('/data/Akeaveny/Datasets/linemod/test/input.png', p_img)
-        scipy.misc.imsave('/data/Akeaveny/Datasets/linemod/test/label.png',
-                          mask[rmin:rmax, cmin:cmax].astype(np.int32))
+        # fw.close()
 
         return torch.from_numpy(cloud.astype(np.float32)), \
                torch.LongTensor(choose.astype(np.int32)), \
@@ -232,7 +208,6 @@ class PoseDataset(data.Dataset):
             return self.num_pt_mesh_small
 
 
-
 border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680]
 img_width = 480
 img_length = 640
@@ -240,8 +215,7 @@ img_length = 640
 
 def mask_to_bbox(mask):
     mask = mask.astype(np.uint8)
-    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
+    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     x = 0
     y = 0
@@ -266,7 +240,7 @@ def get_bbox(bbox):
     if bbx[2] < 0:
         bbx[2] = 0
     if bbx[3] >= 640:
-        bbx[3] = 639                
+        bbx[3] = 639
     rmin, rmax, cmin, cmax = bbx[0], bbx[1], bbx[2], bbx[3]
     r_b = rmax - rmin
     for tt in range(len(border_list)):

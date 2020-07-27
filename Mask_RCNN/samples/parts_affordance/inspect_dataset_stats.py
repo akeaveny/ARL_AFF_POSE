@@ -36,6 +36,7 @@ import argparse
 #  Parse command line arguments
 ############################################################
 parser = argparse.ArgumentParser(description='Get Stats from Image Dataset')
+
 parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
@@ -56,7 +57,7 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer'
+assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
 if args.dataset_type == 'real':
     import dataset_real as Affordance
     save_to_folder = '/images/dataset_images_real/'
@@ -72,6 +73,10 @@ elif args.dataset_type == 'syn1':
 elif args.dataset_type == 'hammer':
     import dataset_syn_hammer as Affordance
     save_to_folder = '/images/dataset_images_syn_hammer/'
+    image_area_bins = [480 * 640]
+elif args.dataset_type == 'hammer1':
+    import dataset_syn_hammer1 as Affordance
+    save_to_folder = '/images/dataset_images_syn_hammer1/'
     image_area_bins = [480 * 640]
 
 if not (os.path.exists(os.getcwd()+save_to_folder)):
@@ -96,11 +101,11 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 # config_.gpu_options.allow_growth = True
 # sess = tf.Session(config=config_)
 
-from mrcnn import utils
 from mrcnn import visualize
 from mrcnn.visualize import display_images
-from mrcnn import model as modellib, utils
 from mrcnn.model import log
+
+from mrcnn import model as modellib, utils
 
 ############################################################
 #  utility functions
@@ -147,7 +152,7 @@ def image_stats(image_id):
 ''' --- based on https://github.com/matterport/Mask_RCNN/blob/master/samples/nucleus/inspect_nucleus_data.ipynb --- '''
 
 if __name__ == '__main__':
-    np.random.seed(1)
+    np.random.seed(5)
 
     if args.save_output:
         sys.stdout = open(os.getcwd() + save_to_folder + 'output.txt', "w")
@@ -157,11 +162,12 @@ if __name__ == '__main__':
     assert args.dataset, "Argument --dataset is required for training"
 
     config = Affordance.AffordanceConfig()
-    config.display()
 
     dataset = Affordance.AffordanceDataset()
     dataset.load_Affordance(args.dataset, subset=args.dataset_split)
     dataset.prepare()  # Must call before using the dataset
+
+    config.display()
 
     captions = np.array(dataset.class_names)
     ### print("Classes: {}".format(captions))
@@ -182,7 +188,7 @@ if __name__ == '__main__':
     image_color = np.array([s['color'] for s in stats])
     print("Class Count: {}".format(dataset.num_classes))
     print("Image Count: ", image_shape.shape[0])
-    # print("Color mean (RGB+D):{:.2f} {:.2f} {:.2f}".format(*np.mean(image_color, axis=0)))
+    print("Color mean (RGB):{:.2f} {:.2f} {:.2f}".format(*np.mean(image_color, axis=0)))
 
     ##################################
     ###  Display Samples
@@ -283,14 +289,14 @@ if __name__ == '__main__':
     ##################################
     print('\n --------------- IMGAUG ---------------')
 
-    augmentation = iaa.Sometimes(0.9, [
+    augmentation = iaa.Sometimes(0.5, [
         iaa.Fliplr(0.5),
         iaa.Flipud(0.5),
-        # iaa.Multiply((0.8, 1.2)),
-        # iaa.GaussianBlur(sigma=(0.0, 5.0)),
-        # iaa.OneOf([iaa.Affine(rotate=90),
-        #            iaa.Affine(rotate=180),
-        #            iaa.Affine(rotate=270)]),
+        iaa.Multiply((0.8, 1.2)),
+        iaa.GaussianBlur(sigma=(0.0, 2.0)),
+        iaa.OneOf([iaa.Affine(rotate=90),
+                   iaa.Affine(rotate=180),
+                   iaa.Affine(rotate=270)]),
     ])
 
     # Load the image multiple times to show augmentations

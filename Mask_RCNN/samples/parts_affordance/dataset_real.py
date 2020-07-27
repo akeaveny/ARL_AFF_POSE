@@ -45,7 +45,7 @@ class AffordanceConfig(Config):
     IMAGES_PER_GPU = 2
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
     import tensorflow as tf
     config = tf.ConfigProto()
@@ -82,8 +82,10 @@ class AffordanceConfig(Config):
     ##################################
     ''' --- run datasetstats for all params below --- '''
 
-    MAX_GT_INSTANCES = 5 # really only have 1 obj/image
-    DETECTION_MAX_INSTANCES = 5
+    MAX_GT_INSTANCES = 3 # really only have 1 obj/image
+    DETECTION_MAX_INSTANCES = 3
+
+    DETECTION_MIN_CONFIDENCE = 0.9
 
     MEAN_PIXEL = np.array([91.13, 88.92, 98.65])
 
@@ -91,13 +93,11 @@ class AffordanceConfig(Config):
     IMAGE_MIN_DIM = 384
     IMAGE_MAX_DIM = 384
 
-    USE_MINI_MASK = True
-    MINI_MASK_SHAPE = (56, 56) ### AFFORANCENET: TRIED 14, 28, 56, 112, 224
-
-    ### MASK_POOL_SIZE = 28
-    ### MASK_SHAPE = [56, 56]
-
     RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
+
+    USE_MINI_MASK = False
+    MINI_MASK_SHAPE = (56, 56)
+
 
 # ###########################################################
 # # Dataset
@@ -138,8 +138,10 @@ class AffordanceDataset(utils.Dataset):
             annotations = json.load(
                 open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/val_300.json'))
         elif subset == 'test':
+            #annotations = json.load(
+            #    open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100.json'))
             annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100.json'))
+                 open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100_hammer.json'))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

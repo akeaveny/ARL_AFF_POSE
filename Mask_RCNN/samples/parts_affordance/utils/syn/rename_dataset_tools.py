@@ -8,12 +8,12 @@ import scipy.io as sio
 
 # =================== new directory ========================
 # 0.
-data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/parts_affordance1/'
-new_data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_'
+data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/parts_affordance1_hammer/'
+new_data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer1_'
 
 # =================== load from ========================
 # 1.
-folder_to_object = 'parts_affordance1/'
+folder_to_object = 'parts_affordance1_hammer/'
 
 objects = [
     # 'bowl_01/',  'bowl_02/',  'bowl_03/',  'bowl_04/',  'bowl_05/',
@@ -63,27 +63,31 @@ objects = [
 
 # 2.
 scenes = [
-          'turn_table/', 'bench/', 'floor/',
-          'dr/'
+        'bench/', 'floor/', 'turn_table/',
+        'dr/'
           ]
 
 # 3.
 splits = [
           'train/',
-          'val/'
+          # 'val/'
           ]
 
 # 4.
-cameras = ['Kinetic/', 'Xtion/', 'ZED/']
+cameras = [
+    'Kinetic/',
+    'Xtion/',
+    'ZED/'
+]
 
 # =================== images ext ========================
-# image_ext10 = '.json'
+image_ext10 = '.json'
 image_ext20 = '.cs.png'
 image_ext30 = '.depth.cm.8.png'
 image_ext40 = '.depth.png'
 image_ext50 = '.png'
 image_exts1 = [
-    #image_ext10,
+    image_ext10,
     image_ext20,
     image_ext30,
     image_ext40,
@@ -121,13 +125,7 @@ for split in splits:
                             json_num = str(count)[1:]
                             json_file = folder_to_save + np.str(json_num) + '.json'
 
-                            # object_str = object.split(folder_to_object)[1]
-                            # object_id = object_str.split("__")[0]
-                            # model_id = object_str.split("/")[0]
-                            # model_id = model_id.split("__")[1]
-
                             camera_settings = camera.split("/")[0]
-                            # print(object_id, camera_settings, model_id)
                             mat = json_to_mat(json_file, camera_settings)
 
                             new_mat_name = folder_to_save + np.str(image_num) + '-meta.mat'
@@ -154,6 +152,5 @@ for split in splits:
                         # print("New File: ", new_file_name)
 
                         shutil.copyfile(old_file_name, move_file_name)
-                        ### os.rename(old_file_name, new_file_name)
 
                 offset += len(files)

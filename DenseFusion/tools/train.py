@@ -20,17 +20,20 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 from torch.autograd import Variable
-from datasets.ycb.dataset import PoseDataset as PoseDataset_ycb
-from datasets.linemod.dataset import PoseDataset as PoseDataset_linemod
+
 from lib.network import PoseNet, PoseRefineNet
 from lib.loss import Loss
 from lib.loss_refiner import Loss_refine
 from lib.utils import setup_logger
 
+from datasets.ycb.dataset import PoseDataset as PoseDataset_ycb
+from datasets.linemod.dataset import PoseDataset as PoseDataset_linemod
+from datasets.parts_affordance.dataset import PoseDataset as PoseDataset_syn
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', type=str, default = 'ycb', help='ycb or linemod')
-parser.add_argument('--dataset_root', type=str, default = '', help='dataset root dir (''YCB_Video_Dataset'' or ''Linemod_preprocessed'')')
-parser.add_argument('--batch_size', type=int, default = 8, help='batch size')
+parser.add_argument('--dataset', type=str, default = 'parts-affordance', help='ycb or linemod')
+parser.add_argument('--dataset_root', type=str, default ='/data/Akeaveny/Datasets/part-affordance_combined/ndds2', help='dataset root dir (''YCB_Video_Dataset'' or ''Linemod_preprocessed'')')
+parser.add_argument('--batch_size', type=int, default =8, help='batch size')
 parser.add_argument('--workers', type=int, default = 10, help='number of data loading workers')
 parser.add_argument('--lr', default=0.0001, help='learning rate')
 parser.add_argument('--lr_rate', default=0.3, help='learning rate decay rate')
@@ -46,6 +49,10 @@ parser.add_argument('--resume_refinenet', type=str, default = '',  help='resume 
 parser.add_argument('--start_epoch', type=int, default = 1, help='which epoch to start')
 opt = parser.parse_args()
 
+###################
+# GPU
+###################
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def main():
     opt.manualSeed = random.randint(1, 10000)
@@ -58,12 +65,36 @@ def main():
         opt.outf = 'trained_models/ycb' #folder to save trained models
         opt.log_dir = 'experiments/logs/ycb' #folder to save logs
         opt.repeat_epoch = 1 #number of repeat times for one epoch training
+
     elif opt.dataset == 'linemod':
         opt.num_objects = 13
         opt.num_points = 500
         opt.outf = 'trained_models/linemod'
         opt.log_dir = 'experiments/logs/linemod'
+        output_results = 'check_linemod.txt'
         opt.repeat_epoch = 20
+
+
+    elif opt.dataset == 'parts-affordance':
+        print(opt.dataset)
+        opt.num_objects = 205
+        opt.num_points = 500
+        opt.outf = 'trained_models/parts_affordance/hammer'  # TODO:
+        opt.log_dir = 'experiments/logs/parts_affordance/hammer'
+        output_results = 'check_parts_affordance.txt'
+        opt.repeat_epoch = 1
+
+        #########
+        # ak
+        #########
+        opt.nepoch = 500
+        opt.w = 0.01
+        opt.iteration = 5
+
+        opt.start_epoch = 174
+        opt.resume_posenet = 'pose_model_59_0.0279605816403887.pth'
+        ### resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
+
     else:
         print('Unknown dataset')
         return
@@ -93,11 +124,18 @@ def main():
         dataset = PoseDataset_ycb('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'linemod':
         dataset = PoseDataset_linemod('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+    elif opt.dataset == 'parts-affordance':
+        dataset = PoseDataset_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+
     if opt.dataset == 'ycb':
         test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'linemod':
         test_dataset = PoseDataset_linemod('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
+    elif opt.dataset == 'parts-affordance':
+        test_dataset = PoseDataset_syn('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
+
     testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
     
     opt.sym_list = dataset.get_sym_list()
@@ -131,7 +169,7 @@ def main():
             for i, data in enumerate(dataloader, 0):
                 points, choose, img, target, model_points, idx = data
 
-                fw = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/check_linemod.txt', 'w')
+                fw = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/' + output_results, 'w') # TODO:
                 fw.write('Points\n{0}\n\nchoose\n{1}\n\nimg\n{2}\n\ntarget\n{3}\n\nmodel_points\n{4}'.format(points, choose, img, target, model_points))
                 fw.close()
 
@@ -223,11 +261,18 @@ def main():
                 dataset = PoseDataset_ycb('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
             elif opt.dataset == 'linemod':
                 dataset = PoseDataset_linemod('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+            elif opt.dataset == 'parts-affordance':
+                dataset = PoseDataset_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+
             dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+
             if opt.dataset == 'ycb':
                 test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'linemod':
                 test_dataset = PoseDataset_linemod('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
+            elif opt.dataset == 'parts-affordance':
+                test_dataset = PoseDataset_syn('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
+
             testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
             
             opt.sym_list = dataset.get_sym_list()

@@ -45,51 +45,58 @@ def json_to_mat(json_file, camera_settings):
 
                 # ================ class idx ======================
                 actor_tag = object['class']
-                affordance_id = actor_tag.split("_")[0]
-                model_id = actor_tag.split("_")[1]
-                affordance_label = actor_tag.split("_")[-1]
+                # print("actor_tag: ", actor_tag)
 
-                # print("affordance_id: ", affordance_id)
-                # print("affordance_label: ", affordance_label)
-                # print("model_id: ", model_id)
+                if 'hammer' in actor_tag:
+                        # print("actor_tag: ", actor_tag)
 
-                output['Affordance_ID'].append(affordance_id)
-                output['Affordance_Label'].append(affordance_label)
-                output['Model_ID'].append(model_id)
+                        affordance_id = actor_tag.split("_")[0]
+                        model_id = actor_tag.split("_")[1]
+                        affordance_label = actor_tag.split("_")[-1]
 
-                # ================ pose =========================
-                rot = np.asarray(object['pose_transform'])[0:3, 0:3]
-                output['rot' + np.str(affordance_id)] = rot
+                        # print("affordance_id: ", affordance_id)
+                        # print("affordance_label: ", affordance_label)
+                        # print("model_id: ", model_id)
 
-                translation = np.array(object['location']) * 10  # NDDS gives units in centimeters
-                output['cam_translation' + np.str(affordance_id)] = translation
+                        output['Affordance_ID'].append(affordance_id)
+                        output['Affordance_Label'].append(affordance_label)
+                        output['Model_ID'].append(model_id)
 
-                quaternion = np.asarray(object['quaternion_xyzw'])
-                output['quaterniona' + np.str(affordance_id)] = quaternion
+                        # ================ pose =========================
+                        rot = np.asarray(object['pose_transform'])[0:3, 0:3]
+                        output['rot' + np.str(affordance_id)] = rot
 
-                quaternion_obj2cam = R.from_quat(np.array(object['quaternion_xyzw']))
-                quaternion_cam2world = R.from_quat(np.array(open_json_file['camera_data']['quaternion_xyzw_worldframe']))
-                quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
-                mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
-                r = R.from_matrix(mirrored_y_axis)
-                output['quaternionb' + np.str(affordance_id)] = r.as_quat()
+                        translation = np.array(object['location']) * 10  # NDDS gives units in centimeters
+                        output['cam_translation' + np.str(affordance_id)] = translation
 
+                        quaternion = np.asarray(object['quaternion_xyzw'])
+                        output['quaterniona' + np.str(affordance_id)] = quaternion
 
-                # ================ mat =========================
-                # rmin, rmax, cmin, cmax = get_bbox(mask)
-                rmax, cmax = np.asarray(object['bounding_box']['top_left'])
-                rmin, cmin = np.asarray(object['bounding_box']['bottom_right'])
-                output['bbox' + np.str(affordance_id)] = rmin, rmax, cmin, cmax
+                        quaternion_obj2cam = R.from_quat(np.array(object['quaternion_xyzw']))
+                        quaternion_cam2world = R.from_quat(np.array(open_json_file['camera_data']['quaternion_xyzw_worldframe']))
+                        quaternion_obj2world = quaternion_obj2cam * quaternion_cam2world
+                        mirrored_y_axis = np.dot(quaternion_obj2world.as_dcm(), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+                        r = R.from_matrix(mirrored_y_axis)
+                        output['quaternionb' + np.str(affordance_id)] = r.as_quat()
 
-                # ================ camera =========================
-                output['camera_setting' + np.str(affordance_id)] = camera_settings
-                output['camera_scale' + np.str(affordance_id)] = [np.asarray([1], dtype=np.uint16)]
-                output['depth_scale' + np.str(affordance_id)] = [np.asarray([1000], dtype=np.uint16)]
-                output['width' + np.str(affordance_id)] = width
-                output['height' + np.str(affordance_id)] = height
-                output['fx'+ np.str(affordance_id)] = cam_fx
-                output['fy'+ np.str(affordance_id)] = cam_fy
-                output['cx'+ np.str(affordance_id)] = cam_cx
-                output['cy'+ np.str(affordance_id)] = cam_cy
+                        # ================ mat =========================
+                        # rmin, rmax, cmin, cmax = get_bbox(mask)
+                        rmax, cmax = np.asarray(object['bounding_box']['top_left'])
+                        rmin, cmin = np.asarray(object['bounding_box']['bottom_right'])
+                        output['bbox' + np.str(affordance_id)] = rmin, rmax, cmin, cmax
+
+                        # ================ camera =========================
+                        output['camera_setting' + np.str(affordance_id)] = camera_settings
+                        output['camera_scale' + np.str(affordance_id)] = [np.asarray([1], dtype=np.uint16)]
+                        output['depth_scale' + np.str(affordance_id)] = [np.asarray([1000], dtype=np.uint16)]
+                        output['width' + np.str(affordance_id)] = width
+                        output['height' + np.str(affordance_id)] = height
+                        output['fx'+ np.str(affordance_id)] = cam_fx
+                        output['fy'+ np.str(affordance_id)] = cam_fy
+                        output['cx'+ np.str(affordance_id)] = cam_cx
+                        output['cy'+ np.str(affordance_id)] = cam_cy
+
+                else:
+                        pass
 
         return output

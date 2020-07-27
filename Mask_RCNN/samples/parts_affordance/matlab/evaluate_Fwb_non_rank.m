@@ -8,10 +8,11 @@ aff_list = {1, 2, 3, 4, 5, 6, 7};
 
 % get all files
 list_gt = getAllFiles(path, '*_label.png', 1);   % get all files in current folder
-list_predicted = getAllFiles(path, '*.mask.png', 1);
+list_predicted = getAllFiles(path, '*_mask_og.png', 1);
 
 list_predicted = sort(list_predicted);
 list_gt = sort(list_gt); % make the same style
+fprintf('gt: %d, pred: %d \n', length(list_gt), length(list_predicted));
 assert(length(list_predicted)==length(list_gt)); % test length
 num_of_files = length(list_gt);
 

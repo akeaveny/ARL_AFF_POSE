@@ -40,30 +40,35 @@ import argparse
 #  Parse command line arguments
 ############################################################
 parser = argparse.ArgumentParser( description='Train Mask R-CNN to detect Affordance.')
+
 parser.add_argument('--train', required=False, default='rgb',
                     type=str,
                     metavar="Train RGB or RGB+D")
+
 parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds2/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
                     type=str,
                     metavar='real or syn or syn1')
+
 parser.add_argument('--weights', required=True,
                     metavar="/path/to/weights.h5 or 'coco'")
 parser.add_argument('--logs', required=False,
                     default=DEFAULT_LOGS_DIR,
                     metavar="/path/to/logs/",
                     help='Logs and checkpoints directory (default=logs/)')
+
 parser.add_argument('--display_keras', required=False, default=False,
                     type=str,
                     metavar='Display Keras Layers')
+
 args = parser.parse_args()
 
 ############################################################
 #  REAL OR SYN
 ############################################################
-assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer'
+assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
 if args.dataset_type == 'real':
     import dataset_real as Affordance
 elif args.dataset_type == 'syn':
@@ -72,6 +77,8 @@ elif args.dataset_type == 'syn1':
     import dataset_syn1 as Affordance
 elif args.dataset_type == 'hammer':
     import dataset_syn_hammer as Affordance
+elif args.dataset_type == 'hammer1':
+    import dataset_syn_hammer1 as Affordance
 
 # ##################################
 # ###  GPU
@@ -89,7 +96,7 @@ from mrcnn.config import Config
 if args.train == 'rgb':
     from mrcnn import model as modellib, utils
 if args.train == 'rgbd':
-    from mrcnn import modeldepth as modellib, utils # TODO: fix loading RGB+D from config file
+    from mrcnn import modeldepth as modellib, utils
 
 ############################################################
 #  train
@@ -116,14 +123,14 @@ def train(model, args):
     #  IMMGAUG
     ##################
 
-    augmentation = iaa.Sometimes(0.9, [
+    augmentation = iaa.Sometimes(0.5, [
         iaa.Fliplr(0.5),
         iaa.Flipud(0.5),
-        # iaa.Multiply((0.8, 1.2)),
-        # iaa.GaussianBlur(sigma=(0.0, 5.0)),
-        # iaa.OneOf([iaa.Affine(rotate=90),
-        #            iaa.Affine(rotate=180),
-        #            iaa.Affine(rotate=270)]),
+        iaa.Multiply((0.8, 1.2)),
+        iaa.GaussianBlur(sigma=(0.0, 2.0)),
+        iaa.OneOf([iaa.Affine(rotate=90),
+                   iaa.Affine(rotate=180),
+                   iaa.Affine(rotate=270)]),
     ])
 
     # elif args.dataset_type == 'syn' or args.dataset_type == 'syn1':
@@ -138,7 +145,7 @@ def train(model, args):
     print("\n************* trainining HEADS *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=100,
+                epochs=10, # 100
                 augmentation=augmentation,
                 layers='heads')
 
@@ -147,7 +154,7 @@ def train(model, args):
     print("\n************* trainining ResNET 4+ *************")
     model.train(dataset_train, dataset_val,
               learning_rate=config.LEARNING_RATE,
-              epochs=160,
+              epochs=15,  # 100
               augmentation=augmentation,
               layers='4+')
 
@@ -156,7 +163,7 @@ def train(model, args):
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE/10,
-                epochs=240,
+                epochs=20, # 240
                 augmentation=augmentation,
                 layers='all')
 

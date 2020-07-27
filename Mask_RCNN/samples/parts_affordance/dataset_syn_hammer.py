@@ -46,16 +46,16 @@ class AffordanceConfig(Config):
     ###  GPU
     ##################################
 
-    GPU_COUNT = 1
+    GPU_COUNT = 2
     IMAGES_PER_GPU = 2
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 
     config_ = tf.ConfigProto()
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.9)
-    config_ = tf.ConfigProto(gpu_options=gpu_options)
-    # config_.gpu_options.allow_growth = True
+    #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.90)
+    #config_ = tf.ConfigProto(gpu_options=gpu_options)
+    config_.gpu_options.allow_growth = True
     sess = tf.Session(config=config_)
 
     ##################################
@@ -63,7 +63,6 @@ class AffordanceConfig(Config):
     ##################################
 
     ### BACKBONE = "resnet50"
-    ### RESNET_ARCHITECTURE = "resnet50"
 
     ##################################
     ###
@@ -77,38 +76,37 @@ class AffordanceConfig(Config):
     ##################################
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = (1584) // bs
-    VALIDATION_STEPS = (721) // bs
+    STEPS_PER_EPOCH = (1584*10) // bs
+    VALIDATION_STEPS = (721*10) // bs
 
     ##################################
     ###  FROM DATASET STATS
     ##################################
     ''' --- run datasetstats for all params below --- '''
 
-    MAX_GT_INSTANCES = 20 # really only have 1 obj/image or max 3 labels/object
-    DETECTION_MAX_INSTANCES = 20
+    ## MAX_GT_INSTANCES = 2    # really only have 1 obj/image or max 3 labels/object
+    ## DETECTION_MAX_INSTANCES = 2
 
     DETECTION_MIN_CONFIDENCE = 0.9
-    # DETECTION_NMS_THRESHOLD = 0.7
 
     MEAN_PIXEL = np.array([113.45, 112.19, 130.92]) ### SYN RGB
     # MEAN_PIXEL = np.array([183.77, 183.77, 183.77])  ### SYN DEPTH
 
     IMAGE_RESIZE_MODE = "square"
-    IMAGE_MIN_DIM = 1280
-    IMAGE_MAX_DIM = 1280
+    IMAGE_MIN_DIM = 896
+    IMAGE_MAX_DIM = 896
+
+    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512) # 1024
 
     USE_MINI_MASK = True
     MINI_MASK_SHAPE = (56, 56)
 
-    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
-
     TRAIN_ROIS_PER_IMAGE = 100 # TODO: DS bowl 512
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 128
 
-    # MASK_POOL_SIZE = 28
-    # MASK_SHAPE = [244, 244]  # TODO: AFFORANCENET TRIED 14, 28, 56, 112, 224
+    # MASK_SHAPE = [56, 56]  # TODO: AFFORANCENET TRIED 14, 28, 56, 112, 224
 
-    # TRAIN_BN=None # TODO: small batch size
+RAIN_BN=None # TODO: small batch size
 
 # ###########################################################
 # # Dataset
@@ -126,45 +124,46 @@ class AffordanceDataset(utils.Dataset):
         assert subset in ["train", "val", "test"]
         if subset == 'train':
             print("\n************************** LOADING TRAIN **************************")
-           # annotations = json.load(
-           #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/dr/train792.json'))
-            annotations = {}
-           # annotations.update(json.load(
-           #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/bench/train264.json')))
-           # annotations.update(json.load(
-           #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/floor/train264.json')))
+            annotations = json.load(
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/dr/train792.json'))
+            #### annotations = {}
+            annotations.update(json.load(
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/bench/train264.json')))
+            annotations.update(json.load(
+               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/floor/train264.json')))
             annotations.update(json.load(
                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/turn_table/train264.json')))
         elif subset == 'val':
             print("\n************************** LOADING VAL **************************")
-           # annotations = json.load(
-           #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/dr/val360.json'))
-            annotations = {}
-           # annotations.update(json.load(
-           #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/bench/val120.json')))
-           # annotations.update(json.load(
-           #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/floor/val120.json')))
+            annotations = json.load(
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/dr/val360.json'))
+            ### annotations = {}
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/bench/val120.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/floor/val120.json')))
             annotations.update(json.load(
                 open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/turn_table/val120.json')))
         elif subset == 'test':
             print("\n************************** LOADING TEST **************************")
-            # annotations = json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100_hammer.json'))
             annotations = json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/dr/test25.json'))
-            ### annotations = {}
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/bench/test25.json')))
-            annotations.update(json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/floor/test25.json')))
-            annotations.update(json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/turn_table/test25.json')))
+                 open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100_hammer.json'))
+            # annotations = json.load(
+            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/dr/test25.json'))
+            # ## annotations = {}
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/bench/test25.json')))
+            # annotations.update(json.load(
+            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/floor/test25.json')))
+            # annotations.update(json.load(
+            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer/turn_table/test25.json')))
 
         annotations = list(annotations.values())
+        # print(annotations)
         # The VIA tool saves images in the JSON even if they don't have any
         # annotations. Skip unannotated images.
-        # annotations = [a for a in annotations if a['regions']]
-        annotations = [a for a in annotations]
+        annotations = [a for a in annotations if a['regions']]
+        # annotations = [a for a in annotations]
 
         # Add images
         for a in annotations:
@@ -443,11 +442,10 @@ class AffordanceDataset(utils.Dataset):
         rgb = skimage.io.imread(file_path + "rgb.png")
         depth = skimage.io.imread(file_path + "depth.png")
 
-        ##########################
-        # RGB has alpha
+        ##################################
+        # RGB has 4th channel - alpha
         # depth to 3 channels
-        ##########################
-
+        ##################################
         return rgb[..., :3], skimage.color.gray2rgb(depth)
 
     def load_mask(self, image_id):

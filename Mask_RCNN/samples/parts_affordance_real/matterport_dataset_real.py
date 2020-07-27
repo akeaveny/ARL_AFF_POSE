@@ -24,7 +24,7 @@ from mrcnn import model as modellib, utils, visualize
 from mrcnn.model import log
 
 # ========== GPU config ================
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import tensorflow as tf
 config = tf.ConfigProto()
@@ -79,9 +79,9 @@ class AffordanceConfig(Config):
     RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     # RPN_ANCHOR_RATIOS = [0.5, 1, 1.25, 2]
 
-    MASK_POOL_SIZE = 28
-    MASK_SHAPE = [56, 56]
-    MINI_MASK_SHAPE = (224, 224)
+    # MASK_POOL_SIZE = 28
+    # MASK_SHAPE = [56, 56]
+    # MINI_MASK_SHAPE = (224, 224)
     # USE_MINI_MASK = False
 
     # POST_NMS_ROIS_TRAINING = 2000

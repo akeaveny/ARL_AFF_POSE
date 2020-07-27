@@ -51,7 +51,6 @@ ycb_toolbox_dir = 'YCB_Video_toolbox'
 result_wo_refine_dir = 'experiments/eval_result/ycb/Densefusion_wo_refine_result'
 result_refine_dir = 'experiments/eval_result/ycb/Densefusion_iterative_result'
 
-
 def get_bbox(posecnn_rois):
     rmin = int(posecnn_rois[idx][3]) + 1
     rmax = int(posecnn_rois[idx][5]) - 1
@@ -89,7 +88,6 @@ def get_bbox(posecnn_rois):
         cmax = img_length
         cmin -= delt
     return rmin, rmax, cmin, cmax
-
 
 estimator = PoseNet(num_points=num_points, num_obj=num_obj)
 estimator.cuda()

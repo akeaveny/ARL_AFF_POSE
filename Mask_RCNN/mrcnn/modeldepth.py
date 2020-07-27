@@ -1003,7 +1003,11 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     x = KL.Activation('relu')(x)
 
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
-                           name="mrcnn_mask_deconv")(x)
+                           name="mrcnn_mask_deconv1")(x)
+    ### TODO: 56 x 56
+    # x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
+    #                        name="mrcnn_mask_deconv2")(x)
+
     x = KL.TimeDistributed(KL.Conv2D(num_classes, (1, 1), strides=1, activation="sigmoid"),
                            name="mrcnn_mask")(x)
     return x
@@ -2207,16 +2211,19 @@ class MaskRCNN():
         """Finds the last checkpoint file of the last trained model in the
         model directory.
         Returns:
-            log_dir: The directory where events and weights are saved
-            checkpoint_path: the path to the last checkpoint file
+            The path of the last checkpoint file
         """
         # Get directory names. Each directory corresponds to a model
         dir_names = next(os.walk(self.model_dir))[1]
         key = self.config.NAME.lower()
         dir_names = filter(lambda f: f.startswith(key), dir_names)
         dir_names = sorted(dir_names)
+        # print(dir_names)
         if not dir_names:
-            return None, None
+            import errno
+            raise FileNotFoundError(
+                errno.ENOENT,
+                "Could not find model directory under {}".format(self.model_dir))
         # Pick last directory
         dir_name = os.path.join(self.model_dir, dir_names[-1])
         # Find the last checkpoint
@@ -2224,9 +2231,11 @@ class MaskRCNN():
         checkpoints = filter(lambda f: f.startswith("mask_rcnn"), checkpoints)
         checkpoints = sorted(checkpoints)
         if not checkpoints:
-            return dir_name, None
+            import errno
+            raise FileNotFoundError(
+                errno.ENOENT, "Could not find weight files in {}".format(dir_name))
         checkpoint = os.path.join(dir_name, checkpoints[-1])
-        return dir_name, checkpoint
+        return checkpoint
 
     def save_weights(self, filepath, name):
         self.keras_model.save_weights(filepath=filepath, overwrite=True)
@@ -2260,7 +2269,7 @@ class MaskRCNN():
         # In multi-GPU training, we wrap the model. Get layers
         # of the inner model because they have the weights.
         keras_model = self.keras_model
-        layers = keras_model.inner_model.layers if hasattr(keras_model, "inner_model")\
+        layers = keras_model.inner_model.layers if hasattr(keras_model, "inner_model") \
             else keras_model.layers
 
         # Exclude some layers
@@ -2662,7 +2671,7 @@ class MaskRCNN():
             })
         return results
 
-    def detectWdepth(self, images,depthimages, verbose=0):
+    def detectWdepth(self, images, depthimages, verbose=0):
         """Runs the detection pipeline.
 
         images: List of images, potentially of different sizes.
@@ -2720,7 +2729,7 @@ class MaskRCNN():
             })
         return results
 
-    def detect_molded(self, molded_images, image_metas, verbose=0):
+    def detect_molded(self, molded_images, depthimages, image_metas, verbose=0):
         """Runs the detection pipeline, but expect inputs that are
         molded already. Used mostly for debugging and inspecting
         the model.
@@ -2760,8 +2769,9 @@ class MaskRCNN():
             log("image_metas", image_metas)
             log("anchors", anchors)
         # Run object detection
+        molded_depth_images, _, _ = self.mold_inputs(depthimages)
         detections, _, _, mrcnn_mask, _, _, _ =\
-            self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
+            self.keras_model.predict([molded_images, molded_depth_images, image_metas, anchors], verbose=0)
         # Process detections
         results = []
         for i, image in enumerate(molded_images):
