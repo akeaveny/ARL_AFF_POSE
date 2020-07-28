@@ -46,11 +46,11 @@ class AffordanceConfig(Config):
     ###  GPU
     ##################################
 
-    GPU_COUNT = 2
+    GPU_COUNT = 1
     IMAGES_PER_GPU = 2
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
     config_ = tf.ConfigProto()
     #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.90)
@@ -84,10 +84,10 @@ class AffordanceConfig(Config):
     ##################################
     ''' --- run datasetstats for all params below --- '''
 
-    ## MAX_GT_INSTANCES = 2    # really only have 1 obj/image or max 3 labels/object
-    ## DETECTION_MAX_INSTANCES = 2
+    MAX_GT_INSTANCES = 2    # really only have 1 obj/image or max 3 labels/object
+    DETECTION_MAX_INSTANCES = 2
 
-    DETECTION_MIN_CONFIDENCE = 0.9
+    # DETECTION_MIN_CONFIDENCE = 0.9
 
     MEAN_PIXEL = np.array([113.45, 112.19, 130.92]) ### SYN RGB
     # MEAN_PIXEL = np.array([183.77, 183.77, 183.77])  ### SYN DEPTH
@@ -437,9 +437,9 @@ class AffordanceDataset(utils.Dataset):
 
     def load_image_rgb_depth(self, image_id):
 
-        file_path = np.str(image_id).split("rgb.png")[0]
+        file_path = np.str(image_id).split("rgb.jpg")[0]
 
-        rgb = skimage.io.imread(file_path + "rgb.png")
+        rgb = skimage.io.imread(file_path + "rgb.jpg")
         depth = skimage.io.imread(file_path + "depth.png")
 
         ##################################
