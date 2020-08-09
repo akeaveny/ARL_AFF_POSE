@@ -94,9 +94,9 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 # ##################################
 # ###  GPU
 # ##################################
-#
+
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
-#
+
 # config_ = tf.ConfigProto()
 # config_.gpu_options.allow_growth = True
 # sess = tf.Session(config=config_)

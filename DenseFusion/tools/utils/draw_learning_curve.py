@@ -38,7 +38,7 @@ last_id = len(sorted(glob.glob(train_logs))) / 2
 last_id = int(last_id)
 print("\nLoaded Files: ", last_id)
 
-save_img_nm = root_dir + 'epoch_0_learning_curve.png'
+save_img_nm = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/tools/utils/' + 'densefusion_learning_curve.png'
 
 train_data_trend = []
 test_data_trend = []

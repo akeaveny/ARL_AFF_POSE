@@ -145,7 +145,7 @@ def train(model, args):
     print("\n************* trainining HEADS *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=10, # 100
+                epochs=100, # 100
                 augmentation=augmentation,
                 layers='heads')
 
@@ -153,8 +153,8 @@ def train(model, args):
     # Finetune layers from ResNet stage 4 and up
     print("\n************* trainining ResNET 4+ *************")
     model.train(dataset_train, dataset_val,
-              learning_rate=config.LEARNING_RATE,
-              epochs=15,  # 100
+              learning_rate=config.LEARNING_RATE/10,
+              epochs=150,  # 100
               augmentation=augmentation,
               layers='4+')
 
@@ -162,8 +162,8 @@ def train(model, args):
     # Fine tune all layers
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/10,
-                epochs=20, # 240
+                learning_rate=config.LEARNING_RATE/100,
+                epochs=200, # 240
                 augmentation=augmentation,
                 layers='all')
 

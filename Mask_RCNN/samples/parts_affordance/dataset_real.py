@@ -41,11 +41,11 @@ class AffordanceConfig(Config):
     ###  GPU
     ##################################
 
-    GPU_COUNT = 1
+    GPU_COUNT = 2
     IMAGES_PER_GPU = 2
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 
     import tensorflow as tf
     config = tf.ConfigProto()
@@ -138,10 +138,10 @@ class AffordanceDataset(utils.Dataset):
             annotations = json.load(
                 open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/val_300.json'))
         elif subset == 'test':
-            #annotations = json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100.json'))
             annotations = json.load(
-                 open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100_hammer.json'))
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100.json'))
+            #annotations = json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100_hammer.json'))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

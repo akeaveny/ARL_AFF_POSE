@@ -21,15 +21,15 @@ scenes = [
 for scene in scenes:
 
     # ===================== train ====================
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_train/' + scene
-    folder_to_save = 'combined_tools_hammer_train/' + scene
+    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_15k_train/' + scene
+    folder_to_save = 'combined_tools_hammer_15k_train/' + scene
     label_format = '_label.png'
 
     gt_label_addr = data_path + '/??????' + '_label.png'
     files = sorted(glob.glob(gt_label_addr))
     print("Loaded files: ", len(files))
 
-    f_train = open("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list.txt", 'a')
+    f_train = open("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list_15k.txt", 'a')
     # ===================== train ====================
     print('-------- TRAIN --------')
     for file in files:
@@ -52,15 +52,15 @@ for scene in scenes:
     f_train.close
 
     # ===================== val ====================
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_val/' + scene
-    folder_to_save = 'combined_tools_hammer_val/' + scene
+    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_15k_val/' + scene
+    folder_to_save = 'combined_tools_hammer_15k_val/' + scene
     label_format = '_label.png'
 
     gt_label_addr = data_path + '/??????' + '_label.png'
     files = sorted(glob.glob(gt_label_addr))
     print("Loaded files: ", len(files))
 
-    f_val = open("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list.txt", 'a')
+    f_val = open("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list_15k.txt", 'a')
     # ===================== val ====================
     print('-------- VAL --------')
     for file in files:

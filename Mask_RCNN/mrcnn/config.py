@@ -8,6 +8,7 @@ Written by Waleed Abdulla
 """
 
 import numpy as np
+import math
 
 
 # Base Configuration Class
@@ -214,6 +215,16 @@ class Config(object):
         """Set values of computed attributes."""
         # Effective batch size
         self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
+
+        # Input image size
+        self.IMAGE_SHAPE = np.array(
+            [self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM, 3])
+
+        # Compute backbone size from input image size
+        self.BACKBONE_SHAPES = np.array(
+            [[int(math.ceil(self.IMAGE_SHAPE[0] / stride)),
+              int(math.ceil(self.IMAGE_SHAPE[1] / stride))]
+             for stride in self.BACKBONE_STRIDES])
 
         # Input image size
         if self.IMAGE_RESIZE_MODE == "crop":

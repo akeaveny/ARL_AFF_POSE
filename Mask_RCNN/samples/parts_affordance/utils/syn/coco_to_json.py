@@ -47,25 +47,7 @@ def create_sub_masks(mask_image):
 
     return sub_masks
 
-def create_sub_mask_annotation(sub_mask, rgb_img, image_id, category_id, annotation_id, is_crowd,
-                               label_img, class_id, img_number, folder_to_save, dataset_name):
-
-    ###################
-    # init
-    ###################
-
-    # print("String Sequence: ", str_seq)
-    obj_name = img_number + dataset_name
-    data[obj_name] = {}
-    data[obj_name]['fileref'] = ""
-    data[obj_name]['size'] = np.array(label_img).shape[1]
-    data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
-    data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
-    data[obj_name]['fusedfilename'] = folder_to_save + img_number + '_fused.png'
-    data[obj_name]['base64_img_data'] = ""
-    data[obj_name]['file_attributes'] = {}
-
-    data[obj_name]['regions'] = {}
+def create_sub_mask_annotation(sub_mask, class_id, label_img):
 
     ###################
     # contours
@@ -74,81 +56,53 @@ def create_sub_mask_annotation(sub_mask, rgb_img, image_id, category_id, annotat
     # Find contours (boundary lines) around each sub-mask
     # Note: there could be multiple contours if the object
     # is partially occluded. (E.g. an elephant behind a tree)
-    contours = measure.find_contours(sub_mask, 0.5, positive_orientation='low')
+    contours = measure.find_contours(np.array(sub_mask), 0.5, positive_orientation='low')
 
-    segmentations = []
     polygons = []
-    all_edges_x = []
-    all_edges_y = []
+    x_list, y_list = [], []
     for idx, contour in enumerate(contours):
         # Flip from (row, col) representation to (x, y)
         # and subtract the padding pixel
-        edges_x = []
-        edges_y = []
         for i in range(len(contour)):
             row, col = contour[i]
             contour[i] = (col - 1, row - 1)
-            edges_x.append(int(col-1))
-            edges_y.append(int(row-1))
-        all_edges_x.append(edges_x)
-        all_edges_y.append(edges_y)
 
         # Make a polygon and simplify it
         poly = Polygon(contour)
         poly = poly.simplify(1.0, preserve_topology=False)
         polygons.append(poly)
-        segmentation = np.array(poly.exterior.coords, dtype=np.int).ravel().tolist()
-        segmentations.append(segmentation)
+        # segmentation = np.array(poly.exterior.coords, dtype=np.int).ravel().tolist()
+        # segmentations.append(segmentation
 
+        if type(poly) == Polygon:
+            coords = np.array(poly.exterior.coords, dtype=np.int)
+
+            if coords.size != 0:
+                x, y = coords[:, 0], coords[:, 1]
+                x_list.extend(x.tolist())
+                y_list.extend(y.tolist())
+        else:
+            # Multipolygon
+            polys = list(poly)
+            for poly_ in polys:
+
+                coords = np.array(poly_.exterior.coords, dtype=np.int)
+
+                if coords.size != 0:
+                    x, y = coords[:, 0], coords[:, 1]
+                    x_list.extend(x.tolist())
+                    y_list.extend(y.tolist())
+
+    if len(x_list) > 0 and len(y_list) > 0:
         region = {}
         region['region_attributes'] = {}
         region['shape_attributes'] = {}
+        region['shape_attributes']["name"] = "polygon"
+        region['shape_attributes']["all_points_x"] = x_list
+        region['shape_attributes']["all_points_y"] = y_list
+        region['shape_attributes']["class_id"] = class_id
 
-        if np.array(poly.exterior.coords, dtype=np.int).size != 0:
-            region['shape_attributes']["name"] = "polygon"
-            region['shape_attributes']["all_points_x"] = edges_x
-            region['shape_attributes']["all_points_y"] = edges_y
-            region['shape_attributes']["class_id"] = class_id
-
-            data[obj_name]['regions'][np.str(idx)] = region
-
-    # Combine the polygons to calculate the bounding box and area
-    multi_poly = MultiPolygon(polygons)
-    x, y, max_x, max_y = multi_poly.bounds
-    width = max_x - x
-    height = max_y - y
-    bbox = (x, y, width, height)
-    area = multi_poly.area
-
-    ###########################################################
-    #
-    ###########################################################
-
-    # if debug:
-    #     print("bbox", bbox)
-    #
-    #     img_bbox = np.array(rgb_img.copy(), dtype=np.uint8)
-    #     img_name = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/' + 'json.bbox.png'
-    #     cv2.rectangle(img_bbox, (int(x), int(y)), (int(max_x), int(max_y)), (0, 255, 0), 5)
-    #     cv2.imwrite(img_name, img_bbox)
-    #     bbox_image = cv2.imread(img_name)
-    #
-    #     plt.subplot(111)
-    #     plt.title("rgb")
-    #     plt.imshow(bbox_image)
-    #     plt.show()
-
-    annotation = {
-        'segmentation': segmentations,
-        'iscrowd': is_crowd,
-        'image_id': image_id,
-        'category_id': category_id,
-        'id': annotation_id,
-        'bbox': bbox,
-        'area': area
-    }
-
-    return data
+        data[obj_name]['regions'][np.str(class_id)] = region
 
 ###########################################################
 # Manual Config
@@ -162,15 +116,13 @@ val_path = 'combined_tools_val/'
 
 image_ext = '_label.png' ### object ids or affordances
 
-class_id = np.arange(0, 205+1, 1)
+class_id = np.arange(0, 21+1, 1)
 ### class_id = [0, 1, 2, 3, 4, 5, 6, 7]
+
 print("Affordance IDs: \n{}\n".format(class_id))
 
-use_random_idx = True
-# num_val = int(300 / (2 * 3))
-# num_train = int(700 / (2 * 3))
-# num_test = 25
-num_train = num_val = int(25)
+use_random_idx = False
+num_val = num_train = 4
 
 #=====================
 # JSON FILES
@@ -181,36 +133,28 @@ json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/syn
 
 # 1.
 scenes = [
-          # 'turn_table/', 'bench/', 'floor/',
-          'dr/'
+        'bench/', 'floor/', 'turn_table/',
+        # 'dr/',
           ]
 
 for scene in scenes:
     print('\n******************** {} ********************'.format(scene))
 
-    if scene == 'dr/' and use_random_idx:
-        num_val = int(16)
-        num_train = int(num_train * 3)
-
-    ###########################################################
-    # VALIDATION
-    ###########################################################
-    print('\n ------------------ VAL ------------------')
-
+    print('******************** VAL ********************')
     # =====================
     ### config
     # =====================
-
     folder_to_save = val_path + scene
     labels = data_path + folder_to_save + '??????' + image_ext
     images = data_path + folder_to_save + '??????' + "_rgb.png"
 
+    print("labels: ", labels)
     files = np.array(sorted(glob.glob(labels)))
     rgb_files = np.array(sorted(glob.glob(images)))
     print("Loaded files: ", len(files))
 
     if use_random_idx:
-        val_idx = np.random.choice(np.arange(0, len(files)+1, 1), size=int(num_val), replace=False)
+        val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_val), replace=False)
         print("Chosen Files \n", val_idx)
         files = files[val_idx]
     else:
@@ -219,17 +163,12 @@ for scene in scenes:
     data = {}
     iteration = 0
 
-    # =====================
-    ###
-    # =====================
-    is_crowd = 0
-    # These ids will be automatically increased as we go
-    annotation_id = 1
-    image_id = 1
-    # Create the annotations
-    annotations = []
+    #=====================
+    #
+    #=====================
 
-    json_addr = json_path + scene + 'val' + np.str(num_val) + 'coco_test.json'
+    json_addr = json_path + scene + 'coco_val_' + np.str(len(files)) + '.json'
+    print("json_addr: ", json_addr)
     for idx, file in enumerate(files):
 
         str_num = file.split(data_path + folder_to_save)[1]
@@ -248,22 +187,107 @@ for scene in scenes:
             print('\n ------------------ Pass! --------------------')
             pass
         else:
+            ###################
+            # init
+            ###################
+            obj_name = img_number + dataset_name
+            data[obj_name] = {}
+            data[obj_name]['fileref'] = ""
+            data[obj_name]['size'] = 640
+            data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
+            data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
+            data[obj_name]['base64_img_data'] = ""
+            data[obj_name]['file_attributes'] = {}
+
+            data[obj_name]['regions'] = {}
+
             print("class ids: ", np.unique(label_img))
+            ###################
+            # sub masks
+            ###################
             sub_masks = create_sub_masks(label_img)
             for idx, sub_mask in sub_masks.items():
                 if int(idx) > 0:
                     object_id = int(idx)
                     print("object_id: ", object_id)
-                    category_id = {'(0, 255, 0)': 0}
-                    annotation = create_sub_mask_annotation(sub_mask, rgb_img, image_id, category_id, annotation_id, is_crowd,
-                                                            label_img, object_id, img_number, folder_to_save, dataset_name)
-                    # write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
-                    annotation_id += 1
-            image_id += 1
-
-            # write_to_json(label_img, label_img, class_id, img_number, folder_to_save, dataset_name)
+                    create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
         iteration += 1
 
     with open(json_addr, 'w') as outfile:
         json.dump(data, outfile, sort_keys=True)
 
+    # =====================
+    ### config
+    # =====================
+    print('******************** TRAIN ********************')
+    folder_to_save = train_path + scene
+    labels = data_path + folder_to_save + '??????' + image_ext
+    images = data_path + folder_to_save + '??????' + "_rgb.png"
+
+    print("labels: ", labels)
+    files = np.array(sorted(glob.glob(labels)))
+    rgb_files = np.array(sorted(glob.glob(images)))
+    print("Loaded files: ", len(files))
+
+    if use_random_idx:
+        train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
+        print("Chosen Files \n", train_idx)
+        files = files[train_idx]
+    else:
+        num_train = len(files)
+
+    data = {}
+    iteration = 0
+
+    # =====================
+    #
+    # =====================
+
+    json_addr = json_path + scene + 'coco_train_' + np.str(len(files)) + '.json'
+    print("json_addr: ", json_addr)
+    for idx, file in enumerate(files):
+
+        str_num = file.split(data_path + folder_to_save)[1]
+        img_number = str_num.split(image_ext)[0]
+        label_addr = file
+
+        ### print("label_addr: ", label_addr)
+        print('Image: {}/{}'.format(iteration, len(files)))
+
+        rgb_img = np.array(Image.open(rgb_files[idx]))
+        label_img = Image.open(label_addr)
+        object_ids = np.unique(np.array(label_img))
+        print("GT Affordances:", object_ids)
+
+        if label_img.size == 0:
+            print('\n ------------------ Pass! --------------------')
+            pass
+        else:
+            ###################
+            # init
+            ###################
+            obj_name = img_number + dataset_name
+            data[obj_name] = {}
+            data[obj_name]['fileref'] = ""
+            data[obj_name]['size'] = 640
+            data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
+            data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
+            data[obj_name]['base64_img_data'] = ""
+            data[obj_name]['file_attributes'] = {}
+
+            data[obj_name]['regions'] = {}
+
+            print("class ids: ", np.unique(label_img))
+            ###################
+            # sub masks
+            ###################
+            sub_masks = create_sub_masks(label_img)
+            for idx, sub_mask in sub_masks.items():
+                if int(idx) > 0:
+                    object_id = int(idx)
+                    print("object_id: ", object_id)
+                    create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+        iteration += 1
+
+    with open(json_addr, 'w') as outfile:
+        json.dump(data, outfile, sort_keys=True)

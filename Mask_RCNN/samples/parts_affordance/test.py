@@ -62,7 +62,7 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer'
+assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
 if args.dataset_type == 'real':
     import dataset_real as Affordance
     save_to_folder = '/images/test_images_real/'
@@ -90,6 +90,14 @@ elif args.dataset_type == 'syn1':
 elif args.dataset_type == 'hammer':
     import dataset_syn_hammer as Affordance
     save_to_folder = '/images/test_images_syn_hammer/'
+    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
+    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
+    IMAGE_MAX_DIM_ = 640
+elif args.dataset_type == 'hammer1':
+    import dataset_syn_hammer1 as Affordance
+    save_to_folder = '/images/test_images_syn_hammer1/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     IMAGE_RESIZE_MODE_ = "square"
@@ -126,9 +134,9 @@ def seq_get_masks(image, cur_detection, gt_mask, args):
 
         for i in range(cur_masks.shape[-1]):
 
-            if args.dataset_type == 'real':
+            if args.dataset_type == 'real' or args.dataset_type == 'hammer1':
                 cur_class_ids[i] = cur_class_ids[i]
-            elif args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer':
+            elif args.dataset_type == 'syn' or args.dataset_type == 'hammer':
                 cur_class_ids[i] = map_affordance_label(cur_class_ids[i])
             print("Pred Affordance Label:", cur_class_ids[i])
 
@@ -204,6 +212,12 @@ def detect_and_get_masks(model, config, args):
         ##################################
         rgb, depth = rgb[..., :3], skimage.color.gray2rgb(depth)
 
+        # print("depth min: ", np.min(np.array(depth)))
+        # print("depth max: ", np.max(np.array(depth)))
+        #
+        # print("rgb type: ", rgb.dtype)
+        # print("depth type: ", depth.dtype)
+
         ##############################
         #  Detect
         ##############################
@@ -223,7 +237,7 @@ def detect_and_get_masks(model, config, args):
             ### image, depthimage, image_meta, gt_class_id, gt_bbox, gt_mask = \
             ###    modellib.load_images_gt(dataset, config, image_id, use_mini_mask=False)
             # run detect
-            cur_detect = model.detectWdepth([rgb], [depth])[0]
+            cur_detect = model.detectWdepth([rgb], [depth], verbose=0)[0]
 
         # get instance_masks
         instance_mask, color_mask = seq_get_masks(rgb, cur_detect, gt_label, args)

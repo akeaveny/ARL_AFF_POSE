@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import argparse
 import os
 import sys
@@ -13,7 +15,9 @@ import math
 import cv2
 import matplotlib.pyplot as plt
 
-ROOT_DIR = sys.path.insert(0, os.getcwd())
+# ROOT_DIR = os.path.abspath("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/")
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)
 print("ROOT_DIR", ROOT_DIR)
 
 import torch
@@ -34,7 +38,7 @@ from lib.transformations import euler_matrix, quaternion_matrix, quaternion_from
 ##################################
 ## GPU
 ##################################
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 #############
 #
@@ -101,14 +105,18 @@ parser.add_argument('--dataset_type', required=False, default='val',
                     type=str,
                     metavar='train or val')
 
+parser.add_argument('--ADD', required=False, default=2,
+                    type=int,
+                    metavar='ADD distance to evaluate')
+
 parser.add_argument('--train_file', required=False, default='train_data_list.txt',
                     metavar="/path/to/model weights")
 parser.add_argument('--val_file', required=False, default='test_data_list.txt',
                     metavar="/path/to/refine weights")
 
-parser.add_argument('--model', required=False, default=os.getcwd() + '/trained_models/parts_affordance_syn/parts_affordance1_hammer1/pose_model_5_0.09450025089477782.pth',
+parser.add_argument('--model', required=False, default=ROOT_DIR + '/trained_models/parts_affordance/hammer/pose_model_current.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
-parser.add_argument('--refine_model', required=False, default=os.getcwd() + '/trained_models/parts_affordance_syn/parts_affordance1_hammer1/pose_refine_model_247_0.04728509413062927.pth',
+parser.add_argument('--refine_model', required=False, default=ROOT_DIR + '/trained_models/parts_affordance/hammer/pose_refine_model_current.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--classes', required=False, default='classes_train.txt',
@@ -116,7 +124,7 @@ parser.add_argument('--classes', required=False, default='classes_train.txt',
 parser.add_argument('--class_ids', required=False, default='class_ids_train.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
 
-parser.add_argument('--output_result_dir', required=False, default='experiments/eval_result/parts_affordance',
+parser.add_argument('--output_result_dir', required=False, default=ROOT_DIR + '/experiments/eval_result/parts_affordance',
                     type=str,
                     metavar="Visualize Results")
 parser.add_argument('--visualize', required=False, default=False,
@@ -197,6 +205,7 @@ loaded_images_ = np.loadtxt('{}/{}'.format(args.dataset_config, images_file), dt
 ############
 #
 ############
+num_correct = 0
 fw = open('{0}/eval_result_logs.txt'.format(args.output_result_dir), 'w')
 for idx in range(len(loaded_images_)):
 
@@ -259,9 +268,11 @@ for idx in range(len(loaded_images_)):
             meta_idx = '0' + np.str(itemid)
             camera_setting = meta['camera_setting' + meta_idx][0]
 
-            # print("camera_setting: ", meta['camera_setting' + meta_idx][0])
-            # print("Affordance ID: ", itemid)
+            print("\nCamera: ", meta['camera_setting' + meta_idx][0])
+            print("Affordance ID: ", itemid)
             # print("Meta IDX: ", meta_idx)
+            fw.write(meta['camera_setting' + meta_idx][0])
+            fw.write(np.str(itemid))
 
             my_result_wo_refine = []
             my_result = []
@@ -269,7 +280,6 @@ for idx in range(len(loaded_images_)):
             ####################
             # camera_setting
             ####################
-
             if camera_setting == 'Kinetic':
                 height = 640
                 width = 480
@@ -301,12 +311,6 @@ for idx in range(len(loaded_images_)):
 
             xmap = np.array([[j for i in range(height)] for j in range(width)])
             ymap = np.array([[i for i in range(height)] for j in range(width)])
-
-            # GT
-            gt_trans = np.array(meta['cam_translation' + meta_idx][0]) / 1e3 / 10 # in cm
-
-            gt_rot1 = np.dot(np.array(meta['rot' + meta_idx]), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-            gt_rot1 = np.dot(gt_rot1.T, np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]))
 
             ##############
             # bbox
@@ -427,48 +431,89 @@ for idx in range(len(loaded_images_)):
                 # project to screen
                 ############################
 
+                cam_mat = np.array([[cam_fx, 0, cam_cx], [0, cam_fy, cam_cy], [0, 0, 1]])
+                dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+
+                ############################
+                # pred
+                ############################
+
+                mat_r = quaternion_matrix(my_r)[0:3, 0:3]
+                my_t_ = my_t
+
+                rgb_img = Image.open(rgb_addr)
+                imgpts, jac = cv2.projectPoints(cld[itemid] * 1e3,
+                                                mat_r,
+                                                my_t_  * 1e3,
+                                                cam_mat, dist)
+                cv2_img = cv2.polylines(np.array(rgb_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+
+                img_name = args.save_images_path + 'test1.cv2.cloud.png'
+                cv2.imwrite(img_name, cv2_img)
+                cld_image = cv2.imread(img_name)
+
+                ############################
+                # gt
+                ############################
+
+                gt_trans = np.array(meta['cam_translation' + meta_idx][0]) / 1e3 / 10  # in cm
+
+                gt_rot1 = np.dot(np.array(meta['rot' + meta_idx]), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+                gt_rot1 = np.dot(gt_rot1.T, np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]))
+
+                rgb_img = Image.open(rgb_addr)
+                imgpts_gt, jac = cv2.projectPoints(cld[itemid] * 1e3,
+                                                   gt_rot1,
+                                                   gt_trans * 1e3,
+                                                   cam_mat, dist)
+                cv2_img_gt = cv2.polylines(np.array(rgb_img), np.int32([np.squeeze(imgpts_gt)]), True, (0, 255, 255))
+
+                img_name_gt = args.save_images_path + 'test1.gt.cloud.png'
+                cv2.imwrite(img_name_gt, cv2_img_gt)
+                cld_image_gt = cv2.imread(img_name_gt)
+
+                # print("mat_t \n", my_t_)
+                # print("gt_trans \n", gt_trans)
+                # # print("my_r: \n", my_r)
+                # # print("gt_quart: \n", gt_quart)
+                # print("mat_r \n", mat_r)
+                # print("gt_rot \n", gt_rot1)
+
+                ADD = np.mean(np.linalg.norm(imgpts - imgpts_gt, axis=1)) / 10
+                print("ADD: {:.2f} [cm]".format(ADD))
+
+                ############################
+                # ADD or ADD-S
+                ############################
+
+                # my_r = quaternion_matrix(my_r)[:3, :3]
+                mat_r = quaternion_matrix(my_r)[0:3, 0:3]
+                pred = np.dot(cld[itemid] * 1e3, mat_r.T)
+                pred = np.add(pred,  my_t * 1e3)
+
+                target = np.dot(cld[itemid] * 1e3, gt_rot1.T)
+                target = np.add(target, gt_trans * 1e3)
+
+                # if idx[0].item() in sym_list:  # TODO: ADD-S
+                #     pred = torch.from_numpy(pred.astype(np.float32)).cuda().transpose(1, 0).contiguous()
+                #     target = torch.from_numpy(target.astype(np.float32)).cuda().transpose(1, 0).contiguous()
+                #     inds = knn(target.unsqueeze(0), pred.unsqueeze(0))
+                #     target = torch.index_select(target, 1, inds.view(-1) - 1)
+                #     dis = torch.mean(torch.norm((pred.transpose(1, 0) - target.transpose(1, 0)), dim=1), dim=0).item()
+
+                dis = np.mean(np.linalg.norm(pred - target, axis=1)) / 10 # [cm]
+                print("ADD: {:.2f} [cm]".format(dis))
+
+                if ADD < args.ADD:  # TODO: units [cm???]
+                    num_correct += 1
+                    print('No.{} Pass! Distance: {:.2f}'.format(idx, dis))
+                    fw.write('No.{} Pass! Distance: {:.2f}\n'.format(idx,dis))
+                else:
+                    print('No.{} NOT Pass! Distance: {:.2f}'.format(idx, dis))
+                    fw.write('No.{} NOT Pass! Distance: {:.2f}\n'.format(idx, dis))
+                print('************ Num Correct:{}/{}.. ************'.format(num_correct, len(loaded_images_)))
+
                 if args.visualize:
-
-                    cam_mat = np.array([[cam_fx, 0, cam_cx], [0, cam_fy, cam_cy], [0, 0, 1]])
-                    dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
-
-                    # quarternion
-                    mat_r = quaternion_matrix(my_r)[0:3, 0:3]
-                    my_t_ = my_t
-
-                    rgb_img = Image.open(rgb_addr)
-                    imgpts, jac = cv2.projectPoints(cld[itemid] * 1e3,
-                                                    mat_r,
-                                                    my_t_  * 1e3,
-                                                    cam_mat, dist)
-                    cv2_img = cv2.polylines(np.array(rgb_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-
-                    img_name = args.save_images_path + 'test1.cv2.cloud.png'
-                    cv2.imwrite(img_name, cv2_img)
-                    cld_image = cv2.imread(img_name)
-
-                    # GT
-                    rgb_img = Image.open(rgb_addr)
-                    imgpts_gt, jac = cv2.projectPoints(cld[itemid] * 1e3,
-                                                       gt_rot1,
-                                                       gt_trans * 1e3,
-                                                       cam_mat, dist)
-                    cv2_img_gt = cv2.polylines(np.array(rgb_img), np.int32([np.squeeze(imgpts_gt)]), True, (0, 255, 255))
-
-                    img_name_gt = args.save_images_path + 'test1.gt.cloud.png'
-                    cv2.imwrite(img_name_gt, cv2_img_gt)
-                    cld_image_gt = cv2.imread(img_name_gt)
-
-                    print("mat_t \n", my_t_)
-                    print("gt_trans \n", gt_trans)
-                    # print("my_r: \n", my_r)
-                    # print("gt_quart: \n", gt_quart)
-                    print("mat_r \n", mat_r)
-                    print("gt_rot \n", gt_rot1)
-
-                    ADD = np.mean(np.linalg.norm(imgpts - imgpts_gt, axis=1))
-                    print("ADD: {:.2f} [cm]".format(ADD / 10))
-
                     plt.subplot(3, 2, 1)
                     plt.title("rgb")
                     plt.imshow(img)
@@ -488,35 +533,6 @@ for idx in range(len(loaded_images_)):
                     plt.title("pred - quarternion")
                     plt.imshow(cld_image)
                     plt.show()
-
-                ############################
-                # ADD or ADD-S
-                ############################
-
-                # my_r = quaternion_matrix(my_r)[:3, :3]
-                mat_r = quaternion_matrix(my_r)[0:3, 0:3]
-                pred = np.dot(cld[itemid], mat_r.T)
-                pred = np.add(pred,  my_t)
-
-                target = np.dot(cld[itemid], gt_rot1.T)
-                target = np.add(target, gt_trans)
-
-                # if idx[0].item() in sym_list:  # TODO: ADD-S
-                #     pred = torch.from_numpy(pred.astype(np.float32)).cuda().transpose(1, 0).contiguous()
-                #     target = torch.from_numpy(target.astype(np.float32)).cuda().transpose(1, 0).contiguous()
-                #     inds = knn(target.unsqueeze(0), pred.unsqueeze(0))
-                #     target = torch.index_select(target, 1, inds.view(-1) - 1)
-                #     dis = torch.mean(torch.norm((pred.transpose(1, 0) - target.transpose(1, 0)), dim=1), dim=0).item()
-
-                dis = np.mean(np.linalg.norm(pred - target, axis=1)) * 100 # [cm]
-                print("ADD: {:.2f} [cm]".format(dis))
-
-                if dis < 2:  # TODO: units [cm???]
-                    print('No.{0} Pass! Distance: {1}'.format(idx, dis))
-                    fw.write('No.{0} Pass! Distance: {1}\n'.format(idx,dis))
-                else:
-                    print('No.{0} NOT Pass! Distance: {1}'.format(idx, dis))
-                    fw.write('No.{0} NOT Pass! Distance: {1}\n'.format(idx, dis))
 
             except ZeroDivisionError:
                 print("DenseFusion Detector Lost {0} at No.{1} keyframe".format(itemid, idx))

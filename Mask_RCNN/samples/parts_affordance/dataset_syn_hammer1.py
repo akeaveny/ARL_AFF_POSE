@@ -24,9 +24,13 @@ from mrcnn.config import Config
 from mrcnn import model as modellib, utils, visualize
 from mrcnn.model import log
 
-import tensorflow as tf
-
 from skimage.color import gray2rgb
+
+import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # ###########################################################
 # # Dataset
@@ -46,16 +50,14 @@ class AffordanceConfig(Config):
     ###  GPU
     ##################################
 
-    GPU_COUNT = 2
-    IMAGES_PER_GPU = 3
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
     config_ = tf.ConfigProto()
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.90)
-    config_ = tf.ConfigProto(gpu_options=gpu_options)
-    # config_.gpu_options.allow_growth = True
+    config_.gpu_options.allow_growth = True
     sess = tf.Session(config=config_)
 
     ##################################
@@ -70,6 +72,7 @@ class AffordanceConfig(Config):
 
     LEARNING_RATE = 1e-03
     WEIGHT_DECAY = 0.0001
+    ### TRAIN_BN = None
 
     ##################################
     ###  NUM OF IMAGES
@@ -84,29 +87,27 @@ class AffordanceConfig(Config):
     ##################################
     ''' --- run datasetstats for all params below --- '''
 
-    MAX_GT_INSTANCES = 20  # really only have 1 obj/image or max 3 labels/object
-    DETECTION_MAX_INSTANCES = 20
+    MAX_GT_INSTANCES = 2  # really only have 1 obj/image or max 3 labels/object
+    DETECTION_MAX_INSTANCES = 2
 
-    DETECTION_MIN_CONFIDENCE = 0.9
+    # DETECTION_MIN_CONFIDENCE = 0.9
 
-    MEAN_PIXEL = np.array([113.45, 112.19, 130.92])  ### SYN RGB
-    # MEAN_PIXEL = np.array([183.77, 183.77, 183.77])  ### SYN DEPTH
+    MEAN_PIXEL = np.array([113.45, 112.19, 130.92])  ### SYN RGB DR + PR
+    ### MEAN_PIXEL = np.array([126.78, 131.24, 150.50])  ### DR
+    ### MEAN_PIXEL = np.array([100.17, 93.19, 111.39])  ### PR
 
     IMAGE_RESIZE_MODE = "square"
-    IMAGE_MIN_DIM = 512
-    IMAGE_MAX_DIM = 512
+    IMAGE_MIN_DIM = 896
+    IMAGE_MAX_DIM = 896
+    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)  ### 1024
 
     USE_MINI_MASK = True
     MINI_MASK_SHAPE = (56, 56)
-
-    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
 
     TRAIN_ROIS_PER_IMAGE = 100  # TODO: DS bowl 512
     RPN_TRAIN_ANCHORS_PER_IMAGE = 128
 
     # MASK_SHAPE = [56, 56]  # TODO: AFFORANCENET TRIED 14, 28, 56, 112, 224
-
-    # TRAIN_BN=None # TODO: small batch size
 
 # ###########################################################
 # # Dataset
@@ -214,9 +215,9 @@ class AffordanceDataset(utils.Dataset):
 
     def load_image_rgb_depth(self, image_id):
 
-        file_path = np.str(image_id).split("rgb.png")[0]
+        file_path = np.str(image_id).split("rgb.jpg")[0]
 
-        rgb = skimage.io.imread(file_path + "rgb.png")
+        rgb = skimage.io.imread(file_path + "rgb.jpg")
         depth = skimage.io.imread(file_path + "depth.png")
 
         ##################################

@@ -1,26 +1,41 @@
-# Object-RPE
-This is an implementation of [Object-RPE](https://sites.google.com/view/object-rpe)
+# Affordance-semantic Labelling and 6-DoF PoseEstimation
+This work is largely based on:
+1. [Mask R-CNN](https://github.com/matterport/Mask_RCNN) in Tensofflow 1.14.0 
+2. [DenseFusion](https://github.com/j96w/DenseFusion) in Torch 1.4.0
 
-## Installation and compile the source
-The tools require full ROS installation. The installation assumes you have Ubuntu 16.04 LTS [ROS Kinetic]
-1. Clone the repository
-   ```bash
-   $ https://github.com/hoangcuongbk80/Object-RPE.git
-   ```
-2. ROS
-   ```bash
-   $ cd ~/catkin_ws
-   $ catkin_make install
-   ```
-3. Segmentation [here](https://github.com/hoangcuongbk80/Object-RPE/tree/master/Mask_RCNN)
-4. 3D mapping [here](https://github.com/hoangcuongbk80/Object-RPE/tree/master/obj_pose_est/mapping)
-5. 6D object pose estimation [here](https://github.com/hoangcuongbk80/Object-RPE/tree/master/DenseFusion)
+## Synthetic UMD Dataset
+The synthentic dataset is avaliable [here](https://drive.google.com/file/d/1ffP3N0ZVzPAGjTGMdSS1_40JPadBOayS/view?usp=sharing).
 
-## How to operate the system?
+## Pre-Trained Weights
+Pre-trained Mask R-CNN and DenseFusion weights for the hammer object are avaliable [here](https://drive.google.com/file/d/1ffP3N0ZVzPAGjTGMdSS1_40JPadBOayS/view?usp=sharing).
 
-   ```bash
-   $ roscore
-   $ rosrun obj_pose_est ObjectRPE_srv.py
-   $ roslaunch obj_pose_est launch_rpe_cam.launch
-   $ roslaunch openni2_launch openni2.launch
+## Env
+Three conda env were used: 1. Mask R-CNN, 2. DenseFusion and 3. DenseFusion-ROS. Requirement files are included.
+
+## Mask R-CNN
+1. To inspect dataset statistics run:
    ```
+   $ python3 inspect_dataset_stats.py --dataset='(file path to synthetic dataset)' --dataset_type='hammer' --dataset_split='val'
+   ```
+2. To inspect trained model run:
+   ```
+   $ python inspect_trained_model.py --dataset_type='hammer' --detect=rgbd --weights='(file path to weights)'
+   ```
+3. To get predicted Affordance-semantic Masks run:
+   ```
+   $ python test.py --dataset_type='syn' --detect=rgbd  --weights='(file path to weights)'
+   ```
+## DenseFusion
+1. To inspect dataset statistics run:
+   ```
+   $ python inference_parts_affordance.py
+   ```
+
+## Running Live ROS Node
+A camera (e.g. Stereolabs Zed) is needed to run a live demo.
+
+   ```
+   $ roslaunch zed_wrapper zed.launch
+   $ roslaunch densefusion_ros densefusion_ros.launch
+   ```
+

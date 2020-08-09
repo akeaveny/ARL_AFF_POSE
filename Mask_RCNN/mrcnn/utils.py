@@ -22,6 +22,8 @@ import shutil
 import warnings
 from distutils.version import LooseVersion
 
+import cv2
+
 # URL from which to download the latest COCO trained weights
 COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
 
@@ -417,8 +419,9 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     """
     # Keep track of image dtype and return results in the same dtype
     image_dtype = image.dtype
-    # Default window (y1, x1, y2, x2) and default scale == 1.
     h, w = image.shape[:2]
+
+    # Default window (y1, x1, y2, x2) and default scale == 1.
     window = (0, 0, h, w)
     scale = 1
     padding = [(0, 0), (0, 0), (0, 0)]
@@ -456,6 +459,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
+
     elif mode == "pad64":
         h, w = image.shape[:2]
         # Both sides must be divisible by 64
@@ -477,18 +481,19 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
+
     elif mode == "crop":
         # Pick a random crop
-        # h, w = image.shape[:2]
+        h, w = image.shape[:2]
+
         # y = random.randint(0, (h - min_dim))
         # x = random.randint(0, (w - min_dim))
         # crop = (y, x, min_dim, min_dim)
-        # image = image[y:y + min_dim, x:x + min_dim]
-        # window = (0, 0, min_dim, min_dim)
-        h, w = image.shape[:2]
-        x = int(w/2 - min_dim/2)
-        y = int(h/2 - min_dim/2)
+
+        x = (w - min_dim) // 2
+        y = (h - min_dim) // 2
         crop = (y, x, min_dim, min_dim)
+
         image = image[y:y + min_dim, x:x + min_dim]
         window = (0, 0, min_dim, min_dim)
     else:
@@ -507,6 +512,7 @@ def resize_mask(mask, scale, padding, crop=None):
     """
     # Suppress warning from scipy 0.13.0, the output shape of zoom() is
     # calculated with round() instead of int()
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         mask = scipy.ndimage.zoom(mask, zoom=[scale, scale, 1], order=0)

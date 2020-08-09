@@ -8,57 +8,57 @@ import scipy.io as sio
 
 # =================== new directory ========================
 # 0.
-data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/parts_affordance1_hammer/'
-new_data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer1_'
+data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/parts_affordance1/'
+new_data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_'
 
 # =================== load from ========================
 # 1.
-folder_to_object = 'parts_affordance1_hammer/'
+folder_to_object = 'parts_affordance1/'
 
 objects = [
-    # 'bowl_01/',  'bowl_02/',  'bowl_03/',  'bowl_04/',  'bowl_05/',
-    # 'bowl_06/',  'bowl_07/',
-    #
-    # # 'cup_01/', 'cup_02/', 'cup_03/', 'cup_04/', 'cup_05/',
-    # 'cup_06/',
-    #
+    'bowl_01/',  'bowl_02/',  'bowl_03/',  'bowl_04/',  'bowl_05/',
+    'bowl_06/',  'bowl_07/',
+
+    'cup_01/', 'cup_02/', 'cup_03/', 'cup_04/', 'cup_05/',
+    'cup_06/',
+
     'hammer_01/', 'hammer_02/', 'hammer_03/', 'hammer_04/',
-    #
-    # 'knife_01/', 'knife_02/', 'knife_03/', 'knife_04/', 'knife_05/',
-    # 'knife_06/', 'knife_07/', 'knife_08/', 'knife_09/', 'knife_10/',
-    # 'knife_11/', 'knife_12/',
-    #
-    # 'ladle_01/', 'ladle_02/', 'ladle_03/',
-    #
-    # 'mallet_01/', 'mallet_02/', 'mallet_03/', 'mallet_04/',
-    #
-    # 'mug_01/', 'mug_02/', 'mug_03/', 'mug_04/', 'mug_05/',
-    # 'mug_06/', 'mug_07/', 'mug_08/', 'mug_09/', 'mug_10/',
-    # 'mug_11/', 'mug_12/', 'mug_13/', 'mug_14/', 'mug_15/',
-    # 'mug_16/', 'mug_17/', 'mug_18/', 'mug_19/', 'mug_20/'
-    #
-    # 'pot_01/', 'pot_02/',
-    #
-    # 'saw_01/', 'saw_02/', 'saw_03/',
-    #
-    # 'scissors_01/', 'scissors_02/', 'scissors_03/', 'scissors_04/', 'scissors_05/',
-    # 'scissors_06/', 'scissors_07/', 'scissors_08/',
-    #
-    # 'scoop_01/', 'scoop_02/',
-    #
-    # 'shears_01/', 'shears_02/',
-    #
-    # 'shovel_01/', 'shovel_02/',
-    #
-    # 'spoon_01/', 'spoon_02/', 'spoon_03/', 'spoon_04/', 'spoon_05/',
-    # 'spoon_06/', 'spoon_07/', 'spoon_08/', 'spoon_09/', 'spoon_10/',
-    #
-    # 'tenderizer_01/',
-    #
-    # 'trowel_01/', 'trowel_02/', 'trowel_03/',
-    #
-    # 'turner_01/', 'turner_02/', 'turner_03/', 'turner_04/', 'turner_05/',
-    # 'turner_06/', 'turner_07/'
+
+    'knife_01/', 'knife_02/', 'knife_03/', 'knife_04/', 'knife_05/',
+    'knife_06/', 'knife_07/', 'knife_08/', 'knife_09/', 'knife_10/',
+    'knife_11/', 'knife_12/',
+
+    'ladle_01/', 'ladle_02/', 'ladle_03/',
+
+    'mallet_01/', 'mallet_02/', 'mallet_03/', 'mallet_04/',
+
+    'mug_01/', 'mug_02/', 'mug_03/', 'mug_04/', 'mug_05/',
+    'mug_06/', 'mug_07/', 'mug_08/', 'mug_09/', 'mug_10/',
+    'mug_11/', 'mug_12/', 'mug_13/', 'mug_14/', 'mug_15/',
+    'mug_16/', 'mug_17/', 'mug_18/', 'mug_19/', 'mug_20/'
+
+    'pot_01/', 'pot_02/',
+
+    'saw_01/', 'saw_02/', 'saw_03/',
+
+    'scissors_01/', 'scissors_02/', 'scissors_03/', 'scissors_04/', 'scissors_05/',
+    'scissors_06/', 'scissors_07/', 'scissors_08/',
+
+    'scoop_01/', 'scoop_02/',
+
+    'shears_01/', 'shears_02/',
+
+    'shovel_01/', 'shovel_02/',
+
+    'spoon_01/', 'spoon_02/', 'spoon_03/', 'spoon_04/', 'spoon_05/',
+    'spoon_06/', 'spoon_07/', 'spoon_08/', 'spoon_09/', 'spoon_10/',
+
+    'tenderizer_01/',
+
+    'trowel_01/', 'trowel_02/', 'trowel_03/',
+
+    'turner_01/', 'turner_02/', 'turner_03/', 'turner_04/', 'turner_05/',
+    'turner_06/', 'turner_07/'
     ]
 
 # 2.
@@ -69,8 +69,8 @@ scenes = [
 
 # 3.
 splits = [
-          'train/',
-          # 'val/'
+          # 'train/',
+          'val/'
           ]
 
 # 4.

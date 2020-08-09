@@ -23,7 +23,7 @@ args = parser.parse_args()
 #########################
 
 if args.dataset_type == 'val':
-    images_file = 'test_data_list.txt'
+    images_file = 'test_data_list_15k.txt'
 elif args.dataset_type == 'train':
     images_file = 'train_data_list.txt'
 dataset_config = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/'

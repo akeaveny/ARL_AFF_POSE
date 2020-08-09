@@ -35,14 +35,14 @@ parser.add_argument('--dataset', type=str, default = 'parts-affordance', help='y
 parser.add_argument('--dataset_root', type=str, default ='/data/Akeaveny/Datasets/part-affordance_combined/ndds2', help='dataset root dir (''YCB_Video_Dataset'' or ''Linemod_preprocessed'')')
 parser.add_argument('--batch_size', type=int, default =8, help='batch size')
 parser.add_argument('--workers', type=int, default = 10, help='number of data loading workers')
-parser.add_argument('--lr', default=0.0001, help='learning rate')
+parser.add_argument('--lr', default=1e-4, help='learning rate')
 parser.add_argument('--lr_rate', default=0.3, help='learning rate decay rate')
 parser.add_argument('--w', default=0.015, help='learning rate')
 parser.add_argument('--w_rate', default=0.3, help='learning rate decay rate')
 parser.add_argument('--decay_margin', default=0.016, help='margin to decay lr & w')
 parser.add_argument('--refine_margin', default=0.013, help='margin to start the training of iterative refinement')
 parser.add_argument('--noise_trans', default=0.03, help='range of the random noise of translation added to the training data')
-parser.add_argument('--iteration', type=int, default = 2, help='number of refinement iterations')
+parser.add_argument('--iteration', type=int, default=2, help='number of refinement iterations')
 parser.add_argument('--nepoch', type=int, default=500, help='max number of epochs to train')
 parser.add_argument('--resume_posenet', type=str, default = '',  help='resume PoseNet model')
 parser.add_argument('--resume_refinenet', type=str, default = '',  help='resume PoseRefineNet model')
@@ -52,7 +52,7 @@ opt = parser.parse_args()
 ###################
 # GPU
 ###################
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def main():
     opt.manualSeed = random.randint(1, 10000)
@@ -78,9 +78,9 @@ def main():
     elif opt.dataset == 'parts-affordance':
         print(opt.dataset)
         opt.num_objects = 205
-        opt.num_points = 500
-        opt.outf = 'trained_models/parts_affordance/hammer'  # TODO:
-        opt.log_dir = 'experiments/logs/parts_affordance/hammer'
+        opt.num_points = 100
+        opt.outf = 'trained_models/parts_affordance/hammer15k'  # TODO:
+        opt.log_dir = 'experiments/logs/parts_affordance/hammer15k'
         output_results = 'check_parts_affordance.txt'
         opt.repeat_epoch = 1
 
@@ -88,11 +88,14 @@ def main():
         # ak
         #########
         opt.nepoch = 500
+
         opt.w = 0.01
         opt.iteration = 5
 
-        opt.start_epoch = 174
-        opt.resume_posenet = 'pose_model_59_0.0279605816403887.pth'
+        opt.refine_margin = 0.025
+
+        opt.start_epoch = 62
+        opt.resume_posenet = 'pose_model_61_0.023156231451850747.pth'
         ### resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
 
     else:
@@ -169,9 +172,9 @@ def main():
             for i, data in enumerate(dataloader, 0):
                 points, choose, img, target, model_points, idx = data
 
-                fw = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/' + output_results, 'w') # TODO:
-                fw.write('Points\n{0}\n\nchoose\n{1}\n\nimg\n{2}\n\ntarget\n{3}\n\nmodel_points\n{4}'.format(points, choose, img, target, model_points))
-                fw.close()
+                # fw = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/' + output_results, 'w') # TODO:
+                # fw.write('Points\n{0}\n\nchoose\n{1}\n\nimg\n{2}\n\ntarget\n{3}\n\nmodel_points\n{4}'.format(points, choose, img, target, model_points))
+                # fw.close()
 
                 points, choose, img, target, model_points, idx = Variable(points).cuda(), \
                                                                  Variable(choose).cuda(), \

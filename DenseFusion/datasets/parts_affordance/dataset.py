@@ -24,9 +24,9 @@ class PoseDataset(data.Dataset):
         ##################################
 
         if mode == 'train':
-            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list_15k.txt'
         elif mode == 'test':
-            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list_15k.txt'
         print(self.path)
 
         self.num_pt = num_pt
@@ -54,12 +54,12 @@ class PoseDataset(data.Dataset):
         input_file.close()
 
         self.length = len(self.list)
+        self.len_real = len(self.real)
         self.len_syn = len(self.syn)
-        # self.len_real = len(self.real)
 
         print("Loaded: ", len(self.list))
         print("Real Images: ", len(self.real))
-        print("SYN Images: ", len(self.real))
+        print("SYN Images: ", len(self.syn))
 
         ##################################
         # IMGAUG
@@ -72,7 +72,7 @@ class PoseDataset(data.Dataset):
         self.minimum_num_pt = 50
 
         self.norm = transforms.Normalize(mean=[113.45/255, 112.19/255, 130.92/255],
-                                         std=[42.34959629, 42.23650688, 40.89796388])
+                                         std=[42.34959629/255, 42.23650688/255, 40.89796388/255])
 
         ##################################
         # 3D models
@@ -82,7 +82,6 @@ class PoseDataset(data.Dataset):
         self.num_pt_mesh_small = 100 # TODO:
         self.num_pt_mesh_large = 100
         self.refine = refine
-        self.front_num = 0
 
         class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/classes_train.txt')
         class_id_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/class_ids_train.txt')
@@ -265,7 +264,7 @@ class PoseDataset(data.Dataset):
                 #######################################
                 # PROJECT TO SCREEN
                 #######################################
-
+                #
                 # cam_mat = np.array([[cam_fx, 0, cam_cx], [0, cam_fy, cam_cy], [0, 0, 1]])
                 # dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
                 #
@@ -321,9 +320,6 @@ class PoseDataset(data.Dataset):
             return self.num_pt_mesh_large
         else:
             return self.num_pt_mesh_small
-
-    def remove_affordance_ids(self):
-        return 1
 
 def get_bbox(label, affordance_id, img_width, img_length, border_list):
 

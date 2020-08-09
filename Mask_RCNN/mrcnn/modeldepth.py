@@ -1222,6 +1222,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     # Load image and mask
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
+
     if class_ids.size == 0:
         return image, None, class_ids, None, None
     original_shape = image.shape
@@ -1328,7 +1329,6 @@ def load_images_gt(dataset, config, image_id, augment=False, augmentation=None,
     mask, class_ids = dataset.load_mask(image_id)
     if class_ids.size == 0:
         return image, depth_image, None, class_ids, None, None
-
     original_shape = image.shape
     image, window, scale, padding, crop = utils.resize_image(
         image,
@@ -2239,6 +2239,7 @@ class MaskRCNN():
 
     def save_weights(self, filepath, name):
         self.keras_model.save_weights(filepath=filepath, overwrite=True)
+
     def load_weights_keras(self, filepath):
         self.keras_model.load_weights(filepath)
 
@@ -2709,6 +2710,7 @@ class MaskRCNN():
 
         if verbose:
             log("molded_images", molded_images)
+            log("molded_depth_images", molded_depth_images)
             log("image_metas", image_metas)
             log("anchors", anchors)
         # Run object detection

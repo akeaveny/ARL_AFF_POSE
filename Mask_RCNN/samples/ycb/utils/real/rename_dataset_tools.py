@@ -17,12 +17,12 @@ new_data_path = '/data/Akeaveny/Datasets/YCB_Video_Dataset/data_combined/'
 ####################
 
 splits = [
-    'val/',
+    #'val/',
     'train/'
 ]
 
 folder_paths = [
-    '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/test_data_list.txt',
+    #'/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/test_data_list.txt',
     '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/train_data_list.txt'
 ]
 
@@ -31,7 +31,7 @@ image_ext20 = '-color.png'
 image_ext30 = '-depth.png'
 image_ext40 = '-label.png'
 image_ext50 = '-meta.mat'
-image_exts1 = [
+image_exts = [
     image_ext10,
     image_ext20,
     image_ext30,
@@ -46,12 +46,12 @@ for split_idx, split in enumerate(splits):
 
     folders = folder_paths[split_idx]
     image_paths = np.loadtxt('{}'.format(folders), dtype=np.str)
-    print("Folders path: {}".format(folders))
+    print("*****************{}*****************".format(folders))
     print("Loaded images: ", len(image_paths))
     print("offset: ", offset)
 
-    for image_idx, image_path in enumerate(image_paths[0:1]):
-        for image_ext in image_exts1:
+    for image_idx, image_path in enumerate(image_paths):
+        for image_ext in image_exts:
 
             image_path_ = data_path + image_path + image_ext
             image = sorted(glob.glob(image_path_))
@@ -94,5 +94,3 @@ for split_idx, split in enumerate(splits):
                 exit(1)
 
             shutil.copyfile(old_file_name, move_file_name)
-
-        # offset += len(images_paths)

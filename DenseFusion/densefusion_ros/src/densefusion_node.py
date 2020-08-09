@@ -161,8 +161,7 @@ class PoseEstimator(DenseFusionEstimator):
 
             data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/'
             # ================== NDDS =========================
-            train_images_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance_syn/train_data_list.txt'
-            test_images_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance_syn/test_data_list.txt'
+            test_images_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list.txt'
             loaded_images_ = np.loadtxt(test_images_file, dtype=np.str)
             # for idx in range(len(loaded_images_)):
 
