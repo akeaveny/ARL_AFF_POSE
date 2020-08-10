@@ -3,14 +3,31 @@ This work is largely based on:
 1. [Mask R-CNN](https://github.com/matterport/Mask_RCNN) in Tensofflow 1.14.0 
 2. [DenseFusion](https://github.com/j96w/DenseFusion) in Torch 1.4.0
 
+![Alt text](Images/Experiments/ROS.png?raw=true "Title")
+
 ## Synthetic UMD Dataset
 The synthentic dataset is avaliable [here](https://drive.google.com/file/d/1ffP3N0ZVzPAGjTGMdSS1_40JPadBOayS/view?usp=sharing).
 
 ## Pre-Trained Weights
 Pre-trained Mask R-CNN and DenseFusion weights for the hammer object are avaliable [here](https://drive.google.com/file/d/1ffP3N0ZVzPAGjTGMdSS1_40JPadBOayS/view?usp=sharing).
 
-## Env
-Three conda env were used: 1. Mask R-CNN, 2. DenseFusion and 3. DenseFusion-ROS. Requirement files are included.
+## Requirements
+Three Conda environments were used: 1. Mask R-CNN, 2. DenseFusion and 3. DenseFusion-ROS. Requirement files are included.
+1. Mask R-CNN
+   ```
+   $ conda create --name MaskRCNN
+   $ pip install -r MaskRCNN_req.txt
+   ```
+2. DenseFusion
+   ```
+   $ conda create --name DenseFusion
+   $ pip install -r DenseFusion_req.txt
+   ```
+3. DenseFusion-ROS
+   ```
+   $ conda create --name DenseFusion-ROS
+   $ pip install -r DenseFusionROS_req.txt.txt
+   ```
 
 ## Mask R-CNN
 1. To inspect dataset statistics run:
@@ -25,6 +42,12 @@ Three conda env were used: 1. Mask R-CNN, 2. DenseFusion and 3. DenseFusion-ROS.
    ```
    $ python test.py --dataset_type='syn' --detect=rgbd  --weights='(file path to weights)'
    ```
+4. To test preformance with the weighted F-b measure run the following in MATLAB:
+   ```
+   $ cd '(path to project)/Mask_RCNN/samples/parts_affordance/matlab'
+   $ evaluate_Fwb_non_rank('(path to dataset)/part-affordance_combined/real/combined_tools_test_hammer/')
+   ```
+   
 ## DenseFusion
 1. To inspect dataset statistics run:
    ```
@@ -38,4 +61,5 @@ A camera (e.g. Stereolabs Zed) is needed to run a live demo.
    $ roslaunch zed_wrapper zed.launch
    $ roslaunch densefusion_ros densefusion_ros.launch
    ```
+
 

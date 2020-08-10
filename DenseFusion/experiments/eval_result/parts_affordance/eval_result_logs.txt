@@ -1,721 +1,100 @@
-Kinetic20No.0 Pass! Distance: 9.21
-Kinetic20No.1 Pass! Distance: 9.73
-Kinetic20No.2 Pass! Distance: 9.70
-Kinetic20No.3 Pass! Distance: 9.22
-Kinetic20No.4 Pass! Distance: 9.75
-Kinetic20No.5 Pass! Distance: 8.90
-Kinetic20No.6 Pass! Distance: 7.61
-Kinetic20No.7 Pass! Distance: 8.67
-Kinetic20No.8 Pass! Distance: 7.87
-Kinetic20No.9 Pass! Distance: 7.40
-Xtion20No.10 Pass! Distance: 3.63
-Xtion20No.11 Pass! Distance: 3.43
-Xtion20No.12 Pass! Distance: 2.91
-Xtion20No.13 Pass! Distance: 2.69
-Xtion20No.14 Pass! Distance: 2.07
-Xtion20No.15 Pass! Distance: 1.89
-Xtion20No.16 Pass! Distance: 1.67
-Xtion20No.17 Pass! Distance: 1.43
-Xtion20No.18 Pass! Distance: 1.70
-Xtion20No.19 Pass! Distance: 2.89
-ZED20No.20 Pass! Distance: 2.25
-ZED20No.21 Pass! Distance: 1.78
-ZED20No.22 Pass! Distance: 1.71
-ZED20No.23 Pass! Distance: 1.14
-ZED20No.24 Pass! Distance: 1.99
-ZED20No.25 Pass! Distance: 1.99
-ZED20No.26 Pass! Distance: 2.42
-ZED20No.27 Pass! Distance: 1.95
-ZED20No.28 Pass! Distance: 2.35
-ZED20No.29 Pass! Distance: 2.88
-Kinetic22No.30 Pass! Distance: 5.20
-Kinetic22No.31 Pass! Distance: 4.67
-Kinetic22No.32 NOT Pass! Distance: 4.80
-Kinetic22No.33 Pass! Distance: 4.50
-Kinetic22No.34 Pass! Distance: 4.16
-Kinetic22No.35 Pass! Distance: 4.74
-Kinetic22No.36 Pass! Distance: 4.21
-Kinetic22No.37 Pass! Distance: 3.87
-Kinetic22No.38 Pass! Distance: 4.65
-Kinetic22No.39 Pass! Distance: 4.27
-Xtion22No.40 Pass! Distance: 5.13
-Xtion22No.41 Pass! Distance: 2.62
-Xtion22No.42 NOT Pass! Distance: 5.68
-Xtion22No.43 NOT Pass! Distance: 3.92
-Xtion22No.44 NOT Pass! Distance: 3.15
-Xtion22No.45 Pass! Distance: 2.31
-Xtion22No.46 NOT Pass! Distance: 3.47
-Xtion22No.47 Pass! Distance: 1.38
-Xtion22No.48 Pass! Distance: 7.76
-Xtion22No.49 NOT Pass! Distance: 4.88
-ZED22No.50 Pass! Distance: 3.76
-ZED22No.51 Pass! Distance: 2.50
-ZED22No.52 Pass! Distance: 1.73
-ZED22No.53 Pass! Distance: 1.52
-ZED22No.54 Pass! Distance: 2.45
-ZED22No.55 Pass! Distance: 2.05
-ZED22No.56 Pass! Distance: 3.17
-ZED22No.57 NOT Pass! Distance: 2.73
-ZED22No.58 Pass! Distance: 3.50
-ZED22No.59 Pass! Distance: 1.90
-Kinetic24No.60 Pass! Distance: 1.90
-Kinetic24No.61 Pass! Distance: 1.62
-Kinetic24No.62 Pass! Distance: 3.28
-Kinetic24No.63 Pass! Distance: 4.17
-Kinetic24No.64 Pass! Distance: 3.52
-Kinetic24No.65 Pass! Distance: 4.27
-Kinetic24No.66 Pass! Distance: 4.42
-Kinetic24No.67 Pass! Distance: 4.77
-Kinetic24No.68 Pass! Distance: 5.06
-Kinetic24No.69 Pass! Distance: 6.48
-Xtion24No.70 Pass! Distance: 3.81
-Xtion24No.71 Pass! Distance: 3.69
-Xtion24No.72 Pass! Distance: 3.70
-Xtion24No.73 Pass! Distance: 3.67
-Xtion24No.74 Pass! Distance: 3.25
-Xtion24No.75 Pass! Distance: 3.04
-Xtion24No.76 Pass! Distance: 2.89
-Xtion24No.77 Pass! Distance: 2.95
-Xtion24No.78 Pass! Distance: 3.28
-Xtion24No.79 Pass! Distance: 3.05
-ZED24No.80 NOT Pass! Distance: 12.04
-ZED24No.81 NOT Pass! Distance: 11.38
-ZED24No.82 NOT Pass! Distance: 12.09
-ZED24No.83 NOT Pass! Distance: 11.16
-ZED24No.84 NOT Pass! Distance: 10.76
-ZED24No.85 NOT Pass! Distance: 9.40
-ZED24No.86 NOT Pass! Distance: 8.82
-ZED24No.87 NOT Pass! Distance: 9.13
-ZED24No.88 NOT Pass! Distance: 7.47
-ZED24No.89 NOT Pass! Distance: 8.22
-Kinetic26No.90 Pass! Distance: 4.13
-Kinetic26No.91 NOT Pass! Distance: 4.47
-Kinetic26No.92 NOT Pass! Distance: 5.31
-Kinetic26No.93 Pass! Distance: 4.78
-Kinetic26No.94 NOT Pass! Distance: 4.75
-Kinetic26No.95 NOT Pass! Distance: 4.39
-Kinetic26No.96 NOT Pass! Distance: 4.91
-Kinetic26No.97 NOT Pass! Distance: 4.20
-Kinetic26No.98 NOT Pass! Distance: 4.29
-Kinetic26No.99 Pass! Distance: 3.20
-Xtion26No.100 Pass! Distance: 7.93
-Xtion26No.101 Pass! Distance: 2.42
-Xtion26No.102 Pass! Distance: 2.10
-Xtion26No.103 Pass! Distance: 3.94
-Xtion26No.104 Pass! Distance: 1.44
-Xtion26No.105 Pass! Distance: 1.68
-Xtion26No.106 Pass! Distance: 3.45
-Xtion26No.107 Pass! Distance: 1.78
-Xtion26No.108 Pass! Distance: 7.27
-Xtion26No.109 Pass! Distance: 2.32
-ZED26No.110 NOT Pass! Distance: 8.31
-ZED26No.111 NOT Pass! Distance: 6.30
-ZED26No.112 NOT Pass! Distance: 4.90
-ZED26No.113 NOT Pass! Distance: 3.17
-ZED26No.114 NOT Pass! Distance: 3.40
-ZED26No.115 NOT Pass! Distance: 2.87
-ZED26No.116 Pass! Distance: 2.13
-ZED26No.117 Pass! Distance: 1.98
-ZED26No.118 Pass! Distance: 2.69
-ZED26No.119 Pass! Distance: 2.88
-ZED26No.120 Pass! Distance: 3.18
-Kinetic20No.121 NOT Pass! Distance: 25.63
-Kinetic20No.122 NOT Pass! Distance: 26.22
-Kinetic20No.123 NOT Pass! Distance: 27.23
-Kinetic20No.124 Pass! Distance: 21.68
-Kinetic20No.125 NOT Pass! Distance: 19.91
-Kinetic20No.126 NOT Pass! Distance: 5.53
-Kinetic20No.127 Pass! Distance: 3.05
-Kinetic20No.128 Pass! Distance: 1.49
-Kinetic20No.129 Pass! Distance: 1.78
-Kinetic20No.130 Pass! Distance: 1.82
-Xtion20No.131 NOT Pass! Distance: 23.25
-Xtion20No.132 NOT Pass! Distance: 20.44
-Xtion20No.133 NOT Pass! Distance: 10.35
-Xtion20No.134 NOT Pass! Distance: 5.01
-Xtion20No.135 Pass! Distance: 1.68
-Xtion20No.136 Pass! Distance: 2.80
-Xtion20No.137 Pass! Distance: 3.26
-Xtion20No.138 NOT Pass! Distance: 2.92
-Xtion20No.139 Pass! Distance: 1.54
-Xtion20No.140 Pass! Distance: 1.56
-ZED20No.141 Pass! Distance: 1.48
-ZED20No.142 Pass! Distance: 1.70
-ZED20No.143 NOT Pass! Distance: 2.75
-ZED20No.144 Pass! Distance: 1.83
-ZED20No.145 NOT Pass! Distance: 1.99
-ZED20No.146 NOT Pass! Distance: 2.36
-ZED20No.147 NOT Pass! Distance: 2.96
-ZED20No.148 Pass! Distance: 2.05
-ZED20No.149 Pass! Distance: 1.36
-ZED20No.150 Pass! Distance: 1.50
-Kinetic22No.151 Pass! Distance: 1.63
-Kinetic22No.152 Pass! Distance: 1.65
-Kinetic22No.153 Pass! Distance: 1.77
-Kinetic22No.154 Pass! Distance: 1.57
-Kinetic22No.155 Pass! Distance: 2.30
-Kinetic22No.156 Pass! Distance: 2.14
-Kinetic22No.157 Pass! Distance: 1.38
-Kinetic22No.158 Pass! Distance: 2.50
-Kinetic22No.159 Pass! Distance: 4.01
-Kinetic22No.160 Pass! Distance: 3.14
-Xtion22No.161 Pass! Distance: 2.82
-Xtion22No.162 Pass! Distance: 3.47
-Xtion22No.163 Pass! Distance: 4.39
-Xtion22No.164 Pass! Distance: 4.65
-Xtion22No.165 Pass! Distance: 4.84
-Xtion22No.166 Pass! Distance: 5.29
-Xtion22No.167 Pass! Distance: 5.63
-Xtion22No.168 Pass! Distance: 5.34
-Xtion22No.169 Pass! Distance: 4.48
-Xtion22No.170 Pass! Distance: 2.76
-ZED22No.171 Pass! Distance: 5.52
-ZED22No.172 Pass! Distance: 5.16
-ZED22No.173 Pass! Distance: 6.07
-ZED22No.174 Pass! Distance: 5.47
-ZED22No.175 Pass! Distance: 5.91
-ZED22No.176 Pass! Distance: 5.52
-ZED22No.177 Pass! Distance: 4.84
-ZED22No.178 Pass! Distance: 4.41
-ZED22No.179 Pass! Distance: 3.54
-ZED22No.180 Pass! Distance: 2.53
-Kinetic24No.181 Pass! Distance: 2.41
-Kinetic24No.182 Pass! Distance: 2.39
-Kinetic24No.183 Pass! Distance: 2.07
-Kinetic24No.184 Pass! Distance: 2.03
-Kinetic24No.185 Pass! Distance: 1.97
-Kinetic24No.186 Pass! Distance: 3.33
-Kinetic24No.187 Pass! Distance: 3.11
-Kinetic24No.188 Pass! Distance: 3.94
-Kinetic24No.189 Pass! Distance: 4.25
-Kinetic24No.190 Pass! Distance: 5.38
-Xtion24No.191 Pass! Distance: 5.45
-Xtion24No.192 NOT Pass! Distance: 8.49
-Xtion24No.193 NOT Pass! Distance: 4.96
-Xtion24No.194 Pass! Distance: 2.45
-Xtion24No.195 Pass! Distance: 2.55
-Xtion24No.196 Pass! Distance: 1.97
-Xtion24No.197 Pass! Distance: 2.92
-Xtion24No.198 Pass! Distance: 2.94
-Xtion24No.199 Pass! Distance: 3.10
-Xtion24No.200 Pass! Distance: 3.06
-ZED24No.201 Pass! Distance: 2.02
-ZED24No.202 Pass! Distance: 2.27
-ZED24No.203 Pass! Distance: 2.29
-ZED24No.204 Pass! Distance: 2.23
-ZED24No.205 Pass! Distance: 1.86
-ZED24No.206 Pass! Distance: 2.09
-ZED24No.207 Pass! Distance: 1.32
-ZED24No.208 Pass! Distance: 1.41
-ZED24No.209 Pass! Distance: 1.37
-ZED24No.210 Pass! Distance: 1.35
-Kinetic26No.211 Pass! Distance: 7.54
-Kinetic26No.212 Pass! Distance: 7.34
-Kinetic26No.213 NOT Pass! Distance: 6.76
-Kinetic26No.214 Pass! Distance: 7.36
-Kinetic26No.215 Pass! Distance: 6.86
-Kinetic26No.216 Pass! Distance: 3.55
-Kinetic26No.217 Pass! Distance: 5.59
-Kinetic26No.218 Pass! Distance: 4.78
-Kinetic26No.219 Pass! Distance: 3.89
-Kinetic26No.220 Pass! Distance: 2.31
-Xtion26No.221 Pass! Distance: 9.10
-Xtion26No.222 Pass! Distance: 8.84
-Xtion26No.223 Pass! Distance: 8.67
-Xtion26No.224 Pass! Distance: 8.17
-Xtion26No.225 Pass! Distance: 7.66
-Xtion26No.226 Pass! Distance: 7.55
-Xtion26No.227 Pass! Distance: 6.81
-Xtion26No.228 Pass! Distance: 6.65
-Xtion26No.229 Pass! Distance: 7.73
-Xtion26No.230 Pass! Distance: 8.54
-ZED26No.231 Pass! Distance: 4.90
-ZED26No.232 Pass! Distance: 4.71
-ZED26No.233 Pass! Distance: 3.94
-ZED26No.234 Pass! Distance: 4.09
-ZED26No.235 Pass! Distance: 1.64
-ZED26No.236 Pass! Distance: 1.79
-ZED26No.237 Pass! Distance: 5.04
-ZED26No.238 Pass! Distance: 4.89
-ZED26No.239 Pass! Distance: 5.70
-ZED26No.240 Pass! Distance: 2.59
-Kinetic20No.241 Pass! Distance: 7.11
-Kinetic20No.242 Pass! Distance: 7.11
-Kinetic20No.243 Pass! Distance: 6.54
-Kinetic20No.244 Pass! Distance: 4.55
-Kinetic20No.245 Pass! Distance: 4.46
-Kinetic20No.246 Pass! Distance: 4.95
-Kinetic20No.247 Pass! Distance: 4.72
-Kinetic20No.248 Pass! Distance: 4.85
-Kinetic20No.249 Pass! Distance: 4.85
-Kinetic20No.250 Pass! Distance: 5.10
-Xtion20No.251 Pass! Distance: 4.15
-Xtion20No.252 Pass! Distance: 4.22
-Xtion20No.253 Pass! Distance: 3.89
-Xtion20No.254 Pass! Distance: 4.64
-Xtion20No.255 Pass! Distance: 5.03
-Xtion20No.256 Pass! Distance: 4.78
-Xtion20No.257 Pass! Distance: 5.51
-Xtion20No.258 Pass! Distance: 5.85
-Xtion20No.259 Pass! Distance: 6.39
-Xtion20No.260 Pass! Distance: 1.35
-ZED20No.261 Pass! Distance: 8.40
-ZED20No.262 Pass! Distance: 3.39
-ZED20No.263 Pass! Distance: 8.48
-ZED20No.264 Pass! Distance: 3.23
-ZED20No.265 Pass! Distance: 1.60
-ZED20No.266 Pass! Distance: 1.74
-ZED20No.267 Pass! Distance: 5.01
-ZED20No.268 Pass! Distance: 4.80
-ZED20No.269 Pass! Distance: 3.78
-ZED20No.270 Pass! Distance: 2.83
-Kinetic22No.271 Pass! Distance: 1.47
-Kinetic22No.272 Pass! Distance: 1.69
-Kinetic22No.273 Pass! Distance: 2.95
-Kinetic22No.274 Pass! Distance: 2.25
-Kinetic22No.275 Pass! Distance: 2.58
-Kinetic22No.276 Pass! Distance: 2.17
-Kinetic22No.277 NOT Pass! Distance: 3.11
-Kinetic22No.278 Pass! Distance: 0.38
-Kinetic22No.279 Pass! Distance: 3.30
-Kinetic22No.280 Pass! Distance: 4.36
-Xtion22No.281 Pass! Distance: 1.60
-Xtion22No.282 Pass! Distance: 0.99
-Xtion22No.283 Pass! Distance: 1.17
-Xtion22No.284 Pass! Distance: 2.03
-Xtion22No.285 Pass! Distance: 0.94
-Xtion22No.286 Pass! Distance: 1.10
-Xtion22No.287 Pass! Distance: 0.61
-Xtion22No.288 NOT Pass! Distance: 2.56
-Xtion22No.289 Pass! Distance: 1.85
-Xtion22No.290 Pass! Distance: 1.72
-ZED22No.291 Pass! Distance: 2.05
-ZED22No.292 Pass! Distance: 1.87
-ZED22No.293 Pass! Distance: 2.30
-ZED22No.294 Pass! Distance: 1.89
-ZED22No.295 Pass! Distance: 1.11
-ZED22No.296 Pass! Distance: 0.70
-ZED22No.297 Pass! Distance: 0.89
-ZED22No.298 Pass! Distance: 1.03
-ZED22No.299 Pass! Distance: 1.72
-ZED22No.300 Pass! Distance: 1.92
-Kinetic24No.301 Pass! Distance: 2.46
-Kinetic24No.302 Pass! Distance: 3.10
-Kinetic24No.303 Pass! Distance: 4.05
-Kinetic24No.304 Pass! Distance: 4.87
-Kinetic24No.305 Pass! Distance: 3.84
-Kinetic24No.306 Pass! Distance: 3.28
-Kinetic24No.307 Pass! Distance: 1.97
-Kinetic24No.308 Pass! Distance: 1.47
-Kinetic24No.309 Pass! Distance: 4.49
-Kinetic24No.310 Pass! Distance: 3.49
-Xtion24No.311 Pass! Distance: 3.08
-Xtion24No.312 Pass! Distance: 2.43
-Xtion24No.313 Pass! Distance: 4.23
-Xtion24No.314 Pass! Distance: 4.26
-Xtion24No.315 Pass! Distance: 2.84
-Xtion24No.316 Pass! Distance: 1.18
-Xtion24No.317 Pass! Distance: 1.00
-Xtion24No.318 Pass! Distance: 0.90
-Xtion24No.319 Pass! Distance: 1.35
-Xtion24No.320 Pass! Distance: 1.75
-ZED24No.321 Pass! Distance: 6.96
-ZED24No.322 Pass! Distance: 4.19
-ZED24No.323 Pass! Distance: 5.50
-ZED24No.324 Pass! Distance: 5.94
-ZED24No.325 Pass! Distance: 5.22
-ZED24No.326 Pass! Distance: 4.73
-ZED24No.327 Pass! Distance: 4.21
-ZED24No.328 Pass! Distance: 3.98
-ZED24No.329 Pass! Distance: 3.07
-ZED24No.330 Pass! Distance: 2.93
-Kinetic26No.331 Pass! Distance: 1.03
-Kinetic26No.332 Pass! Distance: 3.21
-Kinetic26No.333 Pass! Distance: 1.82
-Kinetic26No.334 Pass! Distance: 2.80
-Kinetic26No.335 Pass! Distance: 3.38
-Kinetic26No.336 Pass! Distance: 1.92
-Kinetic26No.337 Pass! Distance: 3.74
-Kinetic26No.338 Pass! Distance: 2.44
-Kinetic26No.339 Pass! Distance: 2.49
-Kinetic26No.340 Pass! Distance: 1.77
-Xtion26No.341 Pass! Distance: 4.18
-Xtion26No.342 Pass! Distance: 3.75
-Xtion26No.343 Pass! Distance: 2.41
-Xtion26No.344 Pass! Distance: 2.85
-Xtion26No.345 Pass! Distance: 1.99
-Xtion26No.346 Pass! Distance: 2.38
-Xtion26No.347 Pass! Distance: 2.55
-Xtion26No.348 Pass! Distance: 2.75
-Xtion26No.349 Pass! Distance: 2.44
-Xtion26No.350 Pass! Distance: 2.32
-ZED26No.351 Pass! Distance: 1.31
-ZED26No.352 Pass! Distance: 2.12
-ZED26No.353 Pass! Distance: 0.71
-ZED26No.354 Pass! Distance: 2.11
-ZED26No.355 Pass! Distance: 1.35
-ZED26No.356 Pass! Distance: 0.96
-ZED26No.357 Pass! Distance: 0.87
-ZED26No.358 Pass! Distance: 0.28
-ZED26No.359 Pass! Distance: 1.35
-ZED26No.360 Pass! Distance: 1.02
-Kinetic20No.361 Pass! Distance: 2.72
-Kinetic20No.362 Pass! Distance: 3.55
-Kinetic20No.363 Pass! Distance: 2.07
-Kinetic20No.364 Pass! Distance: 4.72
-Kinetic20No.365 Pass! Distance: 3.01
-Kinetic20No.366 Pass! Distance: 1.71
-Kinetic20No.367 Pass! Distance: 1.24
-Kinetic20No.368 Pass! Distance: 3.49
-Kinetic20No.369 Pass! Distance: 1.23
-Kinetic20No.370 Pass! Distance: 2.06
-Kinetic20No.371 Pass! Distance: 0.93
-Kinetic20No.372 Pass! Distance: 1.04
-Kinetic20No.373 Pass! Distance: 0.94
-Kinetic20No.374 Pass! Distance: 2.26
-Kinetic20No.375 Pass! Distance: 0.95
-Kinetic20No.376 Pass! Distance: 1.65
-Kinetic20No.377 Pass! Distance: 1.71
-Kinetic20No.378 Pass! Distance: 3.70
-Kinetic20No.379 Pass! Distance: 4.10
-Kinetic20No.380 Pass! Distance: 3.04
-Kinetic20No.381 Pass! Distance: 4.98
-Kinetic20No.382 Pass! Distance: 5.09
-Kinetic20No.383 Pass! Distance: 2.73
-Kinetic20No.384 Pass! Distance: 3.27
-Kinetic20No.385 Pass! Distance: 2.78
-Kinetic20No.386 Pass! Distance: 2.79
-Kinetic20No.387 Pass! Distance: 3.18
-Kinetic20No.388 Pass! Distance: 3.23
-Kinetic20No.389 Pass! Distance: 3.52
-Kinetic20No.390 Pass! Distance: 4.70
-Xtion20No.391 Pass! Distance: 0.98
-Xtion20No.392 Pass! Distance: 0.84
-Xtion20No.393 Pass! Distance: 0.54
-Xtion20No.394 Pass! Distance: 0.69
-Xtion20No.395 Pass! Distance: 0.80
-Xtion20No.396 Pass! Distance: 0.99
-Xtion20No.397 Pass! Distance: 1.80
-Xtion20No.398 Pass! Distance: 1.79
-Xtion20No.399 Pass! Distance: 0.46
-Xtion20No.400 Pass! Distance: 1.25
-Xtion20No.401 Pass! Distance: 0.91
-Xtion20No.402 Pass! Distance: 1.05
-Xtion20No.403 Pass! Distance: 1.25
-Xtion20No.404 Pass! Distance: 2.61
-Xtion20No.405 Pass! Distance: 1.56
-Xtion20No.406 Pass! Distance: 1.62
-Xtion20No.407 Pass! Distance: 0.91
-Xtion20No.408 Pass! Distance: 1.18
-Xtion20No.409 Pass! Distance: 1.30
-Xtion20No.410 Pass! Distance: 1.50
-Xtion20No.411 Pass! Distance: 1.23
-Xtion20No.412 Pass! Distance: 0.62
-Xtion20No.413 Pass! Distance: 0.60
-Xtion20No.414 Pass! Distance: 0.49
-Xtion20No.415 Pass! Distance: 0.63
-Xtion20No.416 Pass! Distance: 0.59
-Xtion20No.417 Pass! Distance: 0.78
-Xtion20No.418 Pass! Distance: 1.03
-Xtion20No.419 Pass! Distance: 1.08
-Xtion20No.420 Pass! Distance: 1.05
-ZED20No.421 Pass! Distance: 2.26
-ZED20No.422 Pass! Distance: 1.68
-ZED20No.423 Pass! Distance: 3.29
-ZED20No.424 Pass! Distance: 2.37
-ZED20No.425 Pass! Distance: 1.56
-ZED20No.426 Pass! Distance: 2.78
-ZED20No.427 Pass! Distance: 2.04
-ZED20No.428 Pass! Distance: 2.88
-ZED20No.429 Pass! Distance: 0.85
-ZED20No.430 Pass! Distance: 0.91
-ZED20No.431 Pass! Distance: 1.15
-ZED20No.432 Pass! Distance: 1.72
-ZED20No.433 Pass! Distance: 0.53
-ZED20No.434 Pass! Distance: 1.13
-ZED20No.435 Pass! Distance: 0.73
-ZED20No.436 Pass! Distance: 1.46
-ZED20No.437 Pass! Distance: 3.82
-ZED20No.438 Pass! Distance: 4.67
-ZED20No.439 Pass! Distance: 1.96
-ZED20No.440 Pass! Distance: 2.30
-ZED20No.441 Pass! Distance: 3.32
-ZED20No.442 Pass! Distance: 2.48
-ZED20No.443 Pass! Distance: 2.97
-ZED20No.444 Pass! Distance: 1.93
-ZED20No.445 Pass! Distance: 3.37
-ZED20No.446 NOT Pass! Distance: 3.89
-ZED20No.447 NOT Pass! Distance: 4.05
-ZED20No.448 Pass! Distance: 1.83
-ZED20No.449 Pass! Distance: 2.06
-ZED20No.450 Pass! Distance: 1.67
-Kinetic22No.451 Pass! Distance: 2.32
-Kinetic22No.452 Pass! Distance: 3.60
-Kinetic22No.453 Pass! Distance: 1.77
-Kinetic22No.454 Pass! Distance: 0.63
-Kinetic22No.455 Pass! Distance: 0.92
-Kinetic22No.456 Pass! Distance: 0.95
-Kinetic22No.457 Pass! Distance: 0.68
-Kinetic22No.458 Pass! Distance: 1.34
-Kinetic22No.459 Pass! Distance: 2.42
-Kinetic22No.460 Pass! Distance: 1.07
-Kinetic22No.461 Pass! Distance: 2.13
-Kinetic22No.462 Pass! Distance: 1.15
-Kinetic22No.463 Pass! Distance: 1.53
-Kinetic22No.464 Pass! Distance: 1.81
-Kinetic22No.465 Pass! Distance: 1.67
-Kinetic22No.466 Pass! Distance: 1.95
-Kinetic22No.467 Pass! Distance: 1.03
-Kinetic22No.468 Pass! Distance: 1.74
-Kinetic22No.469 Pass! Distance: 1.49
-Kinetic22No.470 Pass! Distance: 2.28
-Kinetic22No.471 Pass! Distance: 2.52
-Kinetic22No.472 Pass! Distance: 3.07
-Kinetic22No.473 Pass! Distance: 1.59
-Kinetic22No.474 Pass! Distance: 2.39
-Kinetic22No.475 Pass! Distance: 1.67
-Kinetic22No.476 Pass! Distance: 3.63
-Kinetic22No.477 Pass! Distance: 2.58
-Kinetic22No.478 Pass! Distance: 1.57
-Kinetic22No.479 Pass! Distance: 1.85
-Kinetic22No.480 Pass! Distance: 1.46
-Xtion22No.481 Pass! Distance: 0.73
-Xtion22No.482 Pass! Distance: 1.06
-Xtion22No.483 Pass! Distance: 0.92
-Xtion22No.484 NOT Pass! Distance: 3.94
-Xtion22No.485 NOT Pass! Distance: 2.55
-Xtion22No.486 Pass! Distance: 1.19
-Xtion22No.487 Pass! Distance: 0.93
-Xtion22No.488 Pass! Distance: 2.18
-Xtion22No.489 Pass! Distance: 1.00
-Xtion22No.490 Pass! Distance: 1.32
-Xtion22No.491 Pass! Distance: 1.73
-Xtion22No.492 Pass! Distance: 3.31
-Xtion22No.493 Pass! Distance: 3.05
-Xtion22No.494 Pass! Distance: 3.67
-Xtion22No.495 Pass! Distance: 2.01
-Xtion22No.496 Pass! Distance: 1.97
-Xtion22No.497 Pass! Distance: 1.83
-Xtion22No.498 Pass! Distance: 2.37
-Xtion22No.499 Pass! Distance: 2.20
-Xtion22No.500 Pass! Distance: 1.24
-Xtion22No.501 Pass! Distance: 0.85
-Xtion22No.502 Pass! Distance: 0.79
-Xtion22No.503 Pass! Distance: 1.73
-Xtion22No.504 Pass! Distance: 2.46
-Xtion22No.505 Pass! Distance: 1.10
-Xtion22No.506 Pass! Distance: 1.56
-Xtion22No.507 Pass! Distance: 0.87
-Xtion22No.508 Pass! Distance: 2.42
-Xtion22No.509 Pass! Distance: 2.98
-Xtion22No.510 Pass! Distance: 2.21
-ZED22No.511 NOT Pass! Distance: 3.23
-ZED22No.512 Pass! Distance: 1.96
-ZED22No.513 NOT Pass! Distance: 3.76
-ZED22No.514 Pass! Distance: 1.30
-ZED22No.515 Pass! Distance: 2.01
-ZED22No.516 Pass! Distance: 0.83
-ZED22No.517 Pass! Distance: 0.64
-ZED22No.518 Pass! Distance: 1.52
-ZED22No.519 Pass! Distance: 2.45
-ZED22No.520 Pass! Distance: 2.28
-ZED22No.521 NOT Pass! Distance: 3.33
-ZED22No.522 NOT Pass! Distance: 2.49
-ZED22No.523 NOT Pass! Distance: 3.80
-ZED22No.524 NOT Pass! Distance: 2.66
-ZED22No.525 NOT Pass! Distance: 3.36
-ZED22No.526 Pass! Distance: 1.39
-ZED22No.527 Pass! Distance: 1.45
-ZED22No.528 Pass! Distance: 2.80
-ZED22No.529 NOT Pass! Distance: 3.58
-ZED22No.530 NOT Pass! Distance: 2.78
-ZED22No.531 NOT Pass! Distance: 2.01
-ZED22No.532 NOT Pass! Distance: 2.16
-ZED22No.533 NOT Pass! Distance: 3.84
-ZED22No.534 NOT Pass! Distance: 6.22
-ZED22No.535 Pass! Distance: 0.76
-ZED22No.536 Pass! Distance: 1.67
-ZED22No.537 Pass! Distance: 2.13
-ZED22No.538 Pass! Distance: 1.81
-ZED22No.539 NOT Pass! Distance: 3.80
-ZED22No.540 Pass! Distance: 0.57
-Kinetic24No.541 Pass! Distance: 2.23
-Kinetic24No.542 Pass! Distance: 2.75
-Kinetic24No.543 Pass! Distance: 2.60
-Kinetic24No.544 NOT Pass! Distance: 2.85
-Kinetic24No.545 Pass! Distance: 2.03
-Kinetic24No.546 Pass! Distance: 2.28
-Kinetic24No.547 Pass! Distance: 2.71
-Kinetic24No.548 Pass! Distance: 2.71
-Kinetic24No.549 Pass! Distance: 1.82
-Kinetic24No.550 Pass! Distance: 1.86
-Kinetic24No.551 Pass! Distance: 1.28
-Kinetic24No.552 Pass! Distance: 1.52
-Kinetic24No.553 NOT Pass! Distance: 1.99
-Kinetic24No.554 Pass! Distance: 2.06
-Kinetic24No.555 Pass! Distance: 1.99
-Kinetic24No.556 Pass! Distance: 2.00
-Kinetic24No.557 Pass! Distance: 2.63
-Kinetic24No.558 NOT Pass! Distance: 2.68
-Kinetic24No.559 NOT Pass! Distance: 2.20
-Kinetic24No.560 NOT Pass! Distance: 2.13
-Kinetic24No.561 Pass! Distance: 1.89
-Kinetic24No.562 Pass! Distance: 2.00
-Kinetic24No.563 Pass! Distance: 1.73
-Kinetic24No.564 Pass! Distance: 1.17
-Kinetic24No.565 Pass! Distance: 1.36
-Kinetic24No.566 Pass! Distance: 1.30
-Kinetic24No.567 NOT Pass! Distance: 2.80
-Kinetic24No.568 Pass! Distance: 3.40
-Kinetic24No.569 NOT Pass! Distance: 2.56
-Kinetic24No.570 Pass! Distance: 2.05
-Xtion24No.571 Pass! Distance: 0.96
-Xtion24No.572 Pass! Distance: 0.68
-Xtion24No.573 Pass! Distance: 0.69
-Xtion24No.574 Pass! Distance: 0.74
-Xtion24No.575 Pass! Distance: 1.36
-Xtion24No.576 Pass! Distance: 1.09
-Xtion24No.577 Pass! Distance: 1.62
-Xtion24No.578 NOT Pass! Distance: 2.06
-Xtion24No.579 Pass! Distance: 1.55
-Xtion24No.580 Pass! Distance: 2.11
-Xtion24No.581 NOT Pass! Distance: 1.27
-Xtion24No.582 Pass! Distance: 1.45
-Xtion24No.583 Pass! Distance: 0.79
-Xtion24No.584 Pass! Distance: 0.98
-Xtion24No.585 Pass! Distance: 0.72
-Xtion24No.586 Pass! Distance: 0.85
-Xtion24No.587 Pass! Distance: 1.16
-Xtion24No.588 Pass! Distance: 0.83
-Xtion24No.589 Pass! Distance: 1.07
-Xtion24No.590 Pass! Distance: 1.54
-Xtion24No.591 Pass! Distance: 0.70
-Xtion24No.592 Pass! Distance: 0.60
-Xtion24No.593 Pass! Distance: 1.04
-Xtion24No.594 Pass! Distance: 1.58
-Xtion24No.595 NOT Pass! Distance: 1.89
-Xtion24No.596 Pass! Distance: 1.56
-Xtion24No.597 Pass! Distance: 0.39
-Xtion24No.598 NOT Pass! Distance: 1.62
-Xtion24No.599 Pass! Distance: 0.39
-Xtion24No.600 Pass! Distance: 1.30
-ZED24No.601 NOT Pass! Distance: 1.47
-ZED24No.602 NOT Pass! Distance: 3.13
-ZED24No.603 NOT Pass! Distance: 3.70
-ZED24No.604 NOT Pass! Distance: 1.77
-ZED24No.605 NOT Pass! Distance: 2.73
-ZED24No.606 NOT Pass! Distance: 3.30
-ZED24No.607 NOT Pass! Distance: 3.87
-ZED24No.608 NOT Pass! Distance: 1.34
-ZED24No.609 NOT Pass! Distance: 1.80
-ZED24No.610 NOT Pass! Distance: 3.10
-ZED24No.611 Pass! Distance: 2.37
-ZED24No.612 NOT Pass! Distance: 4.26
-ZED24No.613 NOT Pass! Distance: 5.62
-ZED24No.614 NOT Pass! Distance: 6.08
-ZED24No.615 NOT Pass! Distance: 4.14
-ZED24No.616 NOT Pass! Distance: 3.65
-ZED24No.617 NOT Pass! Distance: 6.39
-ZED24No.618 NOT Pass! Distance: 6.44
-ZED24No.619 NOT Pass! Distance: 6.11
-ZED24No.620 NOT Pass! Distance: 2.79
-ZED24No.621 NOT Pass! Distance: 2.14
-ZED24No.622 Pass! Distance: 1.84
-ZED24No.623 Pass! Distance: 2.64
-ZED24No.624 NOT Pass! Distance: 3.07
-ZED24No.625 NOT Pass! Distance: 4.43
-ZED24No.626 Pass! Distance: 1.53
-ZED24No.627 Pass! Distance: 1.55
-ZED24No.628 NOT Pass! Distance: 2.31
-ZED24No.629 NOT Pass! Distance: 4.33
-ZED24No.630 NOT Pass! Distance: 5.29
-Kinetic26No.631 Pass! Distance: 1.68
-Kinetic26No.632 Pass! Distance: 1.07
-Kinetic26No.633 Pass! Distance: 0.87
-Kinetic26No.634 Pass! Distance: 0.77
-Kinetic26No.635 Pass! Distance: 0.84
-Kinetic26No.636 Pass! Distance: 1.09
-Kinetic26No.637 Pass! Distance: 1.35
-Kinetic26No.638 Pass! Distance: 2.05
-Kinetic26No.639 Pass! Distance: 2.55
-Kinetic26No.640 Pass! Distance: 2.17
-Kinetic26No.641 Pass! Distance: 3.24
-Kinetic26No.642 Pass! Distance: 3.23
-Kinetic26No.643 Pass! Distance: 2.73
-Kinetic26No.644 Pass! Distance: 3.28
-Kinetic26No.645 Pass! Distance: 3.36
-Kinetic26No.646 Pass! Distance: 3.25
-Kinetic26No.647 Pass! Distance: 3.20
-Kinetic26No.648 Pass! Distance: 2.48
-Kinetic26No.649 Pass! Distance: 2.95
-Kinetic26No.650 NOT Pass! Distance: 4.24
-Kinetic26No.651 Pass! Distance: 3.19
-Kinetic26No.652 NOT Pass! Distance: 4.59
-Kinetic26No.653 NOT Pass! Distance: 4.16
-Kinetic26No.654 NOT Pass! Distance: 4.66
-Kinetic26No.655 Pass! Distance: 3.93
-Kinetic26No.656 Pass! Distance: 3.62
-Kinetic26No.657 Pass! Distance: 3.86
-Kinetic26No.658 Pass! Distance: 2.62
-Kinetic26No.659 Pass! Distance: 3.37
-Kinetic26No.660 Pass! Distance: 3.14
-Xtion26No.661 Pass! Distance: 0.63
-Xtion26No.662 Pass! Distance: 3.04
-Xtion26No.663 Pass! Distance: 2.52
-Xtion26No.664 Pass! Distance: 2.65
-Xtion26No.665 Pass! Distance: 1.22
-Xtion26No.666 Pass! Distance: 1.54
-Xtion26No.667 Pass! Distance: 1.29
-Xtion26No.668 NOT Pass! Distance: 3.99
-Xtion26No.669 Pass! Distance: 2.96
-Xtion26No.670 Pass! Distance: 3.13
-Xtion26No.671 Pass! Distance: 2.93
-Xtion26No.672 NOT Pass! Distance: 3.41
-Xtion26No.673 Pass! Distance: 3.06
-Xtion26No.674 Pass! Distance: 3.50
-Xtion26No.675 NOT Pass! Distance: 5.12
-Xtion26No.676 NOT Pass! Distance: 5.36
-Xtion26No.677 NOT Pass! Distance: 5.11
-Xtion26No.678 NOT Pass! Distance: 5.02
-Xtion26No.679 NOT Pass! Distance: 4.73
-Xtion26No.680 NOT Pass! Distance: 4.97
-Xtion26No.681 NOT Pass! Distance: 4.70
-Xtion26No.682 NOT Pass! Distance: 5.33
-Xtion26No.683 NOT Pass! Distance: 3.79
-Xtion26No.684 Pass! Distance: 2.74
-Xtion26No.685 NOT Pass! Distance: 3.96
-Xtion26No.686 NOT Pass! Distance: 4.16
-Xtion26No.687 NOT Pass! Distance: 4.24
-Xtion26No.688 NOT Pass! Distance: 4.95
-Xtion26No.689 NOT Pass! Distance: 5.15
-Xtion26No.690 NOT Pass! Distance: 4.53
-ZED26No.691 NOT Pass! Distance: 4.15
-ZED26No.692 NOT Pass! Distance: 4.75
-ZED26No.693 NOT Pass! Distance: 3.11
-ZED26No.694 NOT Pass! Distance: 4.21
-ZED26No.695 NOT Pass! Distance: 3.56
-ZED26No.696 Pass! Distance: 2.91
-ZED26No.697 NOT Pass! Distance: 4.51
-ZED26No.698 NOT Pass! Distance: 3.24
-ZED26No.699 NOT Pass! Distance: 3.37
-ZED26No.700 NOT Pass! Distance: 3.98
-ZED26No.701 NOT Pass! Distance: 3.22
-ZED26No.702 NOT Pass! Distance: 3.47
-ZED26No.703 NOT Pass! Distance: 2.95
-ZED26No.704 NOT Pass! Distance: 1.79
-ZED26No.705 Pass! Distance: 1.44
-ZED26No.706 Pass! Distance: 1.64
-ZED26No.707 Pass! Distance: 2.92
-ZED26No.708 Pass! Distance: 2.38
-ZED26No.709 NOT Pass! Distance: 3.12
-ZED26No.710 NOT Pass! Distance: 2.38
-ZED26No.711 NOT Pass! Distance: 2.56
-ZED26No.712 NOT Pass! Distance: 2.90
-ZED26No.713 NOT Pass! Distance: 2.99
-ZED26No.714 NOT Pass! Distance: 3.08
-ZED26No.715 NOT Pass! Distance: 5.04
-ZED26No.716 NOT Pass! Distance: 3.04
-ZED26No.717 NOT Pass! Distance: 1.56
-ZED26No.718 NOT Pass! Distance: 1.58
-ZED26No.719 Pass! Distance: 1.78
-ZED26No.720 Pass! Distance: 2.19
+Kinetic26No.220 Pass! Distance: 0.49
+Kinetic24No.65 Pass! Distance: 0.67
+ZED20No.146 Pass! Distance: 1.90
+ZED20No.20 Pass! Distance: 0.87
+Xtion24No.192 NOT Pass! Distance: 2.09
+ZED26No.240 Pass! Distance: 1.22
+Kinetic22No.160 Pass! Distance: 0.97
+ZED20No.25 Pass! Distance: 0.66
+Kinetic22No.277 Pass! Distance: 1.69
+Kinetic20No.7 Pass! Distance: 0.81
+ZED26No.355 Pass! Distance: 0.51
+Xtion22No.161 Pass! Distance: 0.19
+Xtion24No.70 Pass! Distance: 0.52
+Kinetic26No.98 Pass! Distance: 1.15
+ZED26No.118 Pass! Distance: 0.80
+Kinetic26No.94 Pass! Distance: 1.40
+ZED26No.237 Pass! Distance: 1.51
+ZED26No.358 Pass! Distance: 0.70
+ZED20No.261 Pass! Distance: 1.59
+Kinetic22No.156 Pass! Distance: 0.61
+ZED22No.55 Pass! Distance: 0.63
+Kinetic20No.126 Pass! Distance: 1.54
+ZED20No.24 Pass! Distance: 0.92
+Xtion26No.230 Pass! Distance: 1.69
+Kinetic22No.157 Pass! Distance: 0.64
+Kinetic24No.184 Pass! Distance: 0.92
+Xtion26No.342 Pass! Distance: 1.07
+Kinetic26No.340 Pass! Distance: 0.43
+Xtion24No.200 Pass! Distance: 1.06
+Xtion26No.228 NOT Pass! Distance: 2.74
+ZED24No.89 Pass! Distance: 1.98
+Xtion24No.320 Pass! Distance: 0.92
+ZED24No.84 NOT Pass! Distance: 3.13
+ZED20No.147 NOT Pass! Distance: 2.19
+Kinetic24No.67 Pass! Distance: 0.82
+Kinetic24No.190 Pass! Distance: 1.08
+Xtion22No.283 Pass! Distance: 0.99
+ZED20No.150 Pass! Distance: 1.71
+Xtion20No.17 Pass! Distance: 0.46
+Kinetic22No.30 Pass! Distance: 1.20
+ZED24No.329 Pass! Distance: 0.69
+Kinetic24No.301 Pass! Distance: 0.96
+Xtion22No.163 Pass! Distance: 0.63
+Kinetic20No.241 Pass! Distance: 0.82
+Kinetic24No.68 Pass! Distance: 0.53
+Kinetic20No.3 Pass! Distance: 0.74
+Kinetic24No.69 Pass! Distance: 0.60
+Kinetic24No.66 Pass! Distance: 0.80
+Xtion22No.281 Pass! Distance: 0.52
+Xtion20No.258 Pass! Distance: 0.96
+ZED24No.205 Pass! Distance: 1.50
+ZED22No.175 Pass! Distance: 1.16
+Xtion26No.109 Pass! Distance: 1.29
+Xtion20No.259 Pass! Distance: 0.83
+Xtion26No.227 NOT Pass! Distance: 3.82
+Kinetic20No.127 Pass! Distance: 1.09
+ZED26No.112 NOT Pass! Distance: 2.89
+Kinetic24No.189 Pass! Distance: 1.27
+Xtion22No.170 Pass! Distance: 0.90
+ZED24No.326 Pass! Distance: 0.52
+ZED20No.269 Pass! Distance: 0.93
+Xtion26No.221 NOT Pass! Distance: 2.30
+Xtion20No.12 Pass! Distance: 0.85
+ZED22No.300 Pass! Distance: 0.90
+Xtion20No.13 Pass! Distance: 0.80
+Xtion22No.286 Pass! Distance: 0.96
+Xtion24No.193 Pass! Distance: 1.25
+Kinetic22No.279 Pass! Distance: 0.30
+ZED20No.29 Pass! Distance: 0.63
+ZED20No.142 Pass! Distance: 1.15
+ZED22No.297 Pass! Distance: 1.38
+ZED22No.178 Pass! Distance: 0.88
+ZED22No.173 Pass! Distance: 1.05
+Kinetic22No.35 Pass! Distance: 1.00
+ZED20No.264 Pass! Distance: 1.04
+Xtion24No.77 Pass! Distance: 0.27
+Xtion20No.10 Pass! Distance: 0.82
+Kinetic22No.151 Pass! Distance: 0.40
+ZED20No.266 Pass! Distance: 0.56
+Kinetic24No.181 Pass! Distance: 1.32
+Kinetic20No.243 Pass! Distance: 0.77
+Kinetic26No.331 Pass! Distance: 0.38
+Kinetic26No.99 Pass! Distance: 1.13
+ZED26No.114 Pass! Distance: 0.57
+Xtion22No.290 Pass! Distance: 1.19
+Xtion26No.100 Pass! Distance: 1.15
+Xtion26No.348 Pass! Distance: 1.07
+Xtion20No.131 NOT Pass! Distance: 2.19
+Kinetic20No.242 Pass! Distance: 0.65
+Kinetic24No.60 Pass! Distance: 0.67
+Kinetic22No.272 Pass! Distance: 0.44
+ZED20No.267 Pass! Distance: 0.66
+ZED26No.236 Pass! Distance: 1.00
+ZED26No.232 Pass! Distance: 0.79
+Xtion22No.41 Pass! Distance: 0.84
+Xtion20No.11 Pass! Distance: 0.90
+Xtion26No.223 Pass! Distance: 1.70
+ZED22No.176 Pass! Distance: 1.08
+ZED22No.53 Pass! Distance: 0.23
+Kinetic24No.182 Pass! Distance: 1.00

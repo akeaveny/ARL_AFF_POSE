@@ -304,29 +304,26 @@ class DenseFusionEstimator():
                     # print("ADD: {:.2f} [cm]".format(ADD))
 
                     ############################
-                    # ADD or ADD-S
+                    # TODO: ADD-S
                     ############################
 
-                    # print("pred_T: ", my_t * 1e3)
-                    # print("gt_T: ", gt_trans * 1e3)
-
                     # my_r = quaternion_matrix(my_r)[:3, :3]
-                    mat_r = quaternion_matrix(my_r)[0:3, 0:3]
-                    pred = np.dot(self.cld[itemid] * 1e3, mat_r.T)
-                    pred = np.add(pred, my_t * 1e3)
+                    # mat_r = quaternion_matrix(my_r)[0:3, 0:3]
+                    # pred = np.dot(cld[itemid] * 1e3, mat_r.T)
+                    # pred = np.add(pred,  my_t * 1e3)
 
-                    target = np.dot(self.cld[itemid] * 1e3, gt_rot1.T)
-                    target = np.add(target, gt_trans * 1e3)
+                    # target = np.dot(cld[itemid] * 1e3, gt_rot1.T)
+                    # target = np.add(target, gt_trans * 1e3)
 
-                    # if idx[0].item() in sym_list:  # TODO: ADD-S
+                    # if idx[0].item() in sym_list:
                     #     pred = torch.from_numpy(pred.astype(np.float32)).cuda().transpose(1, 0).contiguous()
                     #     target = torch.from_numpy(target.astype(np.float32)).cuda().transpose(1, 0).contiguous()
                     #     inds = knn(target.unsqueeze(0), pred.unsqueeze(0))
                     #     target = torch.index_select(target, 1, inds.view(-1) - 1)
                     #     dis = torch.mean(torch.norm((pred.transpose(1, 0) - target.transpose(1, 0)), dim=1), dim=0).item()
 
-                    ADD = np.mean(np.linalg.norm(pred - target, axis=1)) / 10  # [cm]
-                    # print("ADD: {:.2f} [cm]".format(ADD))
+                    # ADD_ = np.mean(np.linalg.norm(pred - target, axis=1)) / 10 # [cm]
+                    # print("ADD: {:.2f} [cm]".format(ADD_))
 
                 # if visualize:
                 #     plt.figure(2)

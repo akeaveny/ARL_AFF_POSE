@@ -79,8 +79,8 @@ def main():
         print(opt.dataset)
         opt.num_objects = 205
         opt.num_points = 100
-        opt.outf = 'trained_models/parts_affordance/hammer15k'  # TODO:
-        opt.log_dir = 'experiments/logs/parts_affordance/hammer15k'
+        opt.outf = 'trained_models/parts_affordance/hammer1'  # TODO:
+        opt.log_dir = 'experiments/logs/parts_affordance/hammer1'
         output_results = 'check_parts_affordance.txt'
         opt.repeat_epoch = 1
 
@@ -89,13 +89,13 @@ def main():
         #########
         opt.nepoch = 500
 
-        opt.w = 0.01
-        opt.iteration = 5
+        # opt.w = 0.01
+        # opt.iteration = 5
 
         opt.refine_margin = 0.025
 
-        opt.start_epoch = 62
-        opt.resume_posenet = 'pose_model_61_0.023156231451850747.pth'
+        # opt.start_epoch = 62
+        # opt.resume_posenet = 'pose_model_61_0.023156231451850747.pth'
         ### resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
 
     else:

@@ -24,9 +24,9 @@ class PoseDataset(data.Dataset):
         ##################################
 
         if mode == 'train':
-            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list_15k.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list.txt'
         elif mode == 'test':
-            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list_15k.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list.txt'
         print(self.path)
 
         self.num_pt = num_pt

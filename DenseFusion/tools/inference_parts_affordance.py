@@ -114,9 +114,9 @@ parser.add_argument('--train_file', required=False, default='train_data_list.txt
 parser.add_argument('--val_file', required=False, default='test_data_list.txt',
                     metavar="/path/to/refine weights")
 
-parser.add_argument('--model', required=False, default=ROOT_DIR + '/trained_models/parts_affordance/hammer/pose_model_current.pth',
+parser.add_argument('--model', required=False, default=ROOT_DIR + '/trained_models/parts_affordance/hammer/pose_model_200_0.029124274999407042.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
-parser.add_argument('--refine_model', required=False, default=ROOT_DIR + '/trained_models/parts_affordance/hammer/pose_refine_model_current.pth',
+parser.add_argument('--refine_model', required=False, default=ROOT_DIR + '/trained_models/parts_affordance/hammer/pose_refine_model_360_0.029080938887569262.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--classes', required=False, default='classes_train.txt',
@@ -140,11 +140,15 @@ num_obj = 205
 
 num_points = 1000
 num_points_mesh = 1000
-iteration = 5
+iteration = 2
 bs = 1
 
-norm_ = transforms.Normalize(mean=[0.59076867, 0.51179716, 0.47878297],
-                                std=[0.16110815, 0.16659215, 0.15830115])
+norm_ = transforms.Normalize(mean=[113.45 / 255, 112.19 / 255, 130.92 / 255],
+                                 std=[42.34959629 / 255, 42.23650688 / 255, 40.89796388 / 255])
+
+# norm_ = transforms.Normalize(mean=[126.78076877/ 255, 131.24245301/ 255, 150.4986596/ 255],
+#                                  std=[42.34959629 / 255, 42.23650688 / 255, 40.89796388 / 255])
+
 
 ##################################
 ## classes
@@ -207,7 +211,14 @@ loaded_images_ = np.loadtxt('{}/{}'.format(args.dataset_config, images_file), dt
 ############
 num_correct = 0
 fw = open('{0}/eval_result_logs.txt'.format(args.output_result_dir), 'w')
-for idx in range(len(loaded_images_)):
+
+# select random test images
+np.random.seed(2)
+num_test = 100
+test_idx = np.random.choice(np.arange(0, int(len(loaded_images_)/2), 1), size=int(num_test), replace=False)
+print("Chosen Files \n", test_idx)
+
+for idx in test_idx:
 
     # np.random.seed(0)
     # TODO: pick random idx
@@ -479,39 +490,39 @@ for idx in range(len(loaded_images_)):
                 # print("mat_r \n", mat_r)
                 # print("gt_rot \n", gt_rot1)
 
-                ADD = np.mean(np.linalg.norm(imgpts - imgpts_gt, axis=1)) / 10
+                ADD = np.mean(np.linalg.norm(imgpts - imgpts_gt, axis=1)) / 10 # [cm]
                 print("ADD: {:.2f} [cm]".format(ADD))
 
                 ############################
-                # ADD or ADD-S
+                # TODO: ADD-S
                 ############################
 
                 # my_r = quaternion_matrix(my_r)[:3, :3]
-                mat_r = quaternion_matrix(my_r)[0:3, 0:3]
-                pred = np.dot(cld[itemid] * 1e3, mat_r.T)
-                pred = np.add(pred,  my_t * 1e3)
+                # mat_r = quaternion_matrix(my_r)[0:3, 0:3]
+                # pred = np.dot(cld[itemid] * 1e3, mat_r.T)
+                # pred = np.add(pred,  my_t * 1e3)
 
-                target = np.dot(cld[itemid] * 1e3, gt_rot1.T)
-                target = np.add(target, gt_trans * 1e3)
+                # target = np.dot(cld[itemid] * 1e3, gt_rot1.T)
+                # target = np.add(target, gt_trans * 1e3)
 
-                # if idx[0].item() in sym_list:  # TODO: ADD-S
+                # if idx[0].item() in sym_list:
                 #     pred = torch.from_numpy(pred.astype(np.float32)).cuda().transpose(1, 0).contiguous()
                 #     target = torch.from_numpy(target.astype(np.float32)).cuda().transpose(1, 0).contiguous()
                 #     inds = knn(target.unsqueeze(0), pred.unsqueeze(0))
                 #     target = torch.index_select(target, 1, inds.view(-1) - 1)
                 #     dis = torch.mean(torch.norm((pred.transpose(1, 0) - target.transpose(1, 0)), dim=1), dim=0).item()
 
-                ADD = np.mean(np.linalg.norm(pred - target, axis=1)) / 10 # [cm]
-                print("ADD: {:.2f} [cm]".format(ADD))
+                # ADD_ = np.mean(np.linalg.norm(pred - target, axis=1)) / 10 # [cm]
+                # print("ADD: {:.2f} [cm]".format(ADD_))
 
-                if ADD < args.ADD:  # TODO: units [cm???]
+                if ADD < args.ADD:
                     num_correct += 1
                     print('No.{} Pass! Distance: {:.2f}'.format(idx, ADD))
                     fw.write('No.{} Pass! Distance: {:.2f}\n'.format(idx,ADD))
                 else:
                     print('No.{} NOT Pass! Distance: {:.2f}'.format(idx, ADD))
                     fw.write('No.{} NOT Pass! Distance: {:.2f}\n'.format(idx, ADD))
-                print('************ Num Correct:{}/{}.. ************'.format(num_correct, len(loaded_images_)))
+                print('************ Num Correct:{}/{}.. ************'.format(num_correct, len(test_idx)))
 
                 if args.visualize:
                     plt.subplot(3, 2, 1)

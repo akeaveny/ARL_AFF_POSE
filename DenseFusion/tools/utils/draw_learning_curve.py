@@ -17,7 +17,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Compute Image Mean and Stddev')
 parser.add_argument('--dataset', required=True,
-                    metavar="/path/to//dataset/",
+                    metavar="/path/to/dataset/",
                     help='Directory of the dataset')
 args = parser.parse_args()
 root_dir = args.dataset
