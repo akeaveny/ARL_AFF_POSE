@@ -8,7 +8,17 @@ project(densefusion_ros)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  camera_info_manager_py
+  cv_bridge
+  geometry_msgs
+  message_filters
+  resource_retriever
   rospy
+  sensor_msgs
+  std_msgs
+  tf
+  vision_msgs
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -101,9 +111,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES numpy_tutorial
-#  CATKIN_DEPENDS rospy rospy_tutorials
+  CATKIN_DEPENDS geometry_msgs sensor_msgs std_msgs vision_msgs visualization_msgs
 #  DEPENDS system_lib
 )
 

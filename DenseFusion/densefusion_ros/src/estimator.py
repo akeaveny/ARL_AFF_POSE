@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
 import argparse
 import os
@@ -14,15 +14,7 @@ import scipy.misc
 import numpy.ma as ma
 import math
 
-##################################
-###  GPU
-##################################
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
-import tensorflow as tf
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-sess = tf.Session(config=config)
+np.seterr(divide='ignore')
 
 import torch
 import torch.nn as nn
@@ -36,18 +28,41 @@ import torchvision.utils as vutils
 import torch.nn.functional as F
 from torch.autograd import Variable
 
+##################################
+### GPU
+##################################
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# device = torch.device("cpu")
+
+print("\n********* Torch GPU ************")
+print(torch.__version__)
+print(torch.cuda.current_device())
+print(torch.cuda.device(0))
+print(torch.cuda.device_count())
+print(torch.cuda.get_device_name(0))
+print(torch.cuda.is_available())
+print(torch.cuda.current_device())
+print("*********************************\n")
+
+ROOT_DIR = os.path.abspath("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/densefusion_ros/src/")
+print("ROOT_DIR: ", ROOT_DIR)
+
+print("cwd: ", os.getcwd())
+
 # ========== lib local to src for ros-2.7 env ================
 from lib.network import PoseNet, PoseRefineNet
 from lib.transformations import euler_matrix, quaternion_matrix, quaternion_from_matrix
 from lib.knn.__init__ import KNearestNeighbor
+
 knn = KNearestNeighbor(1)
+
 
 class DenseFusionEstimator():
 
     def __init__(self, model, refine_model,
-                            num_points, num_points_mesh, iteration, bs, num_obj,
-                                classes_file_, class_ids_file_,
-                                    cam_width, cam_height, cam_scale, cam_fx, cam_fy, cam_cx, cam_cy):
+                 num_points, num_points_mesh, iteration, bs, num_obj,
+                 classes_file_, class_ids_file_,
+                 cam_width, cam_height, cam_scale, cam_fx, cam_fy, cam_cx, cam_cy):
 
         """ --- INIT --- """
         self.num_points = num_points
@@ -66,9 +81,9 @@ class DenseFusionEstimator():
         self.refiner.load_state_dict(torch.load(refine_model))
         self.refiner.eval()
 
-        #TODO: need norm ?
+        # TODO: need norm ?
         self.norm = transforms.Normalize(mean=[0.59076867, 0.51179716, 0.47878297],
-                                            std=[0.16110815, 0.16659215, 0.15830115])
+                                         std=[0.16110815, 0.16659215, 0.15830115])
 
         """ --- Load 3D Object Models --- """
         class_file, class_id_file = open(classes_file_), open(class_ids_file_)
@@ -79,7 +94,8 @@ class DenseFusionEstimator():
             class_input = class_file.readline()
             if not class_input:
                 break
-            input_file = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/models/{0}/{0}_grasp.xyz'.format(class_input[:-1]))
+            input_file = open(
+                '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/densefusion_ros/models/hammer_01_grasp.xyz')
             self.cld[class_id] = []
             while 1:
                 input_line = input_file.readline()
@@ -87,13 +103,13 @@ class DenseFusionEstimator():
                     break
                 input_line = input_line[:-1].split(' ')
                 self.cld[class_id].append([float(input_line[0]), float(input_line[1]), float(input_line[2])])
-            self.cld[class_id] = np.array(self.cld[class_id]) * 1e3 # [m] to [mmm]
+            self.cld[class_id] = np.array(self.cld[class_id])
             input_file.close()
 
         """ --- Camera Params --- """
         self.width = cam_width
         self.height = cam_height
-        self.border_list = np.arange(0, self.width+1 if self.width > self.height else self.height+1, 40)
+        self.border_list = np.arange(0, self.width + 1 if self.width > self.height else self.height + 1, 40)
         self.border_list[0] = -1
         self.cam_scale = cam_scale
         self.cam_fx = cam_fx
@@ -101,11 +117,11 @@ class DenseFusionEstimator():
         self.cam_cx = cam_cx
         self.cam_cy = cam_cy
 
-        print("--- Successfully loaded DenseFusion! ---\n")
+        print("*** Successfully loaded DenseFusion! ***")
 
     def get_bbox(self, label, affordance_id, img_width, img_length, border_list):
-        rows = np.any(label==affordance_id, axis=1)
-        cols = np.any(label==affordance_id, axis=0)
+        rows = np.any(label == affordance_id, axis=1)
+        cols = np.any(label == affordance_id, axis=0)
 
         rmin, rmax = np.where(rows)[0][[0, -1]]
         cmin, cmax = np.where(cols)[0][[0, -1]]
@@ -147,34 +163,12 @@ class DenseFusionEstimator():
     def get_refined_pose(self, rgb, depth, mask, meta=None, debug=False, visualize=False, check_pose=False):
 
         affordance_ids = np.unique(mask)
-        for affordance_id in affordance_ids[1:-1]: # EXCLUDE THE BACKGROUND 0
+        for affordance_id in affordance_ids[1:-1]:  # EXCLUDE THE BACKGROUND 0
             if affordance_id in self.class_IDs:
                 itemid = affordance_id
 
                 my_result_wo_refine = []
                 my_result = []
-
-                if check_pose:
-                    if rgb.shape[0] == 480:
-                        self.height = 640
-                        self.width = 480
-                        self.border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640]
-                        self.cam_scale = 1
-                        self.cam_fx = 517.055
-                        self.cam_fy = 517.679
-                        self.cam_cx = 315.008
-                        self.cam_cy = 264.155
-                    elif rgb.shape[0] == 720:
-                        self.height = 1280
-                        self.width = 720
-                        self.border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640,
-                                            680, 720, 760, 800, 840, 880, 920, 960, 1000, 1040, 1080, 1120, 1160, 1200, 1240, 1280]
-                        self.cam_scale = 1
-                        self.cam_fx = 697.6871337890625
-                        self.cam_fy = 697.6871337890625
-                        self.cam_cx = 620.2407836914062
-                        self.cam_cy = 353.91357421875
-
                 xmap = np.array([[j for i in range(self.height)] for j in range(self.width)])
                 ymap = np.array([[i for i in range(self.height)] for j in range(self.width)])
 
@@ -247,7 +241,9 @@ class DenseFusionEstimator():
                 # print("my_pred w/o refinement: \n", my_pred)
 
                 for ite in range(0, self.iteration):
-                    T = Variable(torch.from_numpy(my_t.astype(np.float32))).cuda().view(1, 3).repeat(self.num_points, 1).contiguous().view(1, self.num_points, 3)
+                    T = Variable(torch.from_numpy(my_t.astype(np.float32))).cuda().view(1, 3).repeat(self.num_points,
+                                                                                                     1).contiguous().view(
+                        1, self.num_points, 3)
                     my_mat = quaternion_matrix(my_r)
                     R = Variable(torch.from_numpy(my_mat[:3, :3].astype(np.float32))).cuda().view(1, 3, 3)
                     my_mat[0:3, 3] = my_t
@@ -281,66 +277,85 @@ class DenseFusionEstimator():
                 # ===================== PREDICTION =====================
                 ''' ========= quarternion ========= '''
                 mat_r = quaternion_matrix(my_r)[0:3, 0:3]
-                my_t = my_t * 1000
+                my_t_ = my_t
 
-                imgpts, jac = cv.projectPoints(self.cld[itemid],
-                                                mat_r,
-                                                my_t,
-                                                cam_mat, dist)
+                imgpts, jac = cv.projectPoints(self.cld[itemid] * 1e3,
+                                               mat_r,
+                                               my_t_ * 1e3,
+                                               cam_mat, dist)
                 cld_img_pred = cv.polylines(np.array(rgb.copy()), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
 
                 if check_pose:
                     meta_idx = '0' + np.str(itemid)
-                    print("meta_idx: ", meta_idx)
+                    ### print("meta_idx: ", meta_idx)
                     # ===================== GT =====================
-                    gt_trans = np.array(meta['cam_translation' + meta_idx][0]) / 10
+                    gt_trans = np.array(meta['cam_translation' + meta_idx][0]) / 1e3 / 10
                     gt_rot1 = np.dot(np.array(meta['rot' + meta_idx]), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
                     gt_rot1 = np.dot(gt_rot1.T, np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]))
 
-                    imgpts_gt, jac = cv.projectPoints(self.cld[itemid],
-                                                       gt_rot1,
-                                                       gt_trans,
-                                                       cam_mat, dist)
+                    imgpts_gt, jac = cv.projectPoints(self.cld[itemid] * 1e3,
+                                                      gt_rot1,
+                                                      gt_trans * 1e3,
+                                                      cam_mat, dist)
                     cld_img_gt = cv.polylines(np.array(rgb.copy()), np.int32([np.squeeze(imgpts_gt)]), True,
-                                               (0, 255, 255))
+                                              (0, 255, 255))
 
-                    # print("--- Translation ---") # TODO: rospy logging
-                    # print("Pred: \n:", my_t)
-                    # print("GT \n:", gt_trans)
-                    # print("--- Rotation ---")
-                    # print("Pred: \n:", mat_r)
-                    # print("GT \n:", gt_rot1)
+                    ADD = np.mean(np.linalg.norm(imgpts - imgpts_gt, axis=1)) / 10
+                    # print("ADD: {:.2f} [cm]".format(ADD))
 
-                    # print("ADD:", np.abs(np.ravel(imgpts) - np.ravel(imgpts_gt)).sum() / self.num_points)  ### TODO:
-                    # print('ADD: {:.2f}[cm]'.format(np.linalg.norm(imgpts - imgpts_gt) / self.num_points))
+                    ############################
+                    # ADD or ADD-S
+                    ############################
 
-                if visualize:
-                    plt.figure(2)
-                    plt.subplot(2, 3, 1)
-                    plt.title("rgb")
-                    plt.imshow(rgb)
-                    plt.subplot(2, 3, 2)
-                    plt.title("depth")
-                    plt.imshow(depth)
-                    plt.subplot(2, 3, 3)
-                    plt.title("mask")
-                    plt.imshow(mask)
-                    plt.subplot(2, 3, 4)
-                    plt.title("bbox")
-                    plt.imshow(bbox_image)
-                    plt.subplot(2, 3, 5)
-                    plt.title("pred")
-                    plt.imshow(cld_img_pred)
-                    if check_pose:
-                        plt.subplot(2, 3, 6)
-                        plt.title("gt")
-                        plt.imshow(cld_img_gt)
-                    plt.ioff()
-                    plt.pause(2)
+                    # print("pred_T: ", my_t * 1e3)
+                    # print("gt_T: ", gt_trans * 1e3)
+
+                    # my_r = quaternion_matrix(my_r)[:3, :3]
+                    mat_r = quaternion_matrix(my_r)[0:3, 0:3]
+                    pred = np.dot(self.cld[itemid] * 1e3, mat_r.T)
+                    pred = np.add(pred, my_t * 1e3)
+
+                    target = np.dot(self.cld[itemid] * 1e3, gt_rot1.T)
+                    target = np.add(target, gt_trans * 1e3)
+
+                    # if idx[0].item() in sym_list:  # TODO: ADD-S
+                    #     pred = torch.from_numpy(pred.astype(np.float32)).cuda().transpose(1, 0).contiguous()
+                    #     target = torch.from_numpy(target.astype(np.float32)).cuda().transpose(1, 0).contiguous()
+                    #     inds = knn(target.unsqueeze(0), pred.unsqueeze(0))
+                    #     target = torch.index_select(target, 1, inds.view(-1) - 1)
+                    #     dis = torch.mean(torch.norm((pred.transpose(1, 0) - target.transpose(1, 0)), dim=1), dim=0).item()
+
+                    ADD = np.mean(np.linalg.norm(pred - target, axis=1)) / 10  # [cm]
+                    # print("ADD: {:.2f} [cm]".format(ADD))
+
+                # if visualize:
+                #     plt.figure(2)
+                #     plt.subplot(2, 3, 1)
+                #     plt.title("rgb")
+                #     plt.imshow(rgb)
+                #     plt.subplot(2, 3, 2)
+                #     plt.title("depth")
+                #     plt.imshow(depth)
+                #     plt.subplot(2, 3, 3)
+                #     plt.title("mask")
+                #     plt.imshow(mask)
+                #     plt.subplot(2, 3, 4)
+                #     plt.title("bbox")
+                #     plt.imshow(bbox_image)
+                #     plt.subplot(2, 3, 5)
+                #     plt.title("pred")
+                #     plt.imshow(cld_img_pred)
+                #     if check_pose:
+                #         plt.subplot(2, 3, 6)
+                #         plt.title("gt")
+                #         plt.imshow(cld_img_gt)
+                #     plt.ioff()
+                #     plt.pause(2)
+
+                return np.array(my_r), np.array(my_t * 1e3), cld_img_pred
             else:
-                print("\n --- Could not Detect Object Parts! --- ")
+                print("\n ***** Could not Detect Object Parts! ***** ")
                 print("Detected Affordance IDs: ", affordance_ids)
                 print("Avaliable Object IDs: {}\n".format(self.class_IDs))
-                return False
-        return True
+                return None
 

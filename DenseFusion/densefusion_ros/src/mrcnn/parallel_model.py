@@ -32,11 +32,12 @@ class ParallelModel(KM.Model):
         keras_model: The Keras model to parallelize
         gpu_count: Number of GPUs. Must be > 1
         """
-        self.inner_model = keras_model
+        inner_model = keras_model
         self.gpu_count = gpu_count
-        merged_outputs = self.make_parallel()
-        super(ParallelModel, self).__init__(inputs=self.inner_model.inputs,
+        merged_outputs = self.make_parallel(inner_model)
+        super(ParallelModel, self).__init__(inputs=inner_model.inputs,
                                             outputs=merged_outputs)
+        self.inner_model = inner_model
 
     def __getattribute__(self, attrname):
         """Redirect loading and saving methods to the inner model. That's where
@@ -51,19 +52,19 @@ class ParallelModel(KM.Model):
         super(ParallelModel, self).summary(*args, **kwargs)
         self.inner_model.summary(*args, **kwargs)
 
-    def make_parallel(self):
+    def make_parallel(self, inner_model):
         """Creates a new wrapper model that consists of multiple replicas of
         the original model placed on different GPUs.
         """
         # Slice inputs. Slice inputs on the CPU to avoid sending a copy
         # of the full inputs to all GPUs. Saves on bandwidth and memory.
         input_slices = {name: tf.split(x, self.gpu_count)
-                        for name, x in zip(self.inner_model.input_names,
-                                           self.inner_model.inputs)}
+                        for name, x in zip(inner_model.input_names,
+                                           inner_model.inputs)}
 
-        output_names = self.inner_model.output_names
+        output_names = inner_model.output_names
         outputs_all = []
-        for i in range(len(self.inner_model.outputs)):
+        for i in range(len(inner_model.outputs)):
             outputs_all.append([])
 
         # Run the model call() on each GPU to place the ops there
@@ -71,14 +72,14 @@ class ParallelModel(KM.Model):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('tower_%d' % i):
                     # Run a slice of inputs through this replica
-                    zipped_inputs = zip(self.inner_model.input_names,
-                                        self.inner_model.inputs)
+                    zipped_inputs = zip(inner_model.input_names,
+                                        inner_model.inputs)
                     inputs = [
                         KL.Lambda(lambda s: input_slices[name][i],
                                   output_shape=lambda s: (None,) + s[1:])(tensor)
                         for name, tensor in zipped_inputs]
                     # Create the model replica and get the outputs
-                    outputs = self.inner_model(inputs)
+                    outputs = inner_model(inputs)
                     if not isinstance(outputs, list):
                         outputs = [outputs]
                     # Save the outputs for merging back together later
@@ -89,16 +90,18 @@ class ParallelModel(KM.Model):
         with tf.device('/cpu:0'):
             merged = []
             for outputs, name in zip(outputs_all, output_names):
-                # If outputs are numbers without dimensions, add a batch dim.
-                def add_dim(tensor):
-                    """Add a dimension to tensors that don't have any."""
-                    if K.int_shape(tensor) == ():
-                        return KL.Lambda(lambda t: K.reshape(t, [1, 1]))(tensor)
-                    return tensor
-                outputs = list(map(add_dim, outputs))
-
-                # Concatenate
-                merged.append(KL.Concatenate(axis=0, name=name)(outputs))
+                # Concatenate or average outputs?
+                # Outputs usually have a batch dimension and we concatenate
+                # across it. If they don't, then the output is likely a loss
+                # or a metric value that gets averaged across the batch.
+                # Keras expects losses and metrics to be scalars.
+                if K.int_shape(outputs[0]) == ():
+                    # Average
+                    m = KL.Lambda(lambda o: tf.add_n(o) / len(outputs), name=name)(outputs)
+                else:
+                    # Concatenate
+                    m = KL.Concatenate(axis=0, name=name)(outputs)
+                merged.append(m)
         return merged
 
 
@@ -118,10 +121,10 @@ if __name__ == "__main__":
     GPU_COUNT = 2
 
     # Root directory of the project
-    ROOT_DIR = os.getcwd()
+    ROOT_DIR = os.path.abspath("../")
 
     # Directory to save logs and trained model
-    MODEL_DIR = os.path.join(ROOT_DIR, "logs/parallel")
+    MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
     def build_model(x_train, num_classes):
         # Reset default graph. Keras leaves old ops in the graph,

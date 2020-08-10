@@ -11,7 +11,7 @@
   <arg name="num_obj" default='205' />
 
   <!-- MaskRCNN -->
-  <arg name="model" default="$(find densefusion_ros)/models/mask_rcnn_affordance_0040.h5" />
+  <arg name="model" default="$(find densefusion_ros)/models/mask_rcnn_affordance_rgbd.h5" />
   <arg name="class_labels" default="$(find densefusion_ros)/models/mask_rcnn_classes.txt" />
   <arg name="detection_threshold" default="0.5" />
 
@@ -20,7 +20,7 @@
   <arg name="class_ids" default="$(find densefusion_ros)/models/class_ids.txt" />
 
   <!-- ZED Camera -->
-  <arg name="rgb_image" default='/zed/zed_node/left/image_rect_color' />
+  <arg name="rgb_image" default='/zed/zed_node/rgb/image_rect_color' />
   <arg name="rgb_encoding" default='bgr8' />
   <arg name="depth_image" default='/zed/zed_node/depth/depth_registered' />
   <arg name="depth_encoding" default='32FC1' />
@@ -28,10 +28,10 @@
   <arg name="cam_width" default='1280' />
   <arg name="cam_height" default='720' />
   <arg name="cam_scale" default='1' />
-  <arg name="cam_fx" default='697.6871337890625' />
-  <arg name="cam_fy" default='697.6871337890625' />
-  <arg name="cam_cx" default='620.2407836914062' />
-  <arg name="cam_cy" default='353.91357421875' />
+  <arg name="cam_fx" default='683.0367431640625' />
+  <arg name="cam_fy" default='683.0367431640625' />
+  <arg name="cam_cx" default='657.28759765625' />
+  <arg name="cam_cy" default='339.8111877441406' />
 
   <!-- Testing -->
   <arg name="debug" default="False" />
@@ -39,7 +39,10 @@
   <arg name="use_synthetic_images" default="True" />
   <arg name="check_pose" default="True" />
 
-  <node pkg="densefusion_ros" type="densefusion_node.py" name="densefusion_ros" output="screen" >
+  <!-- RVIZ -->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find densefusion_ros)/rviz/densefusion_ros.rviz" />
+
+  <node pkg="densefusion_ros" type="densefusion_node.py" name="densefusion_ros" output="screen" cwd="node">
     <!-- DenseFusion -->
     <param name="pose_model" value="$(arg pose_model)" />
     <param name="refine_model" value="$(arg refine_model)" />

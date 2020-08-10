@@ -237,7 +237,7 @@ def detect_and_get_masks(model, config, args):
             ### image, depthimage, image_meta, gt_class_id, gt_bbox, gt_mask = \
             ###    modellib.load_images_gt(dataset, config, image_id, use_mini_mask=False)
             # run detect
-            cur_detect = model.detectWdepth([rgb], [depth], verbose=0)[0]
+            cur_detect = model.detectWdepth([rgb], [depth], verbose=1)[0]
 
         # get instance_masks
         instance_mask, color_mask = seq_get_masks(rgb, cur_detect, gt_label, args)

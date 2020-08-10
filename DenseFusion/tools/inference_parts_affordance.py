@@ -501,16 +501,16 @@ for idx in range(len(loaded_images_)):
                 #     target = torch.index_select(target, 1, inds.view(-1) - 1)
                 #     dis = torch.mean(torch.norm((pred.transpose(1, 0) - target.transpose(1, 0)), dim=1), dim=0).item()
 
-                dis = np.mean(np.linalg.norm(pred - target, axis=1)) / 10 # [cm]
-                print("ADD: {:.2f} [cm]".format(dis))
+                ADD = np.mean(np.linalg.norm(pred - target, axis=1)) / 10 # [cm]
+                print("ADD: {:.2f} [cm]".format(ADD))
 
                 if ADD < args.ADD:  # TODO: units [cm???]
                     num_correct += 1
-                    print('No.{} Pass! Distance: {:.2f}'.format(idx, dis))
-                    fw.write('No.{} Pass! Distance: {:.2f}\n'.format(idx,dis))
+                    print('No.{} Pass! Distance: {:.2f}'.format(idx, ADD))
+                    fw.write('No.{} Pass! Distance: {:.2f}\n'.format(idx,ADD))
                 else:
-                    print('No.{} NOT Pass! Distance: {:.2f}'.format(idx, dis))
-                    fw.write('No.{} NOT Pass! Distance: {:.2f}\n'.format(idx, dis))
+                    print('No.{} NOT Pass! Distance: {:.2f}'.format(idx, ADD))
+                    fw.write('No.{} NOT Pass! Distance: {:.2f}\n'.format(idx, ADD))
                 print('************ Num Correct:{}/{}.. ************'.format(num_correct, len(loaded_images_)))
 
                 if args.visualize:

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-#!/usr/bin/env python
+#! /usr/bin/env python
+from __future__ import division
 '''
 This ros node subscribes to two camera topics: '/camera/color/image_raw' and 
 '/camera/aligned_depth_to_color/image_raw' in a synchronized way. It then runs 
@@ -25,10 +25,17 @@ from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 import scipy.io as scio
 
-import matplotlib.pyplot as plt
-
 from estimator import DenseFusionEstimator
 from segmentation import MRCNNDetector
+
+from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import CameraInfo, Image as ImageSensor_msg
+from std_msgs.msg import String
+from vision_msgs.msg import Detection3D, Detection3DArray, ObjectHypothesisWithPose
+from visualization_msgs.msg import Marker, MarkerArray
+
+ROOT_DIR = os.path.abspath("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/densefusion_ros/src/")
+print("ROOT_DIR: ", ROOT_DIR)
 
 class ObjectDetector(MRCNNDetector):
 
@@ -118,7 +125,7 @@ class PoseEstimator(DenseFusionEstimator):
             self.__objects_meta[object_label] = [object_name, color]
             self.__labels.append(object_name)
 
-        """ --- Init DenseFusion --- """
+        """ --- Init Mask R-CNN --- """
         self.Mask_RCNN = ObjectDetector()
 
         """ --- Init DenseFusion --- """
@@ -129,17 +136,24 @@ class PoseEstimator(DenseFusionEstimator):
                                       self.__cam_fx, self.__cam_fy, self.__cam_cx, self.__cam_cy)
 
         """ --- Subsribe to Camera --- """
-        # RGB + Depth Images
         self.bridge = CvBridge()
         self.rgb_sub = message_filters.Subscriber(self.__rgb_image, Image)
         self.depth_sub = message_filters.Subscriber(self.__depth_image, Image)
         ts = message_filters.TimeSynchronizer([self.rgb_sub, self.depth_sub], 1)
         ts.registerCallback(self.camera_callback)
 
+        """ --- Publisher --- """
+        self.pub_mask_rcnn = rospy.Publisher('~mask_rcnn_mask', Image, queue_size=1)
+        self.pub_pose = rospy.Publisher('~densefusion_pose', PoseStamped,queue_size=1)
+        self.pub_point_cloud = rospy.Publisher('~densefusion_point_cloud', Image, queue_size=1)
+
+        self.num_image = 0
         if self.__USE_SYNTHETIC_IMAGES:
-            print('\n--- Using Synthetic Images! ---')
+            self.image_path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/densefusion_ros/images/syn/'
+            print('*** Using Synthetic Images! ***\n')
         else:
-            print('--- Subscribed to rgb and depth topic in a sychronized way! ---')
+            self.image_path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/densefusion_ros/images/zed/'
+            print('*** Subscribed to rgb and depth topic in a sychronized way! ***\n')
 
     def camera_callback(self, rgb_msg, depth_msg):
 
@@ -152,52 +166,109 @@ class PoseEstimator(DenseFusionEstimator):
         depth_cv = self.bridge.imgmsg_to_cv2(depth_msg, self.__depth_encoding) # "16UC1" or "32FC1"
         depth_cv = np.float32(depth_cv)
         depth = depth_cv
-        # depth_cv[np.isnan(depth_cv)] = 0 # TODO: In-painting
-        # depth_cv[depth_cv == -np.inf] = 0
-        # depth_cv[depth_cv == np.inf] = 0
-        # depth = depth_cv.reshape(depth.height, depth.width, -1)
 
+        ######################
+        # in-painting
+        ######################
+
+        depth[np.isnan(depth)] = 0
+        depth[depth == -np.inf] = 0
+        depth[depth == np.inf] = 0
+
+        # convert to 8-bit image
+        depth = depth * (2 ** 16 -1) / np.max(depth)
+        depth = np.array(depth, dtype=np.uint16)
+
+        # print("depth min: ", np.min(np.array(depth)))
+        # print("depth max: ", np.max(np.array(depth)))
+        #
+        # print("rgb type: ", rgb.dtype)
+        # print("depth type: ", depth.dtype)
+
+        ######################
+        # NDDS
+        ######################
         if self.__USE_SYNTHETIC_IMAGES:
 
-            data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/'
-            # ================== NDDS =========================
-            test_images_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list.txt'
-            loaded_images_ = np.loadtxt(test_images_file, dtype=np.str)
-            # for idx in range(len(loaded_images_)):
+            data_path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/densefusion_ros/images/gt/'
 
-            idx = np.random.choice(len(loaded_images_), size=1, replace=False)[0]
-
-            rgb_addr = data_path + loaded_images_[idx] + "_rgb.png"
-            depth_addr = data_path + loaded_images_[idx] + "_depth.png"
-            gt_addr = data_path + loaded_images_[idx] + "_label.png"
-
-            if self.__CHECK_POSE:
-                meta_addr = data_path + loaded_images_[idx] + "-meta.mat"
-                meta = scio.loadmat(meta_addr)
+            rgb_addr = data_path + '000086_rgb.png'
+            depth_addr = data_path + '000086_depth.png'
+            gt_addr = data_path + '000086_label.png'
 
             rgb = np.array(PIL.Image.open(rgb_addr))
             depth = np.array(PIL.Image.open(depth_addr))
             gt = np.array(PIL.Image.open(gt_addr))
 
-            # ## ============== SYNTHETIC ===================
+            ### SYNTHETIC
             rgb = np.array(rgb)
             if rgb.shape[-1] == 4:
                 rgb = rgb[..., :3]
 
+            if self.__CHECK_POSE:
+                meta_addr = data_path + '000086-meta.mat'
+                meta = scio.loadmat(meta_addr)
+
+        ######################
+        # Mask R-CNN
+        ######################
+
         t_start = time.time()
-        instance_mask = self.Mask_RCNN.detect_and_get_masks(rgb, self.__VISUALIZE)
+        instance_mask = self.Mask_RCNN.detect_and_get_masks(rgb, depth, self.__VISUALIZE)
         t_mask_rcnn = time.time() - t_start
-        print('Mask R-CNN Prediction time: {:.2f}s\n'.format(t_mask_rcnn))
-        #### if instance_mask is not None:
-        # ## ============== DenseFusion ===================
+        print('Mask R-CNN Prediction time: {:.2f}s ..'.format(t_mask_rcnn))
+
+        ######################
+        # DenseFusion
+        ######################
         t_start = time.time()
-        if self.__USE_SYNTHETIC_IMAGES and self.__CHECK_POSE:
-            DenseFusionEstimator.get_refined_pose(self, rgb, depth, gt, meta,
+        if self.__CHECK_POSE:
+            pred_R, pred_T, cld_img_pred = DenseFusionEstimator.get_refined_pose(self, rgb, depth, gt, meta,
                                                   self.__DEBUG, self.__VISUALIZE, self.__CHECK_POSE)
         else:
-            DenseFusionEstimator.get_refined_pose(self, rgb, depth, self.__DEBUG, self.__VISUALIZE)
+            pred_R, pred_T, cld_img_pred = DenseFusionEstimator.get_refined_pose(self, rgb, depth, instance_mask, debug=self.__DEBUG, visualize=self.__VISUALIZE)
         t_densefusion = time.time() - t_start
         print('DenseFusion Prediction time: {:.2f}s\n'.format(t_densefusion))
+
+        ######################
+        # RVIZ
+        ######################
+
+        # Mask R-CNN
+        cv2_instance_mask = self.bridge.cv2_to_imgmsg(instance_mask, '8UC1') # TODO:
+        self.pub_mask_rcnn.publish(cv2_instance_mask)
+
+        # DenseFusion
+        pose_msg = PoseStamped()
+        pose_msg.header = rgb_msg.header
+        pose_msg.pose.position.x = pred_T[0]
+        pose_msg.pose.position.y = pred_T[1]
+        pose_msg.pose.position.z = pred_T[2]
+        pose_msg.pose.orientation.x = pred_R[0]
+        pose_msg.pose.orientation.y = pred_R[1]
+        pose_msg.pose.orientation.z = pred_R[2]
+        pose_msg.pose.orientation.w = pred_R[3]
+        self.pub_pose.publish(pose_msg)
+
+        cv2_cld_img_pred = self.bridge.cv2_to_imgmsg(cld_img_pred, '8UC3') # TODO:
+        self.pub_point_cloud.publish(cv2_cld_img_pred)
+
+        ######################
+        # save local images
+        ######################
+
+        rgb_name = self.image_path + np.str(self.num_image) + '_rgb.png'
+        cv.imwrite(rgb_name, rgb)
+
+        depth_name = self.image_path + np.str(self.num_image) + '_depth.png'
+        cv.imwrite(depth_name, depth)
+
+        mask_name = self.image_path + np.str(self.num_image) + '_mask.png'
+        cv.imwrite(mask_name, instance_mask)
+
+        self.num_image += 1
+
+
         return
 
 def main(args):
