@@ -1,6 +1,7 @@
 import _init_paths
 import argparse
 import os
+import sys
 import copy
 import random
 import numpy as np
@@ -9,6 +10,11 @@ import scipy.io as scio
 import scipy.misc
 import numpy.ma as ma
 import math
+
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)
+print("ROOT_DIR", ROOT_DIR)
+
 import torch
 import torch.nn as nn
 import torch.nn.parallel
@@ -20,14 +26,20 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import torch.nn.functional as F
 from torch.autograd import Variable
-from datasets.ycb.dataset import PoseDataset
 from lib.network import PoseNet, PoseRefineNet
 from lib.transformations import euler_matrix, quaternion_matrix, quaternion_from_matrix
 
+
+import matplotlib.pyplot as plt
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset_root', type=str, default='', help='dataset root dir')
-parser.add_argument('--model', type=str, default='', help='resume PoseNet model')
-parser.add_argument('--refine_model', type=str, default='', help='resume PoseRefineNet model')
+parser.add_argument('--dataset_root', required=False, default='/data/Akeaveny/Datasets/YCB_Video_Dataset',
+                    type=str,
+                    metavar="/path/to/Affordance/dataset/")
+parser.add_argument('--model', required=False, default=ROOT_DIR + '/trained_models/pretrained_ycb/pose_model_26_0.012863246640872631.pth',
+                    metavar="/path/to/weights.h5 or 'coco'")
+parser.add_argument('--refine_model', required=False, default=ROOT_DIR + '/trained_models/pretrained_ycb/pose_refine_model_69_0.009449292959118935.pth',
+                    metavar="/path/to/weights.h5 or 'coco'")
 opt = parser.parse_args()
 
 norm = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -46,10 +58,12 @@ num_points = 1000
 num_points_mesh = 500
 iteration = 2
 bs = 1
-dataset_config_dir = 'datasets/ycb/dataset_config'
-ycb_toolbox_dir = 'YCB_Video_toolbox'
-result_wo_refine_dir = 'experiments/eval_result/ycb/Densefusion_wo_refine_result'
-result_refine_dir = 'experiments/eval_result/ycb/Densefusion_iterative_result'
+
+DENSEFUSION_ROOT = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/'
+dataset_config_dir = DENSEFUSION_ROOT + 'datasets/ycb/dataset_config'
+ycb_toolbox_dir = DENSEFUSION_ROOT + 'YCB_Video_toolbox'
+result_wo_refine_dir = DENSEFUSION_ROOT + 'experiments/eval_result/ycb/Densefusion_wo_refine_result'
+result_refine_dir = DENSEFUSION_ROOT + 'experiments/eval_result/ycb/Densefusion_iterative_result'
 
 def get_bbox(posecnn_rois):
     rmin = int(posecnn_rois[idx][3]) + 1
@@ -109,9 +123,10 @@ while 1:
         input_line = input_line[:-1]
     testlist.append(input_line)
 input_file.close()
-print(len(testlist))
+# print(len(testlist))
 
 class_file = open('{0}/classes.txt'.format(dataset_config_dir))
+classes = np.loadtxt(class_file, dtype=np.str)
 class_id = 1
 cld = {}
 while 1:
@@ -134,6 +149,12 @@ while 1:
     class_id += 1
 
 for now in range(0, 2949):
+
+    # np.random.seed(0)
+    # ### TODO: pick random idx
+    # now = np.random.choice(2949, size=1, replace=False)[0]
+    # print("image_idx: ", now)
+
     img = Image.open('{0}/{1}-color.png'.format(opt.dataset_root, testlist[now]))
     depth = np.array(Image.open('{0}/{1}-depth.png'.format(opt.dataset_root, testlist[now])))
     posecnn_meta = scio.loadmat('{0}/results_PoseCNN_RSS2018/{1}.mat'.format(ycb_toolbox_dir, '%06d' % now))
@@ -143,6 +164,25 @@ for now in range(0, 2949):
     lst = posecnn_rois[:, 1:2].flatten()
     my_result_wo_refine = []
     my_result = []
+
+    # print(lst)
+    # for ycb_idx in lst:
+    #     print(classes[int(ycb_idx - 1)])
+
+    # plt.subplot(2, 2, 1)
+    # plt.title("rgb")
+    # plt.imshow(img)
+    # plt.subplot(2, 2, 2)
+    # plt.title("depth")
+    # plt.imshow(depth)
+    # plt.subplot(2, 2, 3)
+    # plt.title("gt")
+    # plt.imshow(label)
+    # plt.subplot(2, 2, 4)
+    # plt.title("label")
+    # plt.imshow(label)
+    # plt.show()
+    # plt.ioff()
 
     for idx in range(len(lst)):
         itemid = lst[idx]

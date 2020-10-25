@@ -69,6 +69,29 @@ def random_colors(N, bright=True):
     return colors
 
 
+def display_sementic(image, segmentation_mask, num_classes=int(4),
+                     title="", figsize=(16, 16), ax=None):
+    label_colours = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 0)]
+
+    if not ax:
+        _, ax = plt.subplots(1, figsize=figsize)
+
+    # Show area outside image boundaries.
+    height, width = image.shape[:2]
+    ax.set_ylim(height + 10, -10)
+    ax.set_xlim(-10, width + 10)
+    ax.axis('off')
+    ax.set_title(title)
+    masked_image = image.astype(np.uint32).copy()
+
+    for label in range(num_classes):
+        mask = np.zeros_like(segmentation_mask)
+        mask[np.where(segmentation_mask == label)] = 1
+        masked_image = apply_mask(masked_image, mask, label_colours[label])
+
+    ax.imshow(masked_image.astype(np.uint8))
+    plt.show()
+
 def apply_mask(image, mask, color, alpha=0.5):
     """Apply the given mask to the image.
     """

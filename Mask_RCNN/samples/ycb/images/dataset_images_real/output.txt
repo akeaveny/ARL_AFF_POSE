@@ -1,0 +1,165 @@
+Configurations:
+BACKBONE                       resnet101
+BACKBONE_STRIDES               [4, 8, 16, 32, 64]
+BATCH_SIZE                     2
+BBOX_STD_DEV                   [0.1 0.1 0.2 0.2]
+COMPUTE_BACKBONE_SHAPE         None
+DETECTION_MAX_INSTANCES        3
+DETECTION_MIN_CONFIDENCE       0.9
+DETECTION_NMS_THRESHOLD        0.3
+FPN_CLASSIF_FC_LAYERS_SIZE     1024
+GPU_COUNT                      1
+GRADIENT_CLIP_NORM             5.0
+IMAGES_PER_GPU                 2
+IMAGE_CHANNEL_COUNT            3
+IMAGE_MAX_DIM                  384
+IMAGE_META_SIZE                20
+IMAGE_MIN_DIM                  384
+IMAGE_MIN_SCALE                0
+IMAGE_RESIZE_MODE              crop
+IMAGE_SHAPE                    [384 384   3]
+LEARNING_MOMENTUM              0.9
+LEARNING_RATE                  0.001
+LOSS_WEIGHTS                   {'rpn_class_loss': 1.0, 'rpn_bbox_loss': 1.0, 'mrcnn_class_loss': 1.0, 'mrcnn_bbox_loss': 1.0, 'mrcnn_mask_loss': 1.0}
+MASK_POOL_SIZE                 14
+MASK_SHAPE                     [28, 28]
+MAX_GT_INSTANCES               3
+MEAN_PIXEL                     [91.13 88.92 98.65]
+MINI_MASK_SHAPE                (56, 56)
+NAME                           Affordance
+NUM_CLASSES                    8
+POOL_SIZE                      7
+POST_NMS_ROIS_INFERENCE        1000
+POST_NMS_ROIS_TRAINING         2000
+PRE_NMS_LIMIT                  6000
+ROI_POSITIVE_RATIO             0.33
+RPN_ANCHOR_RATIOS              [0.5, 1, 2]
+RPN_ANCHOR_SCALES              (16, 32, 64, 128, 256)
+RPN_ANCHOR_STRIDE              1
+RPN_BBOX_STD_DEV               [0.1 0.1 0.2 0.2]
+RPN_NMS_THRESHOLD              0.7
+RPN_TRAIN_ANCHORS_PER_IMAGE    256
+STEPS_PER_EPOCH                350
+TOP_DOWN_PYRAMID_SIZE          256
+TRAIN_BN                       False
+TRAIN_ROIS_PER_IMAGE           200
+USE_MINI_MASK                  False
+USE_RPN_ROIS                   True
+VALIDATION_STEPS               150
+WEIGHT_DECAY                   0.0001
+bs                             2
+config                         gpu_options {
+  allow_growth: true
+}
+
+sess                           <tensorflow.python.client.session.Session object at 0x7f34e2520cc0>
+tf                             <module 'tensorflow' from '/home/akeaveny/anaconda3/envs/tensorflow115/lib/python3.6/site-packages/tensorflow/__init__.py'>
+
+
+
+ --------------- Prelim ---------------
+Total time: 1.9 seconds
+Class Count: 8
+Image Count:  300
+Color mean (RGB):91.53 89.21 99.09
+
+ --------------- Samples ---------------
+image_id: 206
+image_file: /data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools/016557_rgb.jpg
+
+ --------------- Image Size ---------------
+Height  mean: 480.00  median: 480.00  min: 480.00  max: 480.00
+Width   mean: 640.00  median: 640.00  min: 640.00  max: 640.00
+
+ --------------- Histograms ---------------
+
+Image Area <= 554**2
+  Total Objects:  575
+  Object Height. mean: 58.26  median: 53.00  min: 0.00  max: 214.00
+  Object Width.  mean: 76.07  median: 72.00  min: 0.00  max: 232.00
+  Object Area.   mean: 4753.48  median: 3675.00  min: 0.00  max: 39345.00
+Object Aspect Ratio.  mean: 0.93  median: 0.72  min: 0.00  max: 7.00
+
+ --------------- IMGAUG ---------------
+
+ --------------- Masks ---------------
+Min:  384
+Max:  384
+Resize Mode:  crop
+Original mask:           shape: (384, 384, 2)         min:    0.00000  max:    1.00000  bool
+Mini Mask                shape: (56, 56, 2)           min:    0.00000  max:    1.00000  bool
+
+ --------------- Masks ---------------
+Min:  384
+Max:  384
+Resize Mode:  crop
+Original mask:           shape: (384, 384, 2)         min:    0.00000  max:    1.00000  bool
+Mini Mask                shape: (56, 56, 2)           min:    0.00000  max:    1.00000  bool
+
+ --------------- Masks ---------------
+Min:  384
+Max:  384
+Resize Mode:  crop
+Original mask:           shape: (384, 384, 1)         min:    0.00000  max:    1.00000  bool
+Mini Mask                shape: (56, 56, 1)           min:    0.00000  max:    1.00000  bool
+
+ --------------- Masks ---------------
+Min:  384
+Max:  384
+Resize Mode:  crop
+Original mask:           shape: (384, 384, 2)         min:    0.00000  max:    1.00000  bool
+Mini Mask                shape: (56, 56, 2)           min:    0.00000  max:    1.00000  bool
+
+ --------------- Anchors ---------------
+Count:  36828
+Scales:  (16, 32, 64, 128, 256)
+ratios:  [0.5, 1, 2]
+Anchors per Cell:  3
+Levels:  5
+Anchors in Level 0: 27648
+Anchors in Level 1: 6912
+Anchors in Level 2: 1728
+Anchors in Level 3: 432
+Anchors in Level 4: 108
+Level 0. Anchors:  27648  Feature map Shape: [96 96]
+Level 1. Anchors:   6912  Feature map Shape: [48 48]
+Level 2. Anchors:   1728  Feature map Shape: [24 24]
+Level 3. Anchors:    432  Feature map Shape: [12 12]
+Level 4. Anchors:    108  Feature map Shape: [6 6]
+rois                     shape: (4, 200, 4)           min:    0.00000  max:  383.00000  int32
+mrcnn_class_ids          shape: (4, 200, 1)           min:    0.00000  max:    6.00000  int32
+mrcnn_bbox               shape: (4, 200, 8, 4)        min:   -2.85714  max:    1.37931  float32
+mrcnn_mask               shape: (4, 200, 28, 28, 8)   min:    0.00000  max:    1.00000  float32
+gt_class_ids             shape: (4, 3)                min:    0.00000  max:    6.00000  int32
+gt_boxes                 shape: (4, 3, 4)             min:    0.00000  max:  302.00000  int32
+gt_masks                 shape: (4, 384, 384, 3)      min:    0.00000  max:    1.00000  bool
+rpn_match                shape: (4, 36828, 1)         min:   -1.00000  max:    1.00000  int32
+rpn_bbox                 shape: (4, 256, 4)           min:   -6.63701  max:    5.63476  float64
+indices [35388 35818]
+anchors                  shape: (36828, 4)            min: -181.01934  max:  501.01934  float64
+refined_anchors          shape: (2, 4)                min:  133.00000  max:  296.00000  float32
+Positive anchors: 2
+Negative anchors: 254
+Neutral anchors: 36572
+Breakdwon of ROIs per class
+BG                     : 198
+grasp                  : 1
+support                : 1
+
+ --------------- RoIs ---------------
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+   66  0.33
+Average percent: 0.33
+Positive ROIs:  2
+Negative ROIs:  198
+Positive Ratio: 0.01
+Unique ROIs: 200 out of 200
+show_plots False

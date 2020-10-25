@@ -37,10 +37,10 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser(description='Get Stats from Image Dataset')
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/YCB_Video_Dataset/data_combined',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/ycb_syn/',
                     type=str,
-                    metavar="/path/to/Affordance/dataset/")
-parser.add_argument('--dataset_type', required=False, default='real',
+                    metavar="/path/to/YCB/dataset/")
+parser.add_argument('--dataset_type', required=False, default='syn',
                     type=str,
                     metavar='real or syn')
 parser.add_argument('--dataset_split', required=False, default='val',
@@ -57,10 +57,14 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-assert args.dataset_type == 'real' or args.dataset_type == 'syn'
+### assert args.dataset_type == 'real' or args.dataset_type == 'syn'
 if args.dataset_type == 'real':
     import dataset_real as YCB
     save_to_folder = '/images/dataset_images_real/'
+    image_area_bins = [480 * 640]
+elif args.dataset_type == 'syn':
+    import dataset_syn as YCB
+    save_to_folder = '/images/dataset_images_syn/'
     image_area_bins = [480 * 640]
 
 if not (os.path.exists(os.getcwd()+save_to_folder)):
@@ -75,15 +79,8 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
-# ##################################
-# ###  GPU
-# ##################################
-#
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
-#
-# config_ = tf.ConfigProto()
-# config_.gpu_options.allow_growth = True
-# sess = tf.Session(config=config_)
+##################################
+##################################
 
 from mrcnn import visualize
 from mrcnn.visualize import display_images
@@ -162,7 +159,7 @@ if __name__ == '__main__':
     t_total = time.time() - t_start
     print("Total time: {:.1f} seconds".format(t_total))
 
-    # # Image stats
+    # Image stats
     image_shape = np.array([s['shape'] for s in stats])
     image_color = np.array([s['color'] for s in stats])
     print("Class Count: {}".format(dataset.num_classes))
@@ -172,31 +169,32 @@ if __name__ == '__main__':
     ##################################
     ###  Display Samples
     ##################################
-    print('\n --------------- Samples ---------------')
+    for idx_samples in range(10):
+        print('\n --------------- Samples ---------------')
 
-    num_images = 16
-    # get random image
-    ### image_ids = np.random.choice(dataset.image_ids, size=len(dataset.image_ids))
-    image_ids = np.random.choice(len(dataset.image_ids), size=num_images)
-    image_id = image_ids[0]
-    print("image_id:", image_id)
-    print("image_file:", dataset.image_reference(image_id))
+        num_images = 4
+        # get random image
+        ### image_ids = np.random.choice(dataset.image_ids, size=len(dataset.image_ids))
+        image_ids = np.random.choice(len(dataset.image_ids), size=num_images)
+        image_id = image_ids[0]
+        print("image_id:", image_id)
+        print("image_file:", dataset.image_reference(image_id))
 
-    # Load the image multiple times to show augmentations
-    limit = num_images
-    ax = get_ax(rows=int(np.sqrt(limit)), cols=int(np.sqrt(limit)))
-    for i in range(limit):
-        image_idx =image_ids[i]
-        image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(dataset, config, image_idx,
-                                                                          use_mini_mask=False)
-        visualize.display_instances(image, bbox, mask, class_ids, dataset.class_names,
-                                    ax=ax[i // int(np.sqrt(limit)), i % int(np.sqrt(limit))],
-                                    captions=captions[class_ids].tolist())
-        # log("molded_image", image)
-        # log("mask", mask)
-        # log("class_ids", class_ids)
-        ### print("captions", np.array(dataset.class_names)[class_ids].tolist())
-    plt.savefig(os.getcwd() + save_to_folder + "gt_affordance_labels.png", bbox_inches='tight')
+        # Load the image multiple times to show augmentations
+        limit = num_images
+        ax = get_ax(rows=int(np.sqrt(limit)), cols=int(np.sqrt(limit)))
+        for i in range(limit):
+            image_idx =image_ids[i]
+            image, image_meta, class_ids, bbox, mask = modellib.load_image_gt(dataset, config, image_idx,
+                                                                              use_mini_mask=False)
+            visualize.display_instances(image, bbox, mask, class_ids, dataset.class_names,
+                                        ax=ax[i // int(np.sqrt(limit)), i % int(np.sqrt(limit))],
+                                        captions=captions[class_ids].tolist())
+            # log("molded_image", image)
+            # log("mask", mask)
+            # log("class_ids", class_ids)
+            ### print("captions", np.array(dataset.class_names)[class_ids].tolist())
+        plt.savefig(os.getcwd() + save_to_folder + "gt_affordance_labels/gt_affordance_labels_" + np.str(idx_samples) + ".png", bbox_inches='tight')
 
     ##################################
     ###  Image Size Stats
@@ -268,15 +266,52 @@ if __name__ == '__main__':
     ##################################
     print('\n --------------- IMGAUG ---------------')
 
-    augmentation = iaa.Sometimes(0.5, [
-        iaa.Fliplr(0.5),
+    # augmentation = iaa.Sometimes(0.9, [
+    #     iaa.Fliplr(0.5),
+    #     iaa.Flipud(0.5),
+    #     iaa.Multiply((0.8, 1.2)),
+    #     iaa.GaussianBlur(sigma=(0.0, 2.0)),
+    #     iaa.OneOf([iaa.Affine(rotate=90),
+    #                iaa.Affine(rotate=180),
+    #                iaa.Affine(rotate=270)]),
+    # ])
+
+    augmentation = iaa.Sometimes(0.833, iaa.Sequential([
+        #########################
+        # COLOR & MASK
+        #########################
+        iaa.Fliplr(0.5),  # horizontal flips
         iaa.Flipud(0.5),
-        iaa.Multiply((0.8, 1.2)),
-        iaa.GaussianBlur(sigma=(0.0, 2.0)),
-        iaa.OneOf([iaa.Affine(rotate=90),
-                   iaa.Affine(rotate=180),
-                   iaa.Affine(rotate=270)]),
-    ])
+        iaa.Crop(percent=(0, 0.1)),  # random crops
+        # Apply affine transformations to each image.
+        # Scale/zoom them, translate/move them, rotate them and shear them.
+        iaa.Affine(
+            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+            translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+            # rotate=(-25, 25),
+            # shear=(-8, 8)
+        ),
+        #########################
+        # ONLY COLOR !!!
+        #########################
+        # Small gaussian blur with random sigma between 0 and 0.5.
+        # But we only blur about 50% of all images.
+        iaa.Sometimes(0.5,
+                      iaa.GaussianBlur(sigma=(0, 0.5))
+                      ),
+        # Strengthen or weaken the contrast in each image.
+        iaa.ContrastNormalization((0.75, 1.25)),
+        # Add gaussian noise.
+        # For 50% of all images, we sample the noise once per pixel.
+        # For the other 50% of all images, we sample the noise per pixel AND
+        # channel. This can change the color (not only brightness) of the
+        # pixels.
+        iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+        # Make some images brighter and some darker.
+        # In 20% of all cases, we sample the multiplier once per channel,
+        # which can end up changing the color of the images.
+        iaa.Multiply((0.8, 1.2), per_channel=0.2),
+    ], random_order=True))  # apply augmenters in random order
 
     # Load the image multiple times to show augmentations
     limit = 16
@@ -295,7 +330,7 @@ if __name__ == '__main__':
 
     crop_config = config
     # Load the image multiple times to show augmentations
-    limit = 16
+    limit = num_images
     ax = get_ax(rows=int(np.sqrt(limit)), cols=int(np.sqrt(limit)))
     for i in range(limit):
         image_idx = image_ids[i]
@@ -542,3 +577,4 @@ if __name__ == '__main__':
         sys.stdout.close()
     else:
         pass
+

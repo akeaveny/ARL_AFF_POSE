@@ -2,6 +2,8 @@ import json
 import glob
 import cv2
 
+import os
+
 import matplotlib.pyplot as plt
 
 from PIL import Image # (pip install Pillow)
@@ -49,60 +51,56 @@ def create_sub_masks(mask_image):
 
 def create_sub_mask_annotation(sub_mask, class_id, label_img):
 
-    ###################
-    # contours
-    ###################
+    #############
+    # cv image
+    #############
 
-    # Find contours (boundary lines) around each sub-mask
-    # Note: there could be multiple contours if the object
-    # is partially occluded. (E.g. an elephant behind a tree)
-    contours = measure.find_contours(np.array(sub_mask), 0.5, positive_orientation='low')
+    h, w = sub_mask.size
+    img = np.array(sub_mask.getdata(), dtype=np.uint8).reshape(w, h)
 
-    polygons = []
-    x_list, y_list = [], []
-    for idx, contour in enumerate(contours):
-        # Flip from (row, col) representation to (x, y)
-        # and subtract the padding pixel
-        for i in range(len(contour)):
-            row, col = contour[i]
-            contour[i] = (col - 1, row - 1)
+    # cv2.imwrite(os.getcwd() + "contours.png", img)
+    # img = cv2.imread(os.getcwd() + "contours.png", 0) * 255
 
-        # Make a polygon and simplify it
-        poly = Polygon(contour)
-        poly = poly.simplify(1.0, preserve_topology=False)
-        polygons.append(poly)
-        # segmentation = np.array(poly.exterior.coords, dtype=np.int).ravel().tolist()
-        # segmentations.append(segmentation
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) * 255
 
-        if type(poly) == Polygon:
-            coords = np.array(poly.exterior.coords, dtype=np.int)
+    contours, hierarchy = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-            if coords.size != 0:
-                x, y = coords[:, 0], coords[:, 1]
-                x_list.extend(x.tolist())
-                y_list.extend(y.tolist())
-        else:
-            # Multipolygon
-            polys = list(poly)
-            for poly_ in polys:
+    # Create an output of all zeroes that has the same shape as the input
+    # image
+    out = np.zeros_like(label_img)
 
-                coords = np.array(poly_.exterior.coords, dtype=np.int)
+    # On this output, draw all of the contours that we have detected
+    # in white, and set the thickness to be 3 pixels
+    cv2.drawContours(label_img, contours, -1, 255, 3)
 
-                if coords.size != 0:
-                    x, y = coords[:, 0], coords[:, 1]
-                    x_list.extend(x.tolist())
-                    y_list.extend(y.tolist())
+    x_list = []
+    y_list = []
+    for k in contours:
+        for i in k:
+            for j in i:
+                x_list.append(j[0])
+                y_list.append(j[1])
 
-    if len(x_list) > 0 and len(y_list) > 0:
-        region = {}
-        region['region_attributes'] = {}
-        region['shape_attributes'] = {}
-        region['shape_attributes']["name"] = "polygon"
-        region['shape_attributes']["all_points_x"] = x_list
-        region['shape_attributes']["all_points_y"] = y_list
-        region['shape_attributes']["class_id"] = class_id
+    if VISUALIZE:
+        # cv
+        cv2.imshow("out", label_img)
+        cv2.waitKey(0)
+        # matplotlib
+        # plt.imshow(label_img)
+        # plt.plot(x_list, y_list, linewidth=1)
+        # plt.show()
+        # plt.ioff()
 
-        data[obj_name]['regions'][np.str(class_id)] = region
+    region = {}
+    region['region_attributes'] = {}
+    region['shape_attributes'] = {}
+    region['shape_attributes']["name"] = "polygon"
+    region['shape_attributes']["all_points_x"] = np.array(x_list).tolist()
+    region['shape_attributes']["all_points_y"] = np.array(y_list).tolist()
+    region['shape_attributes']["class_id"] = class_id
+
+    return region
 
 ###########################################################
 # Manual Config
@@ -110,184 +108,295 @@ def create_sub_mask_annotation(sub_mask, class_id, label_img):
 np.random.seed(1)
 
 dataset_name = 'Affordance'
-data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/'
-train_path = 'combined_tools_train/'
-val_path = 'combined_tools_val/'
 
-image_ext = '_label.png' ### object ids or affordances
+data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/'
 
-class_id = np.arange(0, 21+1, 1)
-### class_id = [0, 1, 2, 3, 4, 5, 6, 7]
+######################
+# objects
+######################
+
+######################
+# aff
+######################
+
+json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/'
+json_name = 'coco_tools_'
+val_path = 'combined_tools5_val/'
+train_path = 'combined_tools5_train/'
+test_path = 'combined_tools5_test/'
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/'
+# json_name = 'coco_clutter_'
+# val_path = 'combined_clutter5_val/'
+# train_path = 'combined_clutter5_train/'
+# test_path = 'combined_clutter5_test/'
+
+image_ext = '_gt_affordance.png'
+
+class_id = [0, 1, 2, 3, 4, 5, 6, 7]
 
 print("Affordance IDs: \n{}\n".format(class_id))
 
+VISUALIZE = False
+
 use_random_idx = False
-num_val = num_train = 4
+num_val = 4
+num_train = 4
+num_test = 4
+
+# 1.
+scenes = [
+        # 'bench/',
+        # 'floor/',
+        # 'turn_table/',
+        'dr/'
+          ]
 
 #=====================
 # JSON FILES
 #=====================
 
-# 0.
-json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/syn/'
-
-# 1.
-scenes = [
-        'bench/', 'floor/', 'turn_table/',
-        # 'dr/',
-          ]
-
 for scene in scenes:
-    print('\n******************** {} ********************'.format(scene))
-
-    print('******************** VAL ********************')
+    print('\n******************** Scene: {} ********************'.format(scene))
     # =====================
-    ### config
+    # VAL
     # =====================
-    folder_to_save = val_path + scene
-    labels = data_path + folder_to_save + '??????' + image_ext
-    images = data_path + folder_to_save + '??????' + "_rgb.png"
-
-    print("labels: ", labels)
-    files = np.array(sorted(glob.glob(labels)))
-    rgb_files = np.array(sorted(glob.glob(images)))
-    print("Loaded files: ", len(files))
-
-    if use_random_idx:
-        val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_val), replace=False)
-        print("Chosen Files \n", val_idx)
-        files = files[val_idx]
+    if num_val == 0:
+        print('******************** SKIPPING VAL ********************')
+        pass
     else:
-        num_val = len(files)
+        print('******************** VAL! ********************')
+        folder_to_save = val_path + scene
+        labels = data_path + folder_to_save + '*' + image_ext
+        images = data_path + folder_to_save + '*' + "_rgb.png"
 
-    data = {}
-    iteration = 0
+        print("labels: ", labels)
+        files = np.array(sorted(glob.glob(labels)))
+        rgb_files = np.array(sorted(glob.glob(images)))
+        print("Loaded files: ", len(files))
 
-    #=====================
-    #
-    #=====================
-
-    json_addr = json_path + scene + 'coco_val_' + np.str(len(files)) + '.json'
-    print("json_addr: ", json_addr)
-    for idx, file in enumerate(files):
-
-        str_num = file.split(data_path + folder_to_save)[1]
-        img_number = str_num.split(image_ext)[0]
-        label_addr = file
-
-        ### print("label_addr: ", label_addr)
-        print('Image: {}/{}'.format(iteration, len(files)))
-
-        rgb_img = np.array(Image.open(rgb_files[idx]))
-        label_img = Image.open(label_addr)
-        object_ids = np.unique(np.array(label_img))
-        print("GT Affordances:", object_ids)
-
-        if label_img.size == 0:
-            print('\n ------------------ Pass! --------------------')
-            pass
+        if use_random_idx:
+            val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_val), replace=False)
+            print("Chosen Files \n", val_idx)
+            files = files[val_idx]
         else:
-            ###################
-            # init
-            ###################
-            obj_name = img_number + dataset_name
-            data[obj_name] = {}
-            data[obj_name]['fileref'] = ""
-            data[obj_name]['size'] = 640
-            data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
-            data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
-            data[obj_name]['base64_img_data'] = ""
-            data[obj_name]['file_attributes'] = {}
+            num_val = len(files)
 
-            data[obj_name]['regions'] = {}
+        data = {}
+        iteration = 0
 
-            print("class ids: ", np.unique(label_img))
-            ###################
-            # sub masks
-            ###################
-            sub_masks = create_sub_masks(label_img)
-            for idx, sub_mask in sub_masks.items():
-                if int(idx) > 0:
-                    object_id = int(idx)
-                    print("object_id: ", object_id)
-                    create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
-        iteration += 1
+        #=====================
 
-    with open(json_addr, 'w') as outfile:
-        json.dump(data, outfile, sort_keys=True)
+        json_addr = json_path + scene + json_name + 'val_' + np.str(len(files)) + '.json'
+        print("json_addr: ", json_addr)
+        for idx, file in enumerate(files):
+
+            str_num = file.split(data_path + folder_to_save)[1]
+            img_number = str_num.split(image_ext)[0]
+            label_addr = file
+
+            print("label_addr: ", label_addr)
+            print('Image: {}/{}'.format(iteration, len(files)))
+
+            rgb_img = np.array(Image.open(rgb_files[idx]))
+            label_img = Image.open(label_addr)
+            object_ids = np.unique(np.array(label_img))
+            print("GT Affordances:", object_ids)
+
+            if label_img.size == 0:
+                print('\n ------------------ Pass! --------------------')
+                pass
+            else:
+                # ###################
+                # # init
+                # ###################
+                obj_name = img_number + dataset_name
+                data[obj_name] = {}
+                data[obj_name]['fileref'] = ""
+                data[obj_name]['size'] = 640
+                data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
+                data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
+                data[obj_name]['base64_img_data'] = ""
+                data[obj_name]['file_attributes'] = {}
+
+                data[obj_name]['regions'] = {}
+                regions = {}
+
+                print("class ids: ", np.unique(label_img))
+                ###################
+                # sub masks
+                ###################
+                sub_masks = create_sub_masks(label_img)
+                for idx, sub_mask in sub_masks.items():
+                    if int(idx) > 0:
+                        object_id = int(idx)
+                        print("object_id: ", object_id)
+                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+                        regions[np.str(object_id)] = region
+                data[obj_name]['regions'] = regions
+            iteration += 1
+
+        with open(json_addr, 'w') as outfile:
+            json.dump(data, outfile, sort_keys=True)
 
     # =====================
-    ### config
+    # TRAIN
     # =====================
-    print('******************** TRAIN ********************')
-    folder_to_save = train_path + scene
-    labels = data_path + folder_to_save + '??????' + image_ext
-    images = data_path + folder_to_save + '??????' + "_rgb.png"
-
-    print("labels: ", labels)
-    files = np.array(sorted(glob.glob(labels)))
-    rgb_files = np.array(sorted(glob.glob(images)))
-    print("Loaded files: ", len(files))
-
-    if use_random_idx:
-        train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
-        print("Chosen Files \n", train_idx)
-        files = files[train_idx]
+    if num_train == 0:
+        print('******************** SKIPPING TRAIN ********************')
+        pass
     else:
-        num_train = len(files)
+        print('******************** TRAIN! ********************')
+        folder_to_save = train_path + scene
+        labels = data_path + folder_to_save + '??????' + image_ext
+        images = data_path + folder_to_save + '??????' + "_rgb.png"
 
-    data = {}
-    iteration = 0
+        print("labels: ", labels)
+        files = np.array(sorted(glob.glob(labels)))
+        rgb_files = np.array(sorted(glob.glob(images)))
+        print("Loaded files: ", len(files))
 
-    # =====================
-    #
-    # =====================
-
-    json_addr = json_path + scene + 'coco_train_' + np.str(len(files)) + '.json'
-    print("json_addr: ", json_addr)
-    for idx, file in enumerate(files):
-
-        str_num = file.split(data_path + folder_to_save)[1]
-        img_number = str_num.split(image_ext)[0]
-        label_addr = file
-
-        ### print("label_addr: ", label_addr)
-        print('Image: {}/{}'.format(iteration, len(files)))
-
-        rgb_img = np.array(Image.open(rgb_files[idx]))
-        label_img = Image.open(label_addr)
-        object_ids = np.unique(np.array(label_img))
-        print("GT Affordances:", object_ids)
-
-        if label_img.size == 0:
-            print('\n ------------------ Pass! --------------------')
-            pass
+        if use_random_idx:
+            train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
+            print("Chosen Files \n", train_idx)
+            files = files[train_idx]
         else:
-            ###################
-            # init
-            ###################
-            obj_name = img_number + dataset_name
-            data[obj_name] = {}
-            data[obj_name]['fileref'] = ""
-            data[obj_name]['size'] = 640
-            data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
-            data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
-            data[obj_name]['base64_img_data'] = ""
-            data[obj_name]['file_attributes'] = {}
+            num_train = len(files)
 
-            data[obj_name]['regions'] = {}
+        data = {}
+        iteration = 0
 
-            print("class ids: ", np.unique(label_img))
-            ###################
-            # sub masks
-            ###################
-            sub_masks = create_sub_masks(label_img)
-            for idx, sub_mask in sub_masks.items():
-                if int(idx) > 0:
-                    object_id = int(idx)
-                    print("object_id: ", object_id)
-                    create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
-        iteration += 1
+        # =====================
 
-    with open(json_addr, 'w') as outfile:
-        json.dump(data, outfile, sort_keys=True)
+        json_addr = json_path + scene + json_name + 'train_' + np.str(len(files)) + '.json'
+        print("json_addr: ", json_addr)
+        for idx, file in enumerate(files):
+
+            str_num = file.split(data_path + folder_to_save)[1]
+            img_number = str_num.split(image_ext)[0]
+            label_addr = file
+
+            print("label_addr: ", label_addr)
+            print('Image: {}/{}'.format(iteration, len(files)))
+
+            rgb_img = np.array(Image.open(rgb_files[idx]))
+            label_img = Image.open(label_addr)
+            object_ids = np.unique(np.array(label_img))
+            print("GT Affordances:", object_ids)
+
+            if label_img.size == 0:
+                print('\n ------------------ Pass! --------------------')
+                pass
+            else:
+                ###################
+                # init
+                ###################
+                obj_name = img_number + dataset_name
+                data[obj_name] = {}
+                data[obj_name]['fileref'] = ""
+                data[obj_name]['size'] = 640
+                data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
+                data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
+                data[obj_name]['base64_img_data'] = ""
+                data[obj_name]['file_attributes'] = {}
+
+                data[obj_name]['regions'] = {}
+                regions = {}
+
+                print("class ids: ", np.unique(label_img))
+                ###################
+                # sub masks
+                ###################
+                sub_masks = create_sub_masks(label_img)
+                for idx, sub_mask in sub_masks.items():
+                    if int(idx) > 0:
+                        object_id = int(idx)
+                        print("object_id: ", object_id)
+                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+                        regions[np.str(object_id)] = region
+                data[obj_name]['regions'] = regions
+            iteration += 1
+
+        with open(json_addr, 'w') as outfile:
+            json.dump(data, outfile, sort_keys=True)
+
+    # =====================
+    # TEST
+    # =====================
+    if num_test == 0:
+        print('******************** SKIPPING TEST ********************')
+        pass
+    else:
+        print('******************** TEST! ********************')
+        folder_to_save = test_path + scene
+        labels = data_path + folder_to_save + '??????' + image_ext
+        images = data_path + folder_to_save + '??????' + "_rgb.png"
+
+        print("labels: ", labels)
+        files = np.array(sorted(glob.glob(labels)))
+        rgb_files = np.array(sorted(glob.glob(images)))
+        print("Loaded files: ", len(files))
+
+        if use_random_idx:
+            test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_test), replace=False)
+            print("Chosen Files \n", test_idx)
+            files = files[test_idx]
+        else:
+            num_test = len(files)
+
+        data = {}
+        iteration = 0
+
+        # =====================
+
+        json_addr = json_path + scene + json_name + 'test_' + np.str(len(files)) + '.json'
+        print("json_addr: ", json_addr)
+        for idx, file in enumerate(files):
+
+            str_num = file.split(data_path + folder_to_save)[1]
+            img_number = str_num.split(image_ext)[0]
+            label_addr = file
+
+            print("label_addr: ", label_addr)
+            print('Image: {}/{}'.format(iteration, len(files)))
+
+            rgb_img = np.array(Image.open(rgb_files[idx]))
+            label_img = Image.open(label_addr)
+            object_ids = np.unique(np.array(label_img))
+            print("GT Affordances:", object_ids)
+
+            if label_img.size == 0:
+                print('\n ------------------ Pass! --------------------')
+                pass
+            else:
+                ###################
+                # init
+                ###################
+                obj_name = img_number + dataset_name
+                data[obj_name] = {}
+                data[obj_name]['fileref'] = ""
+                data[obj_name]['size'] = 640
+                data[obj_name]['filename'] = folder_to_save + img_number + '_rgb.png'
+                data[obj_name]['depthfilename'] = folder_to_save + img_number + '_depth.png'
+                data[obj_name]['base64_img_data'] = ""
+                data[obj_name]['file_attributes'] = {}
+
+                data[obj_name]['regions'] = {}
+                regions = {}
+
+                print("class ids: ", np.unique(label_img))
+                ###################
+                # sub masks
+                ###################
+                sub_masks = create_sub_masks(label_img)
+                for idx, sub_mask in sub_masks.items():
+                    if int(idx) > 0:
+                        object_id = int(idx)
+                        print("object_id: ", object_id)
+                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+                        regions[np.str(object_id)] = region
+                data[obj_name]['regions'] = regions
+            iteration += 1
+
+        with open(json_addr, 'w') as outfile:
+            json.dump(data, outfile, sort_keys=True)

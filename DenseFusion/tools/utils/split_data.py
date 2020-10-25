@@ -7,77 +7,340 @@ from PIL import Image
 import scipy.io as scio
 import matplotlib.pyplot as plt
 
-class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/classes_train.txt')
-class_id_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/class_ids_train.txt')
-class_IDs = np.loadtxt(class_id_file, dtype=np.int32)
+###################################
+# UMD
+###################################
 
-# ===================== SETUP ====================
-# 2.
+# class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/classes_train.txt')
+# class_id_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/class_ids_train.txt')
+# class_IDs = np.loadtxt(class_id_file, dtype=np.int32)
+# print("class_IDs: ", class_IDs)
+#
+# # data_path_tools_train = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_tools2_train/'
+# # data_path_tools_val = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_tools2_val/'
+# # data_path_clutter_train = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_clutter1_train/'
+# # data_path_clutter_val = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_clutter1_val/'
+#
+# train_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list.txt'
+# test_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list.txt'
+
+# ###################################
+# # YCB
+# ###################################
+
+# class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb_syn/dataset_config/classes_train.txt')
+# class_id_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb_syn/dataset_config/class_ids_train.txt')
+# class_IDs = np.loadtxt(class_id_file, dtype=np.int32)
+# print("class_IDs: ", class_IDs)
+#
+# label_format = '_label.png'
+#
+# tools_data_folder = 'combined_tools3_'
+# data_path_tools_train = '/data/Akeaveny/Datasets/ycb_syn/combined_tools3_train/'
+# data_path_tools_val = '/data/Akeaveny/Datasets/ycb_syn/combined_tools3_val/'
+# data_path_tools_test = '/data/Akeaveny/Datasets/ycb_syn/combined_tools3_test/'
+#
+# clutter_data_folder = 'combined_clutter3_'
+# data_path_clutter_train = '/data/Akeaveny/Datasets/ycb_syn/combined_clutter3_train/'
+# data_path_clutter_val = '/data/Akeaveny/Datasets/ycb_syn/combined_clutter3_val/'
+# data_path_clutter_test = '/data/Akeaveny/Datasets/ycb_syn/combined_clutter3_test/'
+#
+# train_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb_syn/dataset_config/train_data_list_clutter.txt'
+# val_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb_syn/dataset_config/val_data_list_clutter.txt'
+# test_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb_syn/dataset_config/test_data_list_clutter.txt'
+
+###################################
+# ARL REAL
+###################################
+
+class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/classes_train.txt')
+class_id_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/class_ids_train.txt')
+class_IDs = np.loadtxt(class_id_file, dtype=np.int32)
+print("class_IDs: ", class_IDs)
+
+label_format = '_label.png'
+
+tools_data_folder = 'combined_real_tools1_'
+data_path_tools_train = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_real_tools1_train/'
+data_path_tools_val = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_real_tools1_val/'
+data_path_tools_test = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_real_tools1_test/'
+
+# train_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/train_data_list.txt'
+# val_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/val_data_list.txt'
+# test_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/test_data_list.txt'
+
+############
+# COMBINED
+############
+clutter_data_folder = 'combined_syn_tools2_'
+data_path_clutter_train = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_train/'
+data_path_clutter_val = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_val/'
+data_path_clutter_test = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_test/'
+
+train_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/train_data_list_combined.txt'
+val_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/val_data_list_combined.txt'
+test_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/test_data_list_combined.txt'
+
+###################################
+# ARL SYN
+###################################
+
+# class_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config/classes_train.txt')
+# class_id_file = open('/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config/class_ids_train.txt')
+# class_IDs = np.loadtxt(class_id_file, dtype=np.int32)
+# print("class_IDs: ", class_IDs)
+#
+# label_format = '_label.png'
+#
+# tools_data_folder = 'combined_syn_tools2_'
+# data_path_tools_train = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_train/'
+# data_path_tools_val = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_val/'
+# data_path_tools_test = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_test/'
+#
+# train_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config/train_data_list.txt'
+# val_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config/val_data_list.txt'
+# test_file = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config/test_data_list.txt'
+
+###################################
+###################################
+
+scenes = [ ''
+          # 'turn_table/', 'bench/', 'floor/',
+          # 'dr/'
+          ]
+
+################################
+# tools
+################################
+for scene in scenes:
+
+    # ===================== train ====================
+    data_path = data_path_tools_train + scene
+    folder_to_save = tools_data_folder + 'train/' + scene
+
+    saved_files = 0
+
+    gt_label_addr = data_path + '/??????' + label_format
+    files = sorted(glob.glob(gt_label_addr))
+
+    f_train = open(train_file, 'a')
+    # ===================== train ====================
+    print('\n-------- TRAIN --------')
+    for file in files:
+
+        str_num = file.split(data_path)[1]
+        img_number = str_num.split(label_format)[0]
+
+        label_addr = data_path + img_number + label_format
+        label = np.array(Image.open(label_addr))
+
+        affordance_ids = np.unique(np.array(label))
+
+        for affordance_id in affordance_ids:
+            if affordance_id in class_IDs:
+                ### print("label_addr: ",label_addr)
+                img_index_str = label_addr.split(folder_to_save)[1]
+                img_index_str = img_index_str.split(label_format)[0]
+                f_train.write(folder_to_save + img_index_str)
+                f_train.write('\n')
+                saved_files += 1
+    f_train.close
+
+    print("Loaded files: ", len(files))
+    print("Actual files: ", saved_files)
+
+    # ===================== val ====================
+    data_path = data_path_tools_val + scene
+    folder_to_save = tools_data_folder + 'val/' + scene
+
+    saved_files = 0
+
+    gt_label_addr = data_path + '/??????' + label_format
+    files = sorted(glob.glob(gt_label_addr))
+
+    f_val = open(val_file, 'a')
+    # ===================== val ====================
+    print('\n-------- VAL --------')
+    for file in files:
+
+        str_num = file.split(data_path)[1]
+        img_number = str_num.split(label_format)[0]
+
+        label_addr = data_path + img_number + label_format
+        label = np.array(Image.open(label_addr))
+
+        affordance_ids = np.unique(np.array(label))
+
+        for affordance_id in affordance_ids:
+            if affordance_id in class_IDs:
+                # print("label_addr: ",label_addr)
+                img_index_str = label_addr.split(folder_to_save)[1]
+                img_index_str = img_index_str.split(label_format)[0]
+                f_val.write(folder_to_save + img_index_str)
+                f_val.write('\n')
+                saved_files += 1
+    f_val.close
+
+    print("Loaded files: ", len(files))
+    print("Actual files: ", saved_files)
+
+    # =========================================
+    # TEST
+    # =========================================
+    data_path = data_path_tools_test + scene
+    folder_to_save = tools_data_folder + 'test/' + scene
+
+    saved_files = 0
+
+    gt_label_addr = data_path + '/??????' + label_format
+    files = sorted(glob.glob(gt_label_addr))
+
+    f_test = open(test_file, 'a')
+
+    # =========================================
+    # =========================================
+    print('\n-------- TEST --------')
+    for file in files:
+
+        str_num = file.split(data_path)[1]
+        img_number = str_num.split(label_format)[0]
+
+        label_addr = data_path + img_number + label_format
+        label = np.array(Image.open(label_addr))
+
+        affordance_ids = np.unique(np.array(label))
+
+        for affordance_id in affordance_ids:
+            if affordance_id in class_IDs:
+                # print("label_addr: ",label_addr)
+                img_index_str = label_addr.split(folder_to_save)[1]
+                img_index_str = img_index_str.split(label_format)[0]
+                f_test.write(folder_to_save + img_index_str)
+                f_test.write('\n')
+                saved_files += 1
+    f_test.close
+
+    print("Loaded files: ", len(files))
+    print("Actual files: ", saved_files)
+
+################################
+################################
+
 scenes = [
           'turn_table/', 'bench/', 'floor/',
           'dr/'
           ]
 
+################################
+# clutter
+################################
 for scene in scenes:
 
     # ===================== train ====================
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_15k_train/' + scene
-    folder_to_save = 'combined_tools_hammer_15k_train/' + scene
-    label_format = '_label.png'
+    data_path = data_path_clutter_train + scene
+    folder_to_save = clutter_data_folder + 'train/' + scene
 
-    gt_label_addr = data_path + '/??????' + '_label.png'
+    saved_files = 0
+
+    gt_label_addr = data_path + '/??????' + label_format
     files = sorted(glob.glob(gt_label_addr))
-    print("Loaded files: ", len(files))
 
-    f_train = open("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/train_data_list_15k.txt", 'a')
+    f_train = open(train_file, 'a')
     # ===================== train ====================
-    print('-------- TRAIN --------')
+    print('\n-------- TRAIN --------')
     for file in files:
 
         str_num = file.split(data_path)[1]
-        img_number = str_num.split('_label.png')[0]
+        img_number = str_num.split(label_format)[0]
 
         label_addr = data_path + img_number + label_format
+        label = np.array(Image.open(label_addr))
 
-        meta = scio.loadmat('{0}/{1}-meta.mat'.format(data_path, img_number))
-        affordance_ids = np.array(meta['Affordance_ID'].astype(np.int32))
+        affordance_ids = np.unique(np.array(label))
 
         for affordance_id in affordance_ids:
             if affordance_id in class_IDs:
-                print("label_addr: ",label_addr)
+                ### print("label_addr: ",label_addr)
                 img_index_str = label_addr.split(folder_to_save)[1]
                 img_index_str = img_index_str.split(label_format)[0]
                 f_train.write(folder_to_save + img_index_str)
                 f_train.write('\n')
+                saved_files += 1
     f_train.close
 
-    # ===================== val ====================
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_hammer_15k_val/' + scene
-    folder_to_save = 'combined_tools_hammer_15k_val/' + scene
-    label_format = '_label.png'
-
-    gt_label_addr = data_path + '/??????' + '_label.png'
-    files = sorted(glob.glob(gt_label_addr))
     print("Loaded files: ", len(files))
+    print("Actual files: ", saved_files)
 
-    f_val = open("/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/test_data_list_15k.txt", 'a')
     # ===================== val ====================
-    print('-------- VAL --------')
+    data_path = data_path_clutter_val + scene
+    folder_to_save = clutter_data_folder + 'val/' + scene
+
+    saved_files = 0
+
+    gt_label_addr = data_path + '/??????' + label_format
+    files = sorted(glob.glob(gt_label_addr))
+
+    f_val = open(val_file, 'a')
+    # ===================== val ====================
+    print('\n-------- VAL --------')
     for file in files:
 
         str_num = file.split(data_path)[1]
-        img_number = str_num.split('_label.png')[0]
+        img_number = str_num.split(label_format)[0]
 
         label_addr = data_path + img_number + label_format
+        label = np.array(Image.open(label_addr))
 
-        meta = scio.loadmat('{0}/{1}-meta.mat'.format(data_path, img_number))
-        affordance_ids = np.array(meta['Affordance_ID'].astype(np.int32))
+        affordance_ids = np.unique(np.array(label))
 
         for affordance_id in affordance_ids:
             if affordance_id in class_IDs:
-                print("label_addr: ",label_addr)
+                # print("label_addr: ",label_addr)
                 img_index_str = label_addr.split(folder_to_save)[1]
                 img_index_str = img_index_str.split(label_format)[0]
                 f_val.write(folder_to_save + img_index_str)
                 f_val.write('\n')
+                saved_files += 1
     f_val.close
+
+    print("Loaded files: ", len(files))
+    print("Actual files: ", saved_files)
+
+    # =========================================
+    # TEST
+    # =========================================
+    data_path = data_path_clutter_test + scene
+    folder_to_save = clutter_data_folder + 'test/' + scene
+
+    saved_files = 0
+
+    gt_label_addr = data_path + '/??????' + label_format
+    files = sorted(glob.glob(gt_label_addr))
+
+    f_test = open(test_file, 'a')
+
+    # =========================================
+    # =========================================
+    print('\n-------- TEST --------')
+    for file in files:
+
+        str_num = file.split(data_path)[1]
+        img_number = str_num.split(label_format)[0]
+
+        label_addr = data_path + img_number + label_format
+        label = np.array(Image.open(label_addr))
+
+        affordance_ids = np.unique(np.array(label))
+
+        for affordance_id in affordance_ids:
+            if affordance_id in class_IDs:
+                # print("label_addr: ",label_addr)
+                img_index_str = label_addr.split(folder_to_save)[1]
+                img_index_str = img_index_str.split(label_format)[0]
+                f_test.write(folder_to_save + img_index_str)
+                f_test.write('\n')
+                saved_files += 1
+    f_test.close
+
+    print("Loaded files: ", len(files))
+    print("Actual files: ", saved_files)

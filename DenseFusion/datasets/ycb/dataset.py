@@ -13,6 +13,7 @@ import numpy.ma as ma
 import copy
 import scipy.misc
 import scipy.io as scio
+import cv2
 
 
 class PoseDataset(data.Dataset):
@@ -99,6 +100,7 @@ class PoseDataset(data.Dataset):
         depth = np.array(Image.open('{0}/{1}-depth.png'.format(self.root, self.list[index])))
         label = np.array(Image.open('{0}/{1}-label.png'.format(self.root, self.list[index])))
         meta = scio.loadmat('{0}/{1}-meta.mat'.format(self.root, self.list[index]))
+        test_folder = '/data/Akeaveny/Datasets/YCB_Video_Dataset/test_densefusion/'
 
         if self.list[index][:8] != 'data_syn' and int(self.list[index][5:9]) >= 60:
             cam_cx = self.cam_cx_2
@@ -146,6 +148,19 @@ class PoseDataset(data.Dataset):
             if len(mask.nonzero()[0]) > self.minimum_num_pt:
                 break
 
+        print("Class Ids: ", obj)
+        print("Class Id: ", obj[idx])
+
+        ### display mask
+        # mask_gt = np.array(mask.copy() * 100, dtype=np.uint8)
+        # mask_name = test_folder + '1.mask.png'
+        # cv2.imwrite(mask_name, mask_gt)
+
+        ### display img
+        # mask_gt = np.array(img.copy(), dtype=np.uint8)
+        # mask_name = test_folder + '1.img.png'
+        # cv2.imwrite(mask_name, mask_gt)
+
         if self.add_noise:
             img = self.trancolor(img)
 
@@ -165,10 +180,6 @@ class PoseDataset(data.Dataset):
 
         if self.list[index][:8] == 'data_syn':
             img_masked = img_masked + np.random.normal(loc=0.0, scale=7.0, size=img_masked.shape)
-
-        # p_img = np.transpose(img_masked, (1, 2, 0))
-        # scipy.misc.imsave('temp/{0}_input.png'.format(index), p_img)
-        # scipy.misc.imsave('temp/{0}_label.png'.format(index), mask[rmin:rmax, cmin:cmax].astype(np.int32))
 
         target_r = meta['poses'][:, :, idx][:, 0:3]
         target_t = np.array([meta['poses'][:, :, idx][:, 3:4].flatten()])
@@ -196,11 +207,6 @@ class PoseDataset(data.Dataset):
         if self.add_noise:
             cloud = np.add(cloud, add_t)
 
-        # fw = open('temp/{0}_cld.xyz'.format(index), 'w')
-        # for it in cloud:
-        #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
-        # fw.close()
-
         dellist = [j for j in range(0, len(self.cld[obj[idx]]))]
         if self.refine:
             dellist = random.sample(dellist, len(self.cld[obj[idx]]) - self.num_pt_mesh_large)
@@ -208,22 +214,46 @@ class PoseDataset(data.Dataset):
             dellist = random.sample(dellist, len(self.cld[obj[idx]]) - self.num_pt_mesh_small)
         model_points = np.delete(self.cld[obj[idx]], dellist, axis=0)
 
-        # fw = open('temp/{0}_model_points.xyz'.format(index), 'w')
-        # for it in model_points:
-        #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
-        # fw.close()
-
         target = np.dot(model_points, target_r.T)
         if self.add_noise:
             target = np.add(target, target_t + add_t)
         else:
             target = np.add(target, target_t)
-        
-        # fw = open('temp/{0}_tar.xyz'.format(index), 'w')
-        # for it in target:
-        #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
-        # fw.close()
-        
+
+        #######################################
+        # PROJECT TO SCREEN
+        #######################################
+
+        # cam_mat = np.array([[cam_fx, 0, cam_cx], [0, cam_fy, cam_cy], [0, 0, 1]])
+        # dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+        #
+        # cam_rotation4 = target_r
+        # cam_translation = target_t
+        #
+        # cv2_img = Image.open('{0}/{1}-color.png'.format(self.root, self.list[index]))
+        # imgpts, jac = cv2.projectPoints(cloud * 1e2, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # temp_folder = test_folder + 'cv2.cloud.png'
+        # cv2.imwrite(temp_folder, cv2_img)
+        #
+        # cv2_img = Image.open('{0}/{1}-color.png'.format(self.root, self.list[index]))
+        # imgpts, jac = cv2.projectPoints(target, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # temp_folder = test_folder + 'cv2.target.png'
+        # cv2.imwrite(temp_folder, cv2_img)
+        #
+        # cv2_img = Image.open('{0}/{1}-color.png'.format(self.root, self.list[index]))
+        # imgpts, jac = cv2.projectPoints(model_points*1e2, cam_rotation4, cam_translation* 1e3, cam_mat, dist)
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # temp_folder = test_folder + 'cv2.model_points.png'
+        # cv2.imwrite(temp_folder, cv2_img)
+        #
+        # cv2_img = Image.open('{0}/{1}-color.png'.format(self.root, self.list[index]))
+        # imgpts, jac = cv2.projectPoints(self.cld[idx]*1e2, cam_rotation4, cam_translation* 1e3, cam_mat, dist)
+        # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+        # temp_folder = test_folder + 'cv2.1.self.cld.png'
+        # cv2.imwrite(temp_folder, cv2_img)
+
         return torch.from_numpy(cloud.astype(np.float32)), \
                torch.LongTensor(choose.astype(np.int32)), \
                self.norm(torch.from_numpy(img_masked.astype(np.float32))), \

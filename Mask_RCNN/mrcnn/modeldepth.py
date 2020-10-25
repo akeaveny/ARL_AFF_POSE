@@ -1376,9 +1376,16 @@ def load_images_gt(dataset, config, image_id, augment=False, augmentation=None,
         # Make augmenters deterministic to apply similarly to images and masks
         det = augmentation.to_deterministic()
         image = det.augment_image(image)
-        # Change mask to np.uint8 because imgaug doesn't support np.bool
         mask = det.augment_image(mask.astype(np.uint8),
                                  hooks=imgaug.HooksImages(activator=hook))
+        # if image_shape[-1] == 3:
+        #     image = det.augment_image(image)
+        #     mask = det.augment_image(mask.astype(np.uint8),
+        #                              hooks=imgaug.HooksImages(activator=hook))
+        # else:
+        #     image = det.augment_images(image)
+        #     mask = det.augment_images(mask.astype(np.uint8),
+        #                               hooks=imgaug.HooksImages(activator=hook))
         # Verify that shapes didn't change
         assert image.shape == image_shape, "Augmentation shouldn't change image size"
         assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
@@ -2861,7 +2868,7 @@ class MaskRCNN():
                 layers.append(l)
         return layers
 
-    def run_graph(self, images, outputs, image_metas=None):
+    def run_graph(self, images, depthimages, outputs, image_metas=None):
         """Runs a sub-set of the computation graph that computes the given
         outputs.
 
@@ -2887,18 +2894,45 @@ class MaskRCNN():
             inputs += [K.learning_phase()]
         kf = K.function(model.inputs, list(outputs.values()))
 
-        # Prepare inputs
-        if image_metas is None:
-            molded_images, image_metas, _ = self.mold_inputs(images)
-        else:
-            molded_images = images
+        ##########################
+        #
+        ##########################
+
+        # Mold inputs to format expected by the neural network
+        molded_images, image_metas, _ = self.mold_inputs(images)
+        molded_depth_images, _, _ = self.mold_inputs(depthimages)
+        # Validate image sizes
+        # All images in a batch MUST be of the same size
         image_shape = molded_images[0].shape
+        for g in molded_images[1:]:
+            assert g.shape == image_shape,\
+                "After resizing, all images must have the same size. Check IMAGE_RESIZE_MODE and image sizes."
+
         # Anchors
         anchors = self.get_anchors(image_shape)
         # Duplicate across the batch dimension because Keras requires it
         # TODO: can this be optimized to avoid duplicating the anchors?
         anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
-        model_in = [molded_images, image_metas, anchors]
+
+        ##########################
+        # Prepare inputs
+        ##########################
+        #
+        # if image_metas is None:
+        #     molded_images, image_metas, _ = self.mold_inputs(images)
+        # else:
+        #     molded_images = images
+        # print("Test:", molded_images.shape)
+        # image_shape = molded_images[0].shape
+        # # Anchors
+        # anchors = self.get_anchors(image_shape)
+        # # Duplicate across the batch dimension because Keras requires it
+        # # TODO: can this be optimized to avoid duplicating the anchors?
+        # anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
+
+        ##########################
+
+        model_in = [molded_images, molded_depth_images, image_metas, anchors]
 
         # Run inference
         if model.uses_learning_phase and not isinstance(K.learning_phase(), int):
@@ -2906,8 +2940,7 @@ class MaskRCNN():
         outputs_np = kf(model_in)
 
         # Pack the generated Numpy arrays into a a dict and log the results.
-        outputs_np = OrderedDict([(k, v)
-                                  for k, v in zip(outputs.keys(), outputs_np)])
+        outputs_np = OrderedDict([(k, v) for k, v in zip(outputs.keys(), outputs_np)])
         for k, v in outputs_np.items():
             log(k, v)
         return outputs_np

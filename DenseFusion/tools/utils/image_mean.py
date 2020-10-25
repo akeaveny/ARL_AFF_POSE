@@ -9,7 +9,11 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFusion')
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds2/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+                    type=str,
+                    metavar="/path/to/Affordance/dataset/")
+parser.add_argument('--dataset_config', required=False,
+                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='val',
@@ -21,31 +25,24 @@ args = parser.parse_args()
 #########################
 # load images
 #########################
-
+num_random = 1000
 if args.dataset_type == 'val':
-    images_file = 'test_data_list.txt'
+    # images_file = 'test_data_list.txt'
+    images_file = 'test_data_list_combined.txt'
 elif args.dataset_type == 'train':
-    images_file = 'train_data_list.txt'
-dataset_config = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/parts_affordance/dataset_config/'
+    # images_file = 'train_data_list.txt'
+    images_file = 'train_data_list_combined.txt'
 
-images_paths = np.loadtxt('{}/{}'.format(dataset_config, images_file), dtype=np.str)
+images_paths = np.loadtxt('{}/{}'.format(args.dataset_config, images_file), dtype=np.str)
+print("Num Images: ", len(images_paths))
 
-# images = []
-# for images_path in images_paths:
-#     images_path_ = args.dataset + images_path + "_rgb.png"
-#     images.append(cv2.imread(images_path_))
-# images = np.asarray(images)
-# print("Loaded Images: ", len(images))
-#
-# print("---------stats---------------")
-# print("Color mean (RGB):{:.2f} {:.2f} {:.2f}".format(*[images[i].mean() for i in range(images.shape[-1])]))
-# print("normalized (RGB):{:.4f} {:.4f} {:.4f}".format(*[images[i].mean()/255 for i in range(images.shape[-1])]))
-# print("Color std (RGB):{:.2f} {:.2f} {:.2f}".format(*[images[i].std() for i in range(images.shape[-1])]))
-# print("normalized (RGB):{:.4} {:.4f} {:.4f}".format(*[images[i].std()/255 for i in range(images.shape[-1])]))
+random_idx = np.random.choice(np.arange(0, len(images_paths), 1), size=int(num_random), replace=False)
+print("Random Img Selected: ", len(images_paths[random_idx]))
 
 dataset_mean, dataset_std, dataset_count = 0, 0, 0
-for images_path in images_paths:
+for images_path in images_paths[random_idx]:
     image_path_ = args.dataset + images_path + "_rgb.png"
+    ### print("image_path_: ", image_path_)
     image = cv2.imread(image_path_)
     mean, stddev = cv2.meanStdDev(image.astype(np.uint8))
     dataset_mean += mean

@@ -1,0 +1,24 @@
+##########
+# 400
+##########
+
+/usr/bin/python3.6 /home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/tools/plot_error_metrics.py
+ROOT_DIR /home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion
+*************** 025_mug_01_grasp ***************
+ADD<2cm = 97.00 [%], AUC = 54.54 [%]
+ADD-S<2cm = 100.00 [%], AUC = 64.02 [%]
+
+Process finished with exit code 0
+
+
+##########
+# 1600
+##########
+
+/usr/bin/python3.6 /home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/tools/plot_error_metrics.py
+ROOT_DIR /home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion
+*************** 025_mug_01_grasp ***************
+ADD<2cm = 98.38 [%], AUC = 73.44 [%]
+ADD-S<2cm = 99.88 [%], AUC = 81.92 [%]
+
+Process finished with exit code 0

@@ -1,4 +1,5 @@
 """
+------------------------------------------------------------
 Mask R-CNN for Object_RPE
 ------------------------------------------------------------
 """
@@ -41,11 +42,11 @@ class AffordanceConfig(Config):
     ###  GPU
     ##################################
 
-    GPU_COUNT = 2
-    IMAGES_PER_GPU = 2
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
     bs = GPU_COUNT * IMAGES_PER_GPU
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
     import tensorflow as tf
     config = tf.ConfigProto()
@@ -65,39 +66,47 @@ class AffordanceConfig(Config):
     ##################################
 
     LEARNING_RATE = 1e-03
-    WEIGHT_DECAY = 0.0001
+    WEIGHT_DECAY = 1e-04
 
     ##################################
     ###  NUM OF IMAGES
     ##################################
 
     # Number of training steps per epoch
-    # STEPS_PER_EPOCH = (16994) // bs
-    # VALIDATION_STEPS = (7285) // bs
-    STEPS_PER_EPOCH = (700) // bs
-    VALIDATION_STEPS = (300) // bs
+    # STEPS_PER_EPOCH = (20181) // bs
+    # VALIDATION_STEPS = (4326) // bs
+
+    STEPS_PER_EPOCH = (80) // bs
+    VALIDATION_STEPS = (20) // bs
 
     ##################################
     ###  FROM DATASET STATS
     ##################################
     ''' --- run datasetstats for all params below --- '''
 
-    MAX_GT_INSTANCES = 3 # really only have 1 obj/image
-    DETECTION_MAX_INSTANCES = 3
+    MEAN_PIXEL = np.array([96.78, 94.99, 103.82])  ### REAL
+
+    # IMAGE_RESIZE_MODE = "crop"
+    # IMAGE_MIN_DIM = 384
+    # IMAGE_MAX_DIM = 384
+    # RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)  ### 1024
+
+    IMAGE_RESIZE_MODE = "square"
+    IMAGE_MIN_DIM = 640
+    IMAGE_MAX_DIM = 640
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)  ### 1024
+
+    USE_MINI_MASK = True
+    MINI_MASK_SHAPE = (56, 56)
+    # MASK_SHAPE = [56, 56]  # TODO: AFFORANCENET TRIED 14, 28, 56, 112, 224
+
+    MAX_GT_INSTANCES = 20  # really only have 1 obj/image or max 3 labels/object
+    DETECTION_MAX_INSTANCES = 20
 
     DETECTION_MIN_CONFIDENCE = 0.9
 
-    MEAN_PIXEL = np.array([91.13, 88.92, 98.65])
-
-    IMAGE_RESIZE_MODE = "crop"
-    IMAGE_MIN_DIM = 384
-    IMAGE_MAX_DIM = 384
-
-    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
-
-    USE_MINI_MASK = False
-    MINI_MASK_SHAPE = (56, 56)
-
+    TRAIN_ROIS_PER_IMAGE = 100  # TODO: DS bowl 512
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 128
 
 # ###########################################################
 # # Dataset
@@ -130,18 +139,22 @@ class AffordanceDataset(utils.Dataset):
         # Train or validation dataset?
         assert subset in ["train", "val", "test"]
         if subset == 'train':
-            print("------------------LOADING TRAIN!------------------")
-            annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/train_700.json'))
+             annotations = {}
+             print("------------------LOADING TRAIN!------------------")
+             annotations.update(json.load(
+               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_80.json')))
+               # open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_20181.json')))
         elif subset == 'val':
+            annotations = {}
             print("------------------LOADING VAL!--------------------")
-            annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/val_300.json'))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_20.json')))
+                # open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_4326.json')))
         elif subset == 'test':
-            annotations = json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100.json'))
-            #annotations = json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/test_100_hammer.json'))
+            annotations = {}
+            print("------------------LOADING Test!--------------------")
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_test_4336.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -166,6 +179,19 @@ class AffordanceDataset(utils.Dataset):
                 path=image_path,
                 width=width, height=height,
                 polygons=polygons)
+
+    def load_image_rgb_depth(self, image_id):
+
+        file_path = np.str(image_id).split("rgb.jpg")[0]
+
+        rgb = skimage.io.imread(file_path + "rgb.jpg")
+        depth = skimage.io.imread(file_path + "depth.png")
+
+        ##################################
+        # RGB has 4th channel - alpha
+        # depth to 3 channels
+        ##################################
+        return rgb[..., :3], skimage.color.gray2rgb(depth)
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.

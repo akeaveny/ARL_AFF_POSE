@@ -55,7 +55,7 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
             target = target[0].transpose(1, 0).contiguous().view(3, -1)
             pred = pred.permute(2, 0, 1).contiguous().view(3, -1)
             inds = knn(target.unsqueeze(0), pred.unsqueeze(0))
-            target = torch.index_select(target, 1, inds.view(-1) - 1)
+            target = torch.index_select(target, 1, inds.view(-1).detach() - 1)
             target = target.view(3, bs * num_p, num_point_mesh).permute(1, 2, 0).contiguous()
             pred = pred.view(3, bs * num_p, num_point_mesh).permute(1, 2, 0).contiguous()
 
@@ -66,7 +66,12 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
     how_max, which_max = torch.max(pred_c, 1)
     dis = dis.view(bs, num_p)
 
-    # print("how_max: {:.5f}".format(how_max.detach().cpu().numpy()[0]))
+    print("how_max: {:.5f}".format(how_max.clone().detach().cpu().numpy()[0]))
+    # if count != 0 and count % 1000 == 0:
+    #     # tensorboard
+    #     scalar_info = {'loss': how_max.clone().detach().cpu().numpy()[0]}
+    #     for key, val in scalar_info.items():
+    #         writer.add_scalar(key, val, count)
 
     t = ori_t[which_max[0]] + points[which_max[0]]
     points = points.view(1, bs * num_p, 3)

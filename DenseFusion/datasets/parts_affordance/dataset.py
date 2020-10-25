@@ -69,7 +69,7 @@ class PoseDataset(data.Dataset):
         self.noise_img_loc = 0.0
         self.noise_img_scale = 7.0
 
-        self.minimum_num_pt = 50
+        self.minimum_num_pt = 100
 
         self.norm = transforms.Normalize(mean=[113.45/255, 112.19/255, 130.92/255],
                                          std=[42.34959629/255, 42.23650688/255, 40.89796388/255])
@@ -90,11 +90,9 @@ class PoseDataset(data.Dataset):
         self.cld = {}
         for class_id in self.class_IDs:
             class_input = class_file.readline()
-            # print("class_id: ", class_id)
-            # print("class_input: ", class_input)
             if not class_input:
                 break
-            input_file = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds2/models/{0}/{0}_grasp.xyz'.format(class_input[:-1]))
+            input_file = open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/models/{0}/{0}_grasp.xyz'.format(class_input[:-1]))
             self.cld[class_id] = []
             while 1:
                 input_line = input_file.readline()
@@ -103,6 +101,9 @@ class PoseDataset(data.Dataset):
                 input_line = input_line[:-1].split(' ')
                 self.cld[class_id].append([float(input_line[0]), float(input_line[1]), float(input_line[2])])
             self.cld[class_id] = np.array(self.cld[class_id])
+            print("class_id: ", class_id)
+            print("class_input: ", class_input)
+            print("Num Point Clouds: ", len(self.cld[class_id]))
             input_file.close()
 
         print("************** LOADED DATASET! **************")
@@ -118,7 +119,7 @@ class PoseDataset(data.Dataset):
         depth = np.array(Image.open('{0}/{1}_depth.png'.format(self.root, self.list[index])))
         label = np.array(Image.open('{0}/{1}_label.png'.format(self.root, self.list[index])))
         meta = scio.loadmat('{0}/{1}-meta.mat'.format(self.root, self.list[index]))
-        test_folder = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/test_densefusion/'
+        test_folder = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/test_densefusion/'
 
         # imgaug
         if self.add_noise:
@@ -133,7 +134,8 @@ class PoseDataset(data.Dataset):
         # Affordance IDs
         ##################################
 
-        affordance_ids = np.array(meta['Affordance_ID'].astype(np.int32))
+        ### affordance_ids = np.array(meta['Affordance_ID'].astype(np.int32))
+        affordance_ids = np.unique(np.array(label))
 
         for affordance_id in affordance_ids:
 
@@ -160,13 +162,12 @@ class PoseDataset(data.Dataset):
                 self.xmap = np.array([[j for i in range(height)] for j in range(width)])
                 self.ymap = np.array([[i for i in range(height)] for j in range(width)])
 
-                if camera_setting == 'Kinetic':
+                if camera_setting == 'Kinect':
                     border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640]
                 elif camera_setting == 'Xtion':
                     border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640]
                 elif camera_setting == 'ZED':
-                    border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680,
-                                   720, 760, 800, 840, 880, 920, 960, 1000, 1040, 1080, 1120, 1160, 1200, 1240, 1280]
+                    border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680]
 
                 cam_cx = meta['cx' + meta_idx][0][0]
                 cam_cy = meta['cy' + meta_idx][0][0]
@@ -182,7 +183,7 @@ class PoseDataset(data.Dataset):
                 # bbox
                 ############
 
-                rmin, rmax, cmin, cmax = get_bbox(label, idx, width, height, border_list)
+                # rmin, rmax, cmin, cmax = get_bbox(label, idx, width, height, border_list)
                 # print("bbox: ", rmin, rmax, cmin, cmax)
 
                 ### display bbox
@@ -195,16 +196,16 @@ class PoseDataset(data.Dataset):
                 # gt bbox
                 ############
 
-                # rmin1, rmax1, cmin1, cmax1 = meta['bbox' + meta_idx].flatten().astype(np.int32)
-                # rmin, rmax, cmin, cmax = rmax1, rmin1, cmax1, cmin1
+                rmin1, rmax1, cmin1, cmax1 = meta['bbox' + meta_idx].flatten().astype(np.int32)
+                rmin, rmax, cmin, cmax = rmax1, rmin1, cmax1, cmin1
                 # print("ground truth: ", rmin1, rmax1, cmin1, cmax1)
 
-                ### display bbox
-                # img_gt = np.array(img.copy())
-                # img_name = test_folder + '1.bbox.gt_test.png'
-                ## cv2.rectangle(img_gt, (y1, x1), (y2, x2), (255, 0, 0), 2)
-                # cv2.rectangle(img_gt, (cmin1, rmin1), (cmax1, rmax1), (255, 0, 0), 2)
-                # cv2.imwrite(img_name, img_gt)
+                ## display bbox
+                img_gt = np.array(img.copy())
+                img_name = test_folder + '1.bbox.gt_test.png'
+                # cv2.rectangle(img_gt, (y1, x1), (y2, x2), (255, 0, 0), 2)
+                cv2.rectangle(img_gt, (cmin1, rmin1), (cmax1, rmax1), (255, 0, 0), 2)
+                cv2.imwrite(img_name, img_gt)
 
                 ############
                 #
@@ -246,7 +247,7 @@ class PoseDataset(data.Dataset):
                 cloud /= 1000
 
                 if self.add_noise:
-                     cloud = np.add(cloud, translation_noise)
+                    cloud = np.add(cloud, translation_noise)
 
                 dellist = [j for j in range(0, len(self.cld[idx]))]
                 if self.refine:
@@ -257,39 +258,39 @@ class PoseDataset(data.Dataset):
 
                 target = np.dot(model_points, cam_rotation4.T)
                 if self.add_noise:
-                    target = np.add(target, cam_translation + translation_noise)
+                    target = np.add(target, cam_translation * 10 + translation_noise) / 10
                 else:
-                    target = np.add(target, cam_translation)
+                    target = np.add(target, cam_translation * 10) / 10
 
                 #######################################
                 # PROJECT TO SCREEN
                 #######################################
-                #
+
                 # cam_mat = np.array([[cam_fx, 0, cam_cx], [0, cam_fy, cam_cy], [0, 0, 1]])
                 # dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
                 #
                 # cv2_img = Image.open('{0}/{1}_rgb.png'.format(self.root, self.list[index]))
-                # imgpts, jac = cv2.projectPoints(cloud * 1e3, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
+                # imgpts, jac = cv2.projectPoints(cloud * 1e2, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
                 # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-                # temp_folder = test_folder + 'cv2.cloud.png'
+                # temp_folder = test_folder + 'cv2.self.cld.png'
                 # cv2.imwrite(temp_folder, cv2_img)
                 #
                 # cv2_img = Image.open('{0}/{1}_rgb.png'.format(self.root, self.list[index]))
                 # imgpts, jac = cv2.projectPoints(target, np.eye(3), np.zeros(shape=cam_translation.shape), cam_mat, dist)
                 # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-                # temp_folder = test_folder + 'cv2.1.target.png'
+                # temp_folder = test_folder + 'cv2.target.png'
                 # cv2.imwrite(temp_folder, cv2_img)
                 #
                 # cv2_img = Image.open('{0}/{1}_rgb.png'.format(self.root, self.list[index]))
-                # imgpts, jac = cv2.projectPoints(model_points*1e3, cam_rotation4, cam_translation* 1e3, cam_mat, dist)
+                # imgpts, jac = cv2.projectPoints(model_points*1e2, cam_rotation4, cam_translation* 1e3, cam_mat, dist)
                 # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
                 # temp_folder = test_folder + 'cv2.model_points.png'
                 # cv2.imwrite(temp_folder, cv2_img)
                 #
                 # cv2_img = Image.open('{0}/{1}_rgb.png'.format(self.root, self.list[index]))
-                # imgpts, jac = cv2.projectPoints(self.cld[idx]*1e3, cam_rotation4, cam_translation* 1e3, cam_mat, dist)
+                # imgpts, jac = cv2.projectPoints(self.cld[idx]*1e2, cam_rotation4, cam_translation* 1e3, cam_mat, dist)
                 # cv2_img = cv2.polylines(np.array(cv2_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-                # temp_folder = test_folder + 'cv2.1.self.cld.png'
+                # temp_folder = test_folder + 'cv2.1.gt.png'
                 # cv2.imwrite(temp_folder, cv2_img)
 
                 #######################################

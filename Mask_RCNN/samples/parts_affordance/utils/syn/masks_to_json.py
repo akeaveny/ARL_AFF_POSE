@@ -184,47 +184,93 @@ def write_to_json(instance_img, label_img, classes, img_number, folder_to_save, 
         # data[obj_name]['file_attributes'] = {}
         data[obj_name]['regions'] = regions
     return stop
-
 ###########################################################
 # Manual Config
 ###########################################################
 np.random.seed(1)
 
 dataset_name = 'Affordance'
-data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/'
-train_path = 'combined_tools_hammer_15k_train/'
-val_path = 'combined_tools_hammer_15k_val/'
 
-### image_ext = '_label.png'
-image_ext = '_gt_affordance.png' ### object ids or affordances
+data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/'
+
+######################
+# objects
+######################
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/objects/scissors/'
+# train_path = 'objects/combined_tools_scissors2_train/'
+# val_path = 'objects/combined_tools_scissors2_val/'
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/objects/hammer1/'
+# train_path = 'objects/combined_tools_hammer2_train/'
+# val_path = 'objects/combined_tools_hammer2_val/'
+
+# image_ext = '_label.png' ### object ids '_label.png'
+
+# class_id = np.arange(0, 205+1, 1)
+
+######################
+# object id
+######################
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/syn/'
+# train_path = 'combined_tools2_train/'
+# val_path = 'combined_tools2_val/'
+
+json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/clutter/'
+train_path = 'combined_clutter1_train/'
+val_path = 'combined_clutter1_val/'
+
+image_ext = '_label.png' ### object ids '_label.png'
 
 class_id = np.arange(0, 205+1, 1)
-### class_id = [0, 1, 2, 3, 4, 5, 6, 7]
-print("Affordance IDs: \n{}\n".format(class_id))
 
-use_random_idx = False
-num_val = int(300 / (2 * 3))
-num_train = int(700 / (2 * 3))
+######################
+# affordance
+######################
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/syn_aff/'
+# train_path = 'combined_tools2_train/'
+# val_path = 'combined_tools2_val/'
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/clutter_aff/'
+# train_path = 'combined_clutter1_train/'
+# val_path = 'combined_clutter1_val/'
+#
+# image_ext = '_gt_affordance.png' ### affordances '_gt_affordance.png'
+#
+# class_id = [0, 1, 2, 3, 4, 5, 6, 7]
+#
+# print("Affordance IDs: \n{}\n".format(class_id))
+
+VISUALIZE = False
+
+use_random_idx = True
+num_val = num_train = 4
+
+# 1.
+scenes = [
+          # 'bench/',
+          # 'floor/',
+          'turn_table/',
+          # 'dr/'
+          ]
 
 #=====================
 # JSON FILES
 #=====================
 
-# 0.
-json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/json/rgb/hammer15k/'
 
 # 1.
 scenes = [
-          'turn_table/', 'bench/', 'floor/',
-          'dr/'
+          'bench/',
+          'floor/',
+          'turn_table/',
+          # 'dr/'
           ]
 
 for scene in scenes:
     print('\n******************** {} ********************'.format(scene))
-
-    if scene == 'dr/' and use_random_idx:
-        num_val = int(num_val * 3)
-        num_train = int(num_train * 3)
 
     ###########################################################
     # VALIDATION
@@ -251,18 +297,18 @@ for scene in scenes:
     data = {}
     iteration = 0
 
-    # =====================
+    ##################
     ###
-    # =====================
+    ##################
 
-    json_addr = json_path + scene + 'val' + np.str(num_val) + '.json'
+    json_addr = json_path + scene + 'val_' + np.str(num_val) + '.json'
     for file in files:
 
         str_num = file.split(data_path + folder_to_save)[1]
         img_number = str_num.split(image_ext)[0]
         label_addr = file
 
-        ### print("label_addr: ", label_addr)
+        print("label_addr: ", label_addr)
         print('Image: {}/{}'.format(iteration, len(files)))
 
         label_img = load_image(label_addr)
@@ -303,11 +349,11 @@ for scene in scenes:
     data = {}
     iteration = 0
 
-    # =====================
+    ##################
     ###
-    # =====================
+    ##################
 
-    json_addr = json_path + scene + 'train' + np.str(num_train) + '.json'
+    json_addr = json_path + scene + 'train_' + np.str(num_train) + '.json'
     for file in files:
 
         str_num = file.split(data_path + folder_to_save)[1]

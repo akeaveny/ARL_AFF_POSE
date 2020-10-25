@@ -41,11 +41,11 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser( description='Train Mask R-CNN to detect Affordance.')
 
-parser.add_argument('--train', required=False, default='rgb',
+parser.add_argument('--train', required=False, default='rgbd',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds2/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -68,7 +68,7 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
+# assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
 if args.dataset_type == 'real':
     import dataset_real as Affordance
 elif args.dataset_type == 'syn':
@@ -76,9 +76,15 @@ elif args.dataset_type == 'syn':
 elif args.dataset_type == 'syn1':
     import dataset_syn1 as Affordance
 elif args.dataset_type == 'hammer':
-    import dataset_syn_hammer as Affordance
+    import objects.dataset_syn_hammer as Affordance
 elif args.dataset_type == 'hammer1':
-    import dataset_syn_hammer1 as Affordance
+    import objects.dataset_syn_hammer1 as Affordance
+elif args.dataset_type == 'scissors_real':
+    import objects.dataset_real_scissors as Affordance
+elif args.dataset_type == 'scissors':
+    import objects.dataset_syn_scissors as Affordance
+elif args.dataset_type == 'scissors_20k':
+    import objects.dataset_syn_scissors_20k as Affordance
 
 # ##################################
 # ###  GPU
@@ -95,8 +101,13 @@ elif args.dataset_type == 'hammer1':
 from mrcnn.config import Config
 if args.train == 'rgb':
     from mrcnn import model as modellib, utils
-if args.train == 'rgbd':
+elif args.train == 'rgbd':
     from mrcnn import modeldepth as modellib, utils
+elif args.train == 'rgbd+':
+    from mrcnn import modeldepthv2 as modellib, utils
+else:
+    print("*** No Model Selected ***")
+    exit(1)
 
 ############################################################
 #  train
@@ -122,50 +133,107 @@ def train(model, args):
     ##################
     #  IMMGAUG
     ##################
-
-    augmentation = iaa.Sometimes(0.5, [
-        iaa.Fliplr(0.5),
+    augmentation = iaa.Sometimes(0.833, iaa.Sequential([
+        #########################
+        # COLOR & MASK
+        #########################
+        iaa.Fliplr(0.5),  # horizontal flips
         iaa.Flipud(0.5),
-        iaa.Multiply((0.8, 1.2)),
-        iaa.GaussianBlur(sigma=(0.0, 2.0)),
-        iaa.OneOf([iaa.Affine(rotate=90),
-                   iaa.Affine(rotate=180),
-                   iaa.Affine(rotate=270)]),
-    ])
-
-    # elif args.dataset_type == 'syn' or args.dataset_type == 'syn1':
-    #    augmentation = None
+        iaa.Crop(percent=(0, 0.1)),  # random crops
+        # Apply affine transformations to each image.
+        # Scale/zoom them, translate/move them, rotate them and shear them.
+        iaa.Affine(
+            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+            translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+            # rotate=(-25, 25),
+            # shear=(-8, 8)
+        ),
+        #########################
+        # ONLY COLOR !!!
+        #########################
+        # Small gaussian blur with random sigma between 0 and 0.5.
+        # But we only blur about 50% of all images.
+        iaa.Sometimes(0.5,
+                      iaa.GaussianBlur(sigma=(0, 0.5))
+                      ),
+        # Strengthen or weaken the contrast in each image.
+        iaa.ContrastNormalization((0.75, 1.25)),
+        # Add gaussian noise.
+        # For 50% of all images, we sample the noise once per pixel.
+        # For the other 50% of all images, we sample the noise per pixel AND
+        # channel. This can change the color (not only brightness) of the
+        # pixels.
+        iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+        # Make some images brighter and some darker.
+        # In 20% of all cases, we sample the multiplier once per channel,
+        # which can end up changing the color of the images.
+        iaa.Multiply((0.8, 1.2), per_channel=0.2),
+    ], random_order=True))  # apply augmenters in random order
 
     #############################
     #  Learning Rate Scheduler
     #############################
 
-    # Training - Stage 1 HEADS
-    # HEADS
+    # ### Training - Stage 1 HEADS
+    ### Training - Stage 1 HEADS
+    ## HEADS
     print("\n************* trainining HEADS *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=100, # 100
+                epochs=40,
                 augmentation=augmentation,
                 layers='heads')
 
-    # Training - Stage 2
-    # Finetune layers from ResNet stage 4 and up
+    ### Training - Stage 2a
+    ### Finetune layers from ResNet stage 4 and up
     print("\n************* trainining ResNET 4+ *************")
     model.train(dataset_train, dataset_val,
               learning_rate=config.LEARNING_RATE/10,
-              epochs=150,  # 100
+              epochs=45,
               augmentation=augmentation,
               layers='4+')
 
-    # Training - Stage 3
-    # Fine tune all layers
+    ### Training - Stage 3
+    ### Fine tune all layers
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE/100,
-                epochs=200, # 240
+                epochs=50,
                 augmentation=augmentation,
                 layers='all')
+
+    # ########################
+    # # Finetuning
+    # ########################
+    # START = 20
+    #
+    # # ### Training - Stage 1 HEADS
+    # ### Training - Stage 1 HEADS
+    # ## HEADS
+    # print("\n************* trainining HEADS *************")
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE,
+    #             epochs=START + 400,
+    #             augmentation=augmentation,
+    #             layers='heads')
+    #
+    # ### Training - Stage 2a
+    # ### Finetune layers from ResNet stage 4 and up
+    # print("\n************* trainining ResNET 4+ *************")
+    # model.train(dataset_train, dataset_val,
+    #           learning_rate=config.LEARNING_RATE/10,
+    #           epochs=START + 450,
+    #           augmentation=augmentation,
+    #           layers='4+')
+    #
+    # ### Training - Stage 3
+    # ### Fine tune all layers
+    # print("\n************* trainining ALL *************")
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE/100,
+    #             epochs=START + 500,
+    #             augmentation=augmentation,
+    #             layers='all')
 
 ############################################################
 #  Training

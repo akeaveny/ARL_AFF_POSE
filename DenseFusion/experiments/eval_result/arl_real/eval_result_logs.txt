@@ -1,0 +1,100 @@
+spatula_01_grasp Pass! Distance: 1.36
+spatula_01_grasp NOT Pass! Distance: 5.22
+spatula_01_grasp NOT Pass! Distance: 2.23
+spatula_01_grasp NOT Pass! Distance: 2.71
+hammer_01_grasp NOT Pass! Distance: 6.94
+spatula_01_grasp NOT Pass! Distance: 4.19
+spatula_01_grasp NOT Pass! Distance: 8.65
+hammer_01_grasp NOT Pass! Distance: 5.53
+spatula_01_grasp Pass! Distance: 1.00
+hammer_01_grasp NOT Pass! Distance: 4.28
+spatula_01_grasp NOT Pass! Distance: 4.39
+spatula_01_grasp NOT Pass! Distance: 4.70
+spatula_01_grasp Pass! Distance: 1.11
+hammer_01_grasp NOT Pass! Distance: 5.86
+spatula_01_grasp NOT Pass! Distance: 4.34
+hammer_01_grasp NOT Pass! Distance: 5.75
+spatula_01_grasp NOT Pass! Distance: 4.47
+hammer_01_grasp NOT Pass! Distance: 4.60
+spatula_01_grasp NOT Pass! Distance: 5.33
+spatula_01_grasp Pass! Distance: 1.42
+hammer_01_grasp NOT Pass! Distance: 6.81
+hammer_01_grasp NOT Pass! Distance: 4.67
+hammer_01_grasp NOT Pass! Distance: 5.39
+spatula_01_grasp NOT Pass! Distance: 8.83
+hammer_01_grasp NOT Pass! Distance: 6.02
+hammer_01_grasp NOT Pass! Distance: 6.21
+spatula_01_grasp NOT Pass! Distance: 3.38
+spatula_01_grasp Pass! Distance: 1.55
+hammer_01_grasp NOT Pass! Distance: 4.90
+hammer_01_grasp NOT Pass! Distance: 4.26
+spatula_01_grasp NOT Pass! Distance: 4.89
+hammer_01_grasp NOT Pass! Distance: 3.45
+hammer_01_grasp NOT Pass! Distance: 5.53
+hammer_01_grasp NOT Pass! Distance: 4.73
+hammer_01_grasp NOT Pass! Distance: 3.26
+spatula_01_grasp NOT Pass! Distance: 9.06
+spatula_01_grasp NOT Pass! Distance: 4.18
+hammer_01_grasp NOT Pass! Distance: 3.58
+spatula_01_grasp NOT Pass! Distance: 5.69
+hammer_01_grasp NOT Pass! Distance: 7.21
+spatula_01_grasp NOT Pass! Distance: 6.36
+hammer_01_grasp NOT Pass! Distance: 4.24
+hammer_01_grasp NOT Pass! Distance: 4.34
+hammer_01_grasp NOT Pass! Distance: 6.09
+spatula_01_grasp NOT Pass! Distance: 8.83
+hammer_01_grasp NOT Pass! Distance: 6.48
+spatula_01_grasp NOT Pass! Distance: 7.47
+spatula_01_grasp NOT Pass! Distance: 2.01
+spatula_01_grasp NOT Pass! Distance: 5.53
+spatula_01_grasp NOT Pass! Distance: 5.06
+spatula_01_grasp NOT Pass! Distance: 5.27
+hammer_01_grasp NOT Pass! Distance: 5.29
+spatula_01_grasp Pass! Distance: 0.91
+hammer_01_grasp NOT Pass! Distance: 4.98
+spatula_01_grasp NOT Pass! Distance: 8.89
+hammer_01_grasp NOT Pass! Distance: 5.91
+hammer_01_grasp Pass! Distance: 1.96
+hammer_01_grasp NOT Pass! Distance: 5.36
+hammer_01_grasp NOT Pass! Distance: 6.56
+hammer_01_grasp NOT Pass! Distance: 4.48
+hammer_01_grasp Pass! Distance: 1.94
+spatula_01_grasp NOT Pass! Distance: 8.37
+hammer_01_grasp NOT Pass! Distance: 4.57
+hammer_01_grasp NOT Pass! Distance: 6.90
+spatula_01_grasp NOT Pass! Distance: 3.71
+hammer_01_grasp NOT Pass! Distance: 4.41
+spatula_01_grasp Pass! Distance: 0.94
+spatula_01_grasp Pass! Distance: 0.91
+spatula_01_grasp NOT Pass! Distance: 9.26
+spatula_01_grasp NOT Pass! Distance: 8.70
+spatula_01_grasp Pass! Distance: 0.93
+hammer_01_grasp NOT Pass! Distance: 2.80
+hammer_01_grasp NOT Pass! Distance: 6.95
+spatula_01_grasp NOT Pass! Distance: 4.51
+spatula_01_grasp Pass! Distance: 2.00
+spatula_01_grasp NOT Pass! Distance: 4.53
+hammer_01_grasp NOT Pass! Distance: 5.95
+spatula_01_grasp Pass! Distance: 1.98
+hammer_01_grasp Pass! Distance: 0.97
+spatula_01_grasp NOT Pass! Distance: 8.65
+spatula_01_grasp NOT Pass! Distance: 5.82
+spatula_01_grasp NOT Pass! Distance: 2.76
+hammer_01_grasp NOT Pass! Distance: 3.92
+hammer_01_grasp NOT Pass! Distance: 4.04
+spatula_01_grasp NOT Pass! Distance: 9.02
+hammer_01_grasp Pass! Distance: 1.15
+spatula_01_grasp NOT Pass! Distance: 3.33
+spatula_01_grasp NOT Pass! Distance: 7.95
+hammer_01_grasp NOT Pass! Distance: 3.04
+hammer_01_grasp NOT Pass! Distance: 2.32
+hammer_01_grasp NOT Pass! Distance: 7.17
+hammer_01_grasp NOT Pass! Distance: 4.61
+hammer_01_grasp NOT Pass! Distance: 3.62
+hammer_01_grasp NOT Pass! Distance: 4.89
+spatula_01_grasp NOT Pass! Distance: 4.43
+hammer_01_grasp NOT Pass! Distance: 5.70
+spatula_01_grasp NOT Pass! Distance: 4.28
+spatula_01_grasp NOT Pass! Distance: 8.57
+spatula_01_grasp Pass! Distance: 0.82
+spatula_01_grasp NOT Pass! Distance: 7.51

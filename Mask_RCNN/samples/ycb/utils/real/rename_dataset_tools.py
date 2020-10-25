@@ -18,12 +18,14 @@ new_data_path = '/data/Akeaveny/Datasets/YCB_Video_Dataset/data_combined/'
 
 splits = [
     #'val/',
-    'train/'
+    #'train/'
+    'syn/'
 ]
 
 folder_paths = [
     #'/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/test_data_list.txt',
-    '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/train_data_list.txt'
+    #'/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/train_data_list.txt',
+    '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/syn_data_list.txt'
 ]
 
 image_ext10 = '-box.txt'

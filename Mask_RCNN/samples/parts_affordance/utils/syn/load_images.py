@@ -3,6 +3,8 @@ import shutil
 import glob
 import os
 
+from PIL import Image
+
 import skimage.io
 
 import matplotlib.pyplot as plt
@@ -18,7 +20,10 @@ if __name__ == '__main__':
     ######################
     # dir
     ######################
-    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_'
+    # data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds2/combined_tools_'
+    # data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_tools2_'
+    data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_clutter1_'
+    # data_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools_test1/'
 
     ######################
     # load from
@@ -26,18 +31,23 @@ if __name__ == '__main__':
 
     # 2.
     scenes = [
-              # 'turn_table/', 'bench/', 'floor/',
-              'dr/'
+              # 'turn_table/',
+              'bench/',
+              # 'floor/',
+              # 'dr/',
+              #   ''
               ]
 
     # 3.
     splits = [
             'val/',
-            'train/',
+            # 'train/',
+            # ''
             ]
 
     # 4.
-    image_ext10 = '_rgb.png'
+    image_ext10 = '_depth.png'
+    # image_ext10 = '_gt_affordance.png'
     image_exts1 = [
         image_ext10,
     ]
@@ -49,9 +59,28 @@ if __name__ == '__main__':
     for split in splits:
         for scene in scenes:
             print('\n***************** {} *****************'.format(scene))
-            rgb_file_path = data_path + split + scene + '??????' + '_rgb.png'
-            rgb_files = sorted(glob.glob(rgb_file_path))
-            print("Loaded files: ", len(rgb_files))
-            num_files += len(rgb_files)
+            file_path = data_path + split + scene + '??????' + image_ext10
+            files = sorted(glob.glob(file_path))
+            print("Loaded files: ", len(files))
+            num_files += len(files)
         print("\n-----{} has {} files-----".format(split, num_files))
     print("Dataset has {} files".format(num_files))
+
+    umd_depth_max = 0
+    for file in files:
+        max = np.max(np.array(Image.open(file)))
+        if max > umd_depth_max:
+            umd_depth_max = max
+    print("umd_depth_max: ", umd_depth_max)
+
+    for file in files:
+        img = np.array(Image.open(file))
+        depth = img * (2 ** 8 - 1) / umd_depth_max  ### 8 bit
+        print("Depth 16 bit: ", np.min(img), np.max(img), img.dtype)
+        print("Depth 8 bit: ", np.min(depth), np.max(depth), img.dtype)
+        # print("Mask: ", np.unique(img))
+        plt.imshow(img)
+        plt.show()
+        plt.ioff()
+
+
