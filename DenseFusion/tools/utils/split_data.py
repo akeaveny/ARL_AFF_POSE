@@ -271,76 +271,76 @@ for scene in scenes:
     print("Loaded files: ", len(files))
     print("Actual files: ", saved_files)
 
-    # ===================== val ====================
-    data_path = data_path_clutter_val + scene
-    folder_to_save = clutter_data_folder + 'val/' + scene
-
-    saved_files = 0
-
-    gt_label_addr = data_path + '/??????' + label_format
-    files = sorted(glob.glob(gt_label_addr))
-
-    f_val = open(val_file, 'a')
-    # ===================== val ====================
-    print('\n-------- VAL --------')
-    for file in files:
-
-        str_num = file.split(data_path)[1]
-        img_number = str_num.split(label_format)[0]
-
-        label_addr = data_path + img_number + label_format
-        label = np.array(Image.open(label_addr))
-
-        affordance_ids = np.unique(np.array(label))
-
-        for affordance_id in affordance_ids:
-            if affordance_id in class_IDs:
-                # print("label_addr: ",label_addr)
-                img_index_str = label_addr.split(folder_to_save)[1]
-                img_index_str = img_index_str.split(label_format)[0]
-                f_val.write(folder_to_save + img_index_str)
-                f_val.write('\n')
-                saved_files += 1
-    f_val.close
-
-    print("Loaded files: ", len(files))
-    print("Actual files: ", saved_files)
-
-    # =========================================
-    # TEST
-    # =========================================
-    data_path = data_path_clutter_test + scene
-    folder_to_save = clutter_data_folder + 'test/' + scene
-
-    saved_files = 0
-
-    gt_label_addr = data_path + '/??????' + label_format
-    files = sorted(glob.glob(gt_label_addr))
-
-    f_test = open(test_file, 'a')
-
-    # =========================================
-    # =========================================
-    print('\n-------- TEST --------')
-    for file in files:
-
-        str_num = file.split(data_path)[1]
-        img_number = str_num.split(label_format)[0]
-
-        label_addr = data_path + img_number + label_format
-        label = np.array(Image.open(label_addr))
-
-        affordance_ids = np.unique(np.array(label))
-
-        for affordance_id in affordance_ids:
-            if affordance_id in class_IDs:
-                # print("label_addr: ",label_addr)
-                img_index_str = label_addr.split(folder_to_save)[1]
-                img_index_str = img_index_str.split(label_format)[0]
-                f_test.write(folder_to_save + img_index_str)
-                f_test.write('\n')
-                saved_files += 1
-    f_test.close
-
-    print("Loaded files: ", len(files))
-    print("Actual files: ", saved_files)
+    # # ===================== val ====================
+    # data_path = data_path_clutter_val + scene
+    # folder_to_save = clutter_data_folder + 'val/' + scene
+    #
+    # saved_files = 0
+    #
+    # gt_label_addr = data_path + '/??????' + label_format
+    # files = sorted(glob.glob(gt_label_addr))
+    #
+    # f_val = open(val_file, 'a')
+    # # ===================== val ====================
+    # print('\n-------- VAL --------')
+    # for file in files:
+    #
+    #     str_num = file.split(data_path)[1]
+    #     img_number = str_num.split(label_format)[0]
+    #
+    #     label_addr = data_path + img_number + label_format
+    #     label = np.array(Image.open(label_addr))
+    #
+    #     affordance_ids = np.unique(np.array(label))
+    #
+    #     for affordance_id in affordance_ids:
+    #         if affordance_id in class_IDs:
+    #             # print("label_addr: ",label_addr)
+    #             img_index_str = label_addr.split(folder_to_save)[1]
+    #             img_index_str = img_index_str.split(label_format)[0]
+    #             f_val.write(folder_to_save + img_index_str)
+    #             f_val.write('\n')
+    #             saved_files += 1
+    # f_val.close
+    #
+    # print("Loaded files: ", len(files))
+    # print("Actual files: ", saved_files)
+    #
+    # # =========================================
+    # # TEST
+    # # =========================================
+    # data_path = data_path_clutter_test + scene
+    # folder_to_save = clutter_data_folder + 'test/' + scene
+    #
+    # saved_files = 0
+    #
+    # gt_label_addr = data_path + '/??????' + label_format
+    # files = sorted(glob.glob(gt_label_addr))
+    #
+    # f_test = open(test_file, 'a')
+    #
+    # # =========================================
+    # # =========================================
+    # print('\n-------- TEST --------')
+    # for file in files:
+    #
+    #     str_num = file.split(data_path)[1]
+    #     img_number = str_num.split(label_format)[0]
+    #
+    #     label_addr = data_path + img_number + label_format
+    #     label = np.array(Image.open(label_addr))
+    #
+    #     affordance_ids = np.unique(np.array(label))
+    #
+    #     for affordance_id in affordance_ids:
+    #         if affordance_id in class_IDs:
+    #             # print("label_addr: ",label_addr)
+    #             img_index_str = label_addr.split(folder_to_save)[1]
+    #             img_index_str = img_index_str.split(label_format)[0]
+    #             f_test.write(folder_to_save + img_index_str)
+    #             f_test.write('\n')
+    #             saved_files += 1
+    # f_test.close
+    #
+    # print("Loaded files: ", len(files))
+    # print("Actual files: ", saved_files)

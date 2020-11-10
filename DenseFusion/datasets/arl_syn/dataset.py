@@ -69,8 +69,8 @@ class PoseDataset(data.Dataset):
         self.noise_img_loc = 0.0
         self.noise_img_scale = 7.0
         self.minimum_num_pt = 50
-        self.norm = transforms.Normalize(mean=[158.35670936/255, 154.18317088/255, 159.27607013/255],
-                                         std=[42.8105516/255, 37.71026474/255, 28.63753541/255]) # TODO
+        self.norm = transforms.Normalize(mean=[158.35670936/255, 154.18317088/255, 159.27607013/255],   # SYN
+                                         std=[42.8105516/255, 37.71026474/255, 28.63753541/255])
 
         ##################################
         # 3D models

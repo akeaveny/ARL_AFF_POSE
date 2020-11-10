@@ -50,9 +50,10 @@ parser.add_argument('--refine_margin', default=0.013, help='margin to start the 
 parser.add_argument('--noise_trans', default=0.03, help='range of the random noise of translation added to the training data')
 parser.add_argument('--iteration', type=int, default=2, help='number of refinement iterations')
 parser.add_argument('--nepoch', type=int, default=500, help='max number of epochs to train')
-parser.add_argument('--resume_posenet', type=str, default = '',  help='resume PoseNet model')
+parser.add_argument('--repeat_epoch', type=int, default=1, help='')
+parser.add_argument('--resume_posenet', type=str, default= '',  help='resume PoseNet model')
 parser.add_argument('--resume_refinenet', type=str, default = '',  help='resume PoseRefineNet model')
-parser.add_argument('--start_epoch', type=int, default = 1, help='which epoch to start')
+parser.add_argument('--start_epoch', type=int, default=1, help='which epoch to start')
 opt = parser.parse_args()
 
 ###################
@@ -89,30 +90,26 @@ def main():
         output_results = 'check_ycb_syn.txt'
 
         opt.w = 0.05
-        opt.repeat_epoch = 1  # number of repeat times for one epoch training
+        opt.refine_margin = 0.01
 
-        # opt.refine_margin = 0.0575
-
-        # opt.start_epoch = 25
-        # opt.resume_posenet = 'pose_model_23_0.05664153265627049.pth'
+        # opt.start_epoch = 20
+        # opt.resume_posenet = 'pose_model_17_0.009960328408820027.pth'
         ## resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
 
     elif opt.dataset == 'arl-real':
         opt.num_objects = 4  # number of object classes in the dataset
         opt.num_points = 1000  # number of points on the input pointcloud
         opt.dataset_root = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL'
-        opt.outf = 'trained_models/arl_real/arl2'  # folder to save trained models
-        opt.log_dir = 'experiments/logs/arl_real/arl2'  # folder to save logs
+        opt.outf = 'trained_models/arl_real/arl3'  # folder to save trained models
+        opt.log_dir = 'experiments/logs/arl_real/arl3'  # folder to save logs
         test_folder = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/'
         output_results = 'check_arl_real.txt'
 
         opt.w = 0.05
-        opt.repeat_epoch = 1  # number of repeat times for one epoch training
-
         opt.refine_margin = 0.01
 
-        # opt.start_epoch = 25
-        # opt.resume_posenet = 'pose_model_23_0.05664153265627049.pth'
+        opt.start_epoch = 20
+        opt.resume_posenet = 'pose_model_17_0.009960328408820027.pth'
         ## resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
 
     elif opt.dataset == 'arl-syn':
@@ -124,9 +121,7 @@ def main():
         output_results = 'check_arl_syn.txt'
 
         opt.w = 0.05
-        opt.repeat_epoch = 1  # number of repeat times for one epoch training
-
-        # opt.refine_margin = 0.0575
+        opt.refine_margin = 0.01
 
         # opt.start_epoch = 25
         # opt.resume_posenet = 'pose_model_23_0.05664153265627049.pth'

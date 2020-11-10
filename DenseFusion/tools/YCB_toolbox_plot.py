@@ -17,6 +17,7 @@ ROOT_DIR = os.path.abspath("..")
 sys.path.append(ROOT_DIR)
 print("ROOT_DIR", ROOT_DIR)
 
+MIN_DISTANCE = 1/10000 # 10 [cm]
 MAX_DISTANCE = 10/100 # 10 [cm]
 THRESHOLD = 2/100 # 2 [cm]
 
@@ -33,6 +34,7 @@ parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFu
 parser.add_argument('--dataset_config', required=False,
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/',
                     default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
+                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config',
                     type=str,
                     metavar="")
 parser.add_argument('--classes', required=False, default='classes.txt',
@@ -44,15 +46,18 @@ parser.add_argument('--error_metrics_dir', required=False,
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/ycb/PoseCNN_error_metrics_result/',
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/ycb/Densefusion_error_metrics_result/',
                     default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_real/Densefusion_error_metrics_result/',
+                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_syn/',
+                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_real/',
                     type=str,
                     metavar="Data Path")
 
-parser.add_argument('--visualize', required=False, default=False,
+parser.add_argument('--visualize', required=False, default=True,
                     type=str,
                     metavar="Visualize Results")
 parser.add_argument('--save_images_path', required=False,
                     # default='/data/Akeaveny/Datasets/ycb_syn/test_densefusion/',
                     default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/',
+                    # default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_syn/',
                     type=str,
                     metavar="Visualize Results")
 
@@ -142,6 +147,8 @@ for ycb_idx in detected_class_IDs:
 
     # ADD
     ax[0, 0].plot(np.sort(ADD), accuracy, '-x', color='blue', linewidth=2)
+    ax[0, 0].set_xlim(MIN_DISTANCE, MAX_DISTANCE)
+    ax[0, 0].axvline(x=0.02, c='blue', linewidth=1, linestyle='--')
     ax[0, 0].set_title(title)
 
     ax[0, 0].grid()
@@ -173,8 +180,10 @@ for ycb_idx in detected_class_IDs:
     title = 'ADD-S\nADD-S<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(metrics[0], metrics[1])
     print('ADD-S<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(metrics[0], metrics[1]))
 
-    # ADD
+    # ADD-S
     ax[0, 1].plot(ADD_S, accuracy, '-x', color='magenta', linewidth=2)
+    ax[0, 1].set_xlim(MIN_DISTANCE, MAX_DISTANCE)
+    ax[0, 1].axvline(x=0.02, c='magenta', linewidth=1, linestyle='--')
     ax[0, 1].set_title(title)
     ax[0, 1].grid()
 

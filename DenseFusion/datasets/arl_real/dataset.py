@@ -116,7 +116,7 @@ class PoseDataset(data.Dataset):
         ##################################
         # init
         ##################################
-        # print('rgb: {0}/{1}_rgb.png'.format(self.root, self.list[index]))
+        # print('{0}/{1}-meta.mat'.format(self.root, self.list[index]))
         img = Image.open('{0}/{1}_rgb.png'.format(self.root, self.list[index]))
         depth = np.array(Image.open('{0}/{1}_depth.png'.format(self.root, self.list[index])))
         label = np.array(Image.open('{0}/{1}_label.png'.format(self.root, self.list[index])))
@@ -151,13 +151,16 @@ class PoseDataset(data.Dataset):
         meta_idx = str(count)[1:]
 
         ##################################
+        mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
+        mask_label = ma.getmaskarray(ma.masked_equal(label, idx))
+        mask = mask_label * mask_depth
 
-        while 1:
-            mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
-            mask_label = ma.getmaskarray(ma.masked_equal(label, idx))
-            mask = mask_label * mask_depth
-            if len(mask.nonzero()[0]) > self.minimum_num_pt:
-                break
+        # while 1:
+        #     mask_depth = ma.getmaskarray(ma.masked_not_equal(depth, 0))
+        #     mask_label = ma.getmaskarray(ma.masked_equal(label, idx))
+        #     mask = mask_label * mask_depth
+        #     if len(mask.nonzero()[0]) > self.minimum_num_pt:
+        #         break
 
         ############
         # meta
@@ -174,7 +177,7 @@ class PoseDataset(data.Dataset):
         cam_fx = meta['fx' + meta_idx][0][0]
         cam_fy = meta['fy' + meta_idx][0][0]
 
-        cam_scale = np.array(meta['camera_scale' + meta_idx])[0][0]  # 1000 for [mm] to [m]
+        cam_scale = np.array(meta['camera_scale' + meta_idx])[0][0]  # 1000 for depth [mm] to [m]
         border_list = np.array(meta['border' + meta_idx]).flatten().astype(np.int32)
 
         cam_rotation4 = np.array(meta['rot' + meta_idx])

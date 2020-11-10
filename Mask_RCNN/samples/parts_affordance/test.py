@@ -17,7 +17,6 @@ import matplotlib.image as mpimg
 import random
 
 import cv2
-
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..'))
 print("ROOT_DIR: ", ROOT_DIR)
 
@@ -26,19 +25,24 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 UMD_DEPTH_MAX = 3626
 
+
+
 import argparse
 ############################################################
 #  Parse command line arguments
 ############################################################
 parser = argparse.ArgumentParser(description='Get Stats from Image Dataset')
 
-parser.add_argument('--detect', required=False, default='rgb',
+parser.add_argument('--detect', required=False, default='rgbd+',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
+parser.add_argument('--dataset', required=False,
+                    default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
+                    # default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
+
 parser.add_argument('--dataset_type', required=False, default='real',
                     type=str,
                     metavar='real or syn')
@@ -46,8 +50,15 @@ parser.add_argument('--dataset_split', required=False, default='test',
                     type=str,
                     metavar='test or val')
 
+parser.add_argument('--is_umd_real', required=False,
+                    default=True,
+                    # default=False,
+                    type=bool,
+                    metavar="/path/to/YCB/dataset/")
+
 parser.add_argument('--save_inference_images', required=False,
-                    default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/test_maskrcnn/',
+                    default='/data/Akeaveny/Datasets/part-affordance_combined/real/test_maskrcnn_real/',
+                    # default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/test_maskrcnn_syn/',
                     type=str,
                     metavar="/path/to/YCB/dataset/")
 
@@ -107,7 +118,7 @@ if args.dataset_type == 'real':
     ### config ###
     MAX_GT_INSTANCES_ = 2
     DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5
+    DETECTION_MIN_CONFIDENCE_ = 0.5 # 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -127,9 +138,9 @@ elif args.dataset_type == 'syn':
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.9 # 0.975
+    MAX_GT_INSTANCES_ = 20
+    DETECTION_MAX_INSTANCES_ = 20
+    DETECTION_MIN_CONFIDENCE_ = 0.975 # 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -149,9 +160,9 @@ elif args.dataset_type == 'syn1':
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.975
+    MAX_GT_INSTANCES_ = 20 # 2
+    DETECTION_MAX_INSTANCES_ = 20 # 2
+    DETECTION_MIN_CONFIDENCE_ = 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -301,6 +312,7 @@ def seq_get_masks(image, cur_detection, gt_mask, args):
     cur_masks = cur_detection['masks']
     cur_class_ids = cur_detection['class_ids']
     cur_rois = cur_detection['rois']
+    good_detect = False
 
     instance_masks = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
     instance_mask_one = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
@@ -309,6 +321,7 @@ def seq_get_masks(image, cur_detection, gt_mask, args):
     if cur_masks.shape[-1] > 0:
 
         for i in range(cur_masks.shape[-1]):
+            good_detect = True
 
             if args.dataset_type == 'real' or args.dataset_type == 'syn1':
                 cur_class_ids[i] = cur_class_ids[i]
@@ -328,7 +341,7 @@ def seq_get_masks(image, cur_detection, gt_mask, args):
     for key in instance_to_color.keys():
         color_masks[instance_masks == key] = instance_to_color[key]
 
-    return instance_masks, color_masks
+    return instance_masks, color_masks, good_detect
 
 def detect_and_get_masks(model, config, args):
 
@@ -366,11 +379,15 @@ def detect_and_get_masks(model, config, args):
 
         ##############################
         ##############################
-
-        rgb_addr = args.dataset + idx + '_rgb.png'
-        depth_addr = args.dataset + idx + '_depth.png'
-        gt_mask_addr = args.dataset + idx + '_gt_affordance.png' # '_label.png'
-        # print(rgb_addr)
+        if args.is_umd_real:
+            rgb_addr = args.dataset + idx + '_rgb.jpg'
+            depth_addr = args.dataset + idx + '_depth.png'
+            gt_mask_addr = args.dataset + idx + '_label.png' # '_gt_affordance.png' or '_label.png'
+        else:
+            rgb_addr = args.dataset + idx + '_rgb.png'
+            depth_addr = args.dataset + idx + '_depth.png'
+            gt_mask_addr = args.dataset + idx + '_gt_affordance.png'  # '_gt_affordance.png' or '_label.png'
+        # print("gt_mask_addr: ", gt_mask_addr)
 
         if os.path.isfile(rgb_addr) == False:
             continue
@@ -379,9 +396,6 @@ def detect_and_get_masks(model, config, args):
         if os.path.isfile(gt_mask_addr) == False:
             continue
 
-        # mask_addr = args.dataset + idx + '_mask_og.png'
-        # color_mask_addr = args.dataset + idx + '_mask_color.png'
-        # cropped_mask_addr = args.dataset + idx + '_mask_cropped.png'
         mask_addr = args.save_inference_images + str(num_image) + '_mask_og.png'
         color_mask_addr = args.save_inference_images + str(num_image) + '_mask_color.png'
         cropped_mask_addr = args.save_inference_images + str(num_image) + '_mask_cropped.png'
@@ -406,9 +420,9 @@ def detect_and_get_masks(model, config, args):
         depth[depth == np.inf] = 0
 
         # convert to 8-bit image
-        depth = depth * (2 ** 16 -1) / UMD_DEPTH_MAX  ### 16 bit
+        # depth = depth * (2 ** 16 -1) / UMD_DEPTH_MAX  ### 16 bit
         # depth = depth * (2 ** 8 - 1) / UMD_DEPTH_MAX  ### 8 bit
-        depth = np.array(depth, dtype=np.uint16)
+        # depth = np.array(depth, dtype=np.uint16)
 
         # print("depth min: ", np.min(np.array(depth)))
         # print("depth max: ", np.max(np.array(depth)))
@@ -443,6 +457,11 @@ def detect_and_get_masks(model, config, args):
             rgb = rgb[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
             depth = depth[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
             gt_label = gt_label[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
+
+            if gt_label.shape != (config.IMAGE_MIN_DIM, config.IMAGE_MIN_DIM):
+                print("\tGT shape:", gt_label.shape)
+                print("\tgt label addr: ", cropped_mask_addr)
+                exit()
         # print("gt_label: ", gt_label.shape)
 
         # plt.subplot(1, 2, 1)
@@ -474,7 +493,7 @@ def detect_and_get_masks(model, config, args):
             cur_detect = model.detectWdepth([rgb], [depth], verbose=0)[0]
 
         # get instance_masks
-        instance_mask, color_mask = seq_get_masks(rgb, cur_detect, gt_label, args)
+        instance_mask, color_mask, good_detect = seq_get_masks(rgb, cur_detect, gt_label, args)
 
         ##############################
         #  Resize
@@ -491,9 +510,8 @@ def detect_and_get_masks(model, config, args):
         cv2.imwrite(cropped_mask_addr, gt_label )
 
         if args.show_plots:  # TODO: boolean string
-            print("GT shape:", gt_label.shape)
-            print("Pred shape:", instance_mask.shape)
-            print("resize_pred shape:", instance_mask.shape)
+            print("\tGT shape:", gt_label.shape)
+            print("\tPred shape:", instance_mask.shape)
             print("\tGT Label:", np.unique(gt_label))
             print("\tPred Labels:", np.unique(instance_mask))
 

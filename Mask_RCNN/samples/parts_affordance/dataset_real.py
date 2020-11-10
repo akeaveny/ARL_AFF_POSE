@@ -76,8 +76,8 @@ class AffordanceConfig(Config):
     # STEPS_PER_EPOCH = (20181) // bs
     # VALIDATION_STEPS = (4326) // bs
 
-    STEPS_PER_EPOCH = (80) // bs
-    VALIDATION_STEPS = (20) // bs
+    STEPS_PER_EPOCH = (606) // bs
+    VALIDATION_STEPS = (131) // bs
 
     ##################################
     ###  FROM DATASET STATS
@@ -141,20 +141,31 @@ class AffordanceDataset(utils.Dataset):
         if subset == 'train':
              annotations = {}
              print("------------------LOADING TRAIN!------------------")
+             # annotations.update(json.load(
+             #   open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_80.json')))
+             #   open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_20181.json')))
+             ####################
              annotations.update(json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_80.json')))
-               # open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_20181.json')))
+               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_train_606.json')))
+
         elif subset == 'val':
             annotations = {}
             print("------------------LOADING VAL!--------------------")
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_20.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_4326.json')))
+            #####################
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_20.json')))
-                # open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_4326.json')))
+               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_val_131.json')))
+
         elif subset == 'test':
             annotations = {}
             print("------------------LOADING Test!--------------------")
             annotations.update(json.load(
                 open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_test_4336.json')))
+            #####################
+            # annotations.update(json.load(
+            #    open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_test_131.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -212,11 +223,26 @@ class AffordanceDataset(utils.Dataset):
                         dtype=np.uint8)
         class_IDs = np.zeros([len(info["polygons"])], dtype=np.int32)
 
+        #################
+        # tools
+        #################
+
+        # for i, p in enumerate(info["polygons"]):
+        #     # Get indexes of pixels inside the polygon and set them to 1
+        #     rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+        #     mask[rr, cc, i] = 1
+        #     class_IDs[i] = p['class_id']
+
+        #################
+        # clutter
+        #################
+
         for i, p in enumerate(info["polygons"]):
-            # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
-            mask[rr, cc, i] = 1
-            class_IDs[i] = p['class_id']
+            for countour_idx, _ in enumerate(range(p["num_contours"])):
+                # Get indexes of pixels inside the polygon and set them to 1
+                rr, cc = skimage.draw.polygon(p['all_points_y' + str(countour_idx)], p['all_points_x' + str(countour_idx)])
+                mask[rr, cc, i] = 1
+                class_IDs[i] = p['class_id']
 
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s

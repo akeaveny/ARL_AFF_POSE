@@ -45,7 +45,9 @@ parser.add_argument('--train', required=False, default='rgbd',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
+parser.add_argument('--dataset', required=False,
+                    default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
+                    # default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -68,7 +70,7 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-# assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
+
 if args.dataset_type == 'real':
     import dataset_real as Affordance
 elif args.dataset_type == 'syn':
@@ -175,45 +177,11 @@ def train(model, args):
     #############################
 
     # ### Training - Stage 1 HEADS
-    ### Training - Stage 1 HEADS
-    ## HEADS
-    print("\n************* trainining HEADS *************")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=40,
-                augmentation=augmentation,
-                layers='heads')
-
-    ### Training - Stage 2a
-    ### Finetune layers from ResNet stage 4 and up
-    print("\n************* trainining ResNET 4+ *************")
-    model.train(dataset_train, dataset_val,
-              learning_rate=config.LEARNING_RATE/10,
-              epochs=45,
-              augmentation=augmentation,
-              layers='4+')
-
-    ### Training - Stage 3
-    ### Fine tune all layers
-    print("\n************* trainining ALL *************")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/100,
-                epochs=50,
-                augmentation=augmentation,
-                layers='all')
-
-    # ########################
-    # # Finetuning
-    # ########################
-    # START = 20
-    #
-    # # ### Training - Stage 1 HEADS
-    # ### Training - Stage 1 HEADS
-    # ## HEADS
+    # ### HEADS
     # print("\n************* trainining HEADS *************")
     # model.train(dataset_train, dataset_val,
     #             learning_rate=config.LEARNING_RATE,
-    #             epochs=START + 400,
+    #             epochs=10,
     #             augmentation=augmentation,
     #             layers='heads')
     #
@@ -222,7 +190,7 @@ def train(model, args):
     # print("\n************* trainining ResNET 4+ *************")
     # model.train(dataset_train, dataset_val,
     #           learning_rate=config.LEARNING_RATE/10,
-    #           epochs=START + 450,
+    #           epochs=15,
     #           augmentation=augmentation,
     #           layers='4+')
     #
@@ -231,9 +199,41 @@ def train(model, args):
     # print("\n************* trainining ALL *************")
     # model.train(dataset_train, dataset_val,
     #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=START + 500,
+    #             epochs=20,
     #             augmentation=augmentation,
     #             layers='all')
+
+    # ########################
+    # # Finetuning
+    # ########################
+    START = 0
+    ### Training - Stage 1 HEADS
+    ## Training - Stage 1 HEADS
+    # HEADS
+    print("\n************* trainining HEADS *************")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=START + 40,
+                augmentation=augmentation,
+                layers='heads')
+
+    ### Training - Stage 2a
+    ### Finetune layers from ResNet stage 4 and up
+    print("\n************* trainining ResNET 4+ *************")
+    model.train(dataset_train, dataset_val,
+              learning_rate=config.LEARNING_RATE/10,
+              epochs=START + 50,
+              augmentation=augmentation,
+              layers='4+')
+
+    ### Training - Stage 3
+    ### Fine tune all layers
+    print("\n************* trainining ALL *************")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/100,
+                epochs=START + 60,
+                augmentation=augmentation,
+                layers='all')
 
 ############################################################
 #  Training

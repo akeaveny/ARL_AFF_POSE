@@ -22,20 +22,14 @@ parser.add_argument('--linemod_dataset', required=False, default='/data/Akeaveny
                     metavar="/path/to/Affordance/dataset/")
 
 parser.add_argument(
-                    # '--arl_syn_dataset', required=False,default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/arl/hammer/turn_table/train/Kinect/',
-                    # '--arl_syn_dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_tools_test_depth_val/dr/',
-                    '--arl_syn_dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_tools_val/dr/',
+                    # '--arl_dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_real_tools1_val/',
+                    '--arl_dataset', required=False,default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/combined_syn_tools2_val/dr/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 
 parser.add_argument(
-                    '--umd_syn_dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/umd_affordance1/hammer_01/dr/train/Kinect/',
-                    type=str,
-                    metavar="/path/to/Affordance/dataset/")
-
-parser.add_argument(
-                    # '--umd_real_dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/real/part-affordance-tools/tools/hammer_01/',
-                    '--umd_real_dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools1_val/',
+                    '--umd_real_dataset', required=False,default='/data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools1_val/',
+                    # '--umd_syn_dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/umd_affordance1/hammer_01/dr/train/Kinect/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 
@@ -52,17 +46,11 @@ args = parser.parse_args()
 # depth_image_ext = "-depth.png"  # ycb
 # depth_image_ext = ".png"  # linemod
 
-# depth_image_ext = "_depth.png"
+depth_image_ext = "_depth.png"
 # depth_image_ext = ".depth.mm.16.png"
-depth_image_ext = ".depth.png"
+# depth_image_ext = ".depth.png"
 
-# ycb_path_ = args.ycb_dataset + "*" + depth_image_ext
-# ycb_files = sorted(glob.glob(ycb_path_))
-#
-# linemod_path_ = args.linemod_dataset + "*" + '.png'
-# linemod_files = sorted(glob.glob(linemod_path_))
-
-arl_syn_path_ = args.ycb_syn_dataset + "*" + depth_image_ext
+arl_syn_path_ = args.arl_dataset + "*" + depth_image_ext
 arl_syn_files = sorted(glob.glob(arl_syn_path_))
 arl_syn_max_depth = -np.inf
 arl_syn_min_depth = np.inf
@@ -71,6 +59,10 @@ NDDS_DEPTH_CONST = 10e3 / (2 ** 8 - 1)
 print('Loaded {} Images'.format(len(arl_syn_files)))
 
 for idx, image_addr in enumerate(arl_syn_files):
+
+    #####################
+    # See 3 diff depths
+    #####################
 
     # # # load images
     # ycb_depth = np.array(Image.open(ycb_files[0]))
@@ -98,7 +90,7 @@ for idx, image_addr in enumerate(arl_syn_files):
     #####################
     # MAX DEPTH
     #####################
-    arl_syn_depth = np.array(Image.open(image_addr)) * NDDS_DEPTH_CONST
+    arl_syn_depth = np.array(Image.open(image_addr))
 
     img_max_depth = np.max(arl_syn_depth)
     img_min_depth = np.min(arl_syn_depth)
@@ -116,7 +108,7 @@ for idx, image_addr in enumerate(arl_syn_files):
 
     arl_syn_max_depth = img_max_depth if img_max_depth > arl_syn_max_depth else arl_syn_max_depth
     arl_syn_min_depth = img_min_depth if img_min_depth < arl_syn_min_depth else arl_syn_min_depth
-print("Min Depth:\t{}, Max Depth:\t{}".format(arl_syn_min_depth, arl_syn_max_depth))
+print("Img dtype:\t{}, Min Depth:\t{}, Max Depth:\t{}".format(arl_syn_depth.dtype, arl_syn_min_depth, arl_syn_max_depth))
 
 
 

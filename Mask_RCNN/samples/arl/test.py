@@ -45,7 +45,9 @@ parser.add_argument('--dataset_split', required=False, default='test',
                     type=str,
                     metavar='test or val')
 
-parser.add_argument('--save_inference_images', required=False, default='test_maskrcnn_real/',
+parser.add_argument('--save_inference_images', required=False,
+                    default='test_maskrcnn_real/',
+                    # default='test_maskrcnn_syn/',
                     type=str,
                     metavar="/path/to/YCB/dataset/")
 
@@ -102,7 +104,7 @@ elif args.dataset_type == 'syn':
     ### config ###
     MAX_GT_INSTANCES_ = 2
     DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.975
+    DETECTION_MIN_CONFIDENCE_ = 0.975  # 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5

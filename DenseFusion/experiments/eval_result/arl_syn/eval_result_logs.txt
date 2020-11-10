@@ -1,1 +1,1 @@
-ZED10 NOT Pass! Distance: 0.61Xtion43 NOT Pass! Distance: 0.28ZED10 NOT Pass! Distance: 0.12ZED43 NOT Pass! Distance: 0.23Kinect43 NOT Pass! Distance: 0.22ZED10 NOT Pass! Distance: 0.17ZED10 NOT Pass! Distance: 0.15Xtion10 NOT Pass! Distance: 0.59ZED43 NOT Pass! Distance: 1.23
+Fail!	Min dis: 5.58 [cm]Fail!	Min dis: 4.55 [cm]Fail!	Min dis: 2.46 [cm]Fail!	Min dis: 4.67 [cm]Fail!	Min dis: 4.00 [cm]Fail!	Min dis: 4.35 [cm]Fail!	Min dis: 8.64 [cm]

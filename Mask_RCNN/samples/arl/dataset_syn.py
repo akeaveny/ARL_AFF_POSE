@@ -156,19 +156,19 @@ class ARLDataset(utils.Dataset):
         elif subset == 'test':
             print("\n************************** LOADING TEST! **************************")
             ### real
-            # annotations = {}
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/real/coco_tools_test_636.json')))
-            ### syn
             annotations = {}
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/bench/coco_tools_test_1002.json')))
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/dr/coco_tools_test_3000.json')))
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/floor/coco_tools_test_1002.json')))
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/turn_table/coco_tools_test_1002.json')))
+                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/real/coco_tools_test_636.json')))
+            ### syn
+            # annotations = {}
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/bench/coco_tools_test_1002.json')))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/dr/coco_tools_test_3000.json')))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/floor/coco_tools_test_1002.json')))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/turn_table/coco_tools_test_1002.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

@@ -31,22 +31,25 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser(description='Get Stats from Image Dataset')
 
-parser.add_argument('--detect', required=False, default='rgbd',
+parser.add_argument('--detect', required=False,
+                    default='rgbd+',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
+parser.add_argument('--dataset', required=False,
+                    default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
+                    # default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
-parser.add_argument('--dataset_type', required=False, default='hammer',
+parser.add_argument('--dataset_type', required=False,
+                    default='hammer',
                     type=str,
                     metavar='real or syn')
 parser.add_argument('--dataset_split', required=False, default='test',
                     type=str,
                     metavar='test or val')
 
-parser.add_argument('--weights', required=False,
-                    default='/data/Akeaveny/Datasets/part-affordance_combined/weights/hammer/affordance20200727T1851/mask_rcnn_affordance_0020.h5',
+parser.add_argument('--weights', required=False, default='coco',
                     metavar="/path/to/weights.h5 or 'coco'")
 parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
@@ -70,6 +73,20 @@ if args.dataset_type == 'real':
     save_to_folder = '/images/test_images_real/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
+    ### config ###
+    MAX_GT_INSTANCES_ = 2
+    DETECTION_MAX_INSTANCES_ = 2
+    DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.985
+    POST_NMS_ROIS_INFERENCE_ = 100
+    RPN_NMS_THRESHOLD_ = 0.8
+    DETECTION_NMS_THRESHOLD_ = 0.5
+    ### crop ###
+    # CROP = True
+    # IMAGE_RESIZE_MODE_ = "crop"
+    # IMAGE_MIN_DIM_ = 384
+    # IMAGE_MAX_DIM_ = 384
+    ### sqaure ###
+    CROP = False
     IMAGE_RESIZE_MODE_ = "square"
     IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
@@ -77,55 +94,54 @@ elif args.dataset_type == 'syn':
     import dataset_syn as Affordance
     save_to_folder = '/images/test_images_syn/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    ### crop ###
-    MAX_GT_INSTANCES_ = 3
-    DETECTION_MAX_INSTANCES_ = 30
-    DETECTION_MIN_CONFIDENCE_ = 0.5
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
+    ### config ###
+    MAX_GT_INSTANCES_ = 2
+    DETECTION_MAX_INSTANCES_ = 2
+    DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.985
+    POST_NMS_ROIS_INFERENCE_ = 100
+    RPN_NMS_THRESHOLD_ = 0.8
+    DETECTION_NMS_THRESHOLD_ = 0.5
+    ### crop ###
+    # CROP = True
+    # IMAGE_RESIZE_MODE_ = "crop"
+    # IMAGE_MIN_DIM_ = 384
+    # IMAGE_MAX_DIM_ = 384
     ### sqaure ###
-    # MAX_GT_INSTANCES_ = 3
-    # DETECTION_MAX_INSTANCES_ = 30
-    # DETECTION_MIN_CONFIDENCE_ = 0.5
-    # RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
+    CROP = False
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
+    IMAGE_MAX_DIM_ = 640
 elif args.dataset_type == 'syn1':
     import dataset_syn1 as Affordance
     save_to_folder = '/images/test_images_syn1/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.985
+    MAX_GT_INSTANCES_ = 20 # 2
+    DETECTION_MAX_INSTANCES_ = 20 # 2
+    DETECTION_MIN_CONFIDENCE_ = 0.9 # 0.985
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
     ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
+    # CROP = True
+    # IMAGE_RESIZE_MODE_ = "crop"
+    # IMAGE_MIN_DIM_ = 384
+    # IMAGE_MAX_DIM_ = 384
     ### sqaure ###
-    # MAX_GT_INSTANCES_ = 3
-    # DETECTION_MAX_INSTANCES_ = 30
-    # DETECTION_MIN_CONFIDENCE_ = 0.5
-    # RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
+    CROP = False
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
+    IMAGE_MAX_DIM_ = 640
 elif args.dataset_type == 'hammer':
     import objects.dataset_syn_hammer as Affordance
     save_to_folder = '/images/objects/test_images_syn_hammer/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### crop ###
-    MAX_GT_INSTANCES_ = 3
-    DETECTION_MAX_INSTANCES_ = 3
+    MAX_GT_INSTANCES_ = 20
+    DETECTION_MAX_INSTANCES_ = 20
     DETECTION_MIN_CONFIDENCE_ = 0.5
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     IMAGE_RESIZE_MODE_ = "crop"
@@ -194,7 +210,12 @@ import tensorflow as tf
 if args.detect == 'rgb':
     from mrcnn import model as modellib, utils, visualize
 if args.detect == 'rgbd':
+    from mrcnn import modeldepth as modellib, utils, visualize
+elif args.detect == 'rgbd+':
     from mrcnn import modeldepthv2 as modellib, utils, visualize
+else:
+    print("*** No Model Selected ***")
+    exit(1)
 
 ###########################################################
 # Test
@@ -263,7 +284,7 @@ def detect_and_get_masks(model, config, args):
     #  rgbd
     ########################
 
-    if args.detect == 'rgbd':
+    if args.detect == 'rgbd' or args.detect == 'rgbd+':
 
         ########################
         #  batch mAP

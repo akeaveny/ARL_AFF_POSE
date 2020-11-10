@@ -33,7 +33,7 @@ for class_id in class_IDs:
 dataset = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/'
 dataset_config = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config/'
 # images_file = 'train_data_list.txt'             # REAL
-images_file = 'train_data_list_combined.txt'    # COMBINED
+images_file = 'val_data_list_combined.txt'    # COMBINED
 
 loaded_images_ = np.loadtxt('{}/{}'.format(dataset_config, images_file), dtype=np.str)
 
