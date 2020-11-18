@@ -7,10 +7,10 @@ aff_list = {1, 2, 3, 4, 5, 6, 7};
 % aff_list = {1, 5};
 
 % get all files
-% list_gt = getAllFiles(path, '*_mask_og.png', 1);   % get all files in current folder
-% list_predicted = getAllFiles(path, '*_mask_cropped.png', 1);
-list_gt = getAllFiles(path, '*_gt.png', 1);   % get all files in current folder
-list_predicted = getAllFiles(path, '*_pred.png', 1);
+list_gt = getAllFiles(path, '*_mask_og.png', 1);   % get all files in current folder
+list_predicted = getAllFiles(path, '*_mask_cropped.png', 1);
+% list_gt = getAllFiles(path, '*_gt.png', 1);   % get all files in current folder
+% list_predicted = getAllFiles(path, '*_pred.png', 1);
 
 list_predicted = sort(list_predicted);
 list_gt = sort(list_gt); % make the same style

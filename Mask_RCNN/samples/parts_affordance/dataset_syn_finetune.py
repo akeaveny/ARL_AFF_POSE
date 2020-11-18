@@ -147,6 +147,8 @@ class AffordanceDataset(utils.Dataset):
             annotations = {}
             print("------------------LOADING TRAIN!------------------")
             # #################
+            # simple
+            # #################
             annotations = json.load(
                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/syn_aff/dr/train_22680.json'))
             annotations.update(json.load(
@@ -157,6 +159,11 @@ class AffordanceDataset(utils.Dataset):
                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/syn_aff/turn_table/train_7182.json')))
             # #################
             # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/finetune/coco_umd_train_finetune_150.json')))
+            # #################
+            # clutter
+            # #################
+            # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/clutter_aff/dr/coco_train_7935.json')))
             # annotations.update(json.load(
             #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/clutter_aff/bench/coco_train_2550.json')))
@@ -164,6 +171,7 @@ class AffordanceDataset(utils.Dataset):
             #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/clutter_aff/floor/coco_train_2664.json')))
             # annotations.update(json.load(
             #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/clutter_aff/turn_table/coco_train_2664.json')))
+            # #################
             # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/finetune/coco_umd_train_finetune_150.json')))
         elif subset == 'val':

@@ -206,7 +206,7 @@ def train(model, args):
     # ########################
     # # Finetuning
     # ########################
-    START = 0
+    START = 20
     ### Training - Stage 1 HEADS
     ## Training - Stage 1 HEADS
     # HEADS
