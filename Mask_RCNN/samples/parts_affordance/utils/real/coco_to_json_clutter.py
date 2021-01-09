@@ -112,13 +112,21 @@ np.random.seed(1)
 
 dataset_name = 'Affordance'
 
-json_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/'
-json_name = 'coco_clutter_'
+json_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/'
+json_name = 'coco_combined_'
 
 data_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/'
-val_path = 'combined_clutter1_val/'
-train_path = 'combined_clutter1_train/'
-test_path = 'combined_clutter1_test/'
+val_path = 'combined_tools1_val/'
+train_path = 'combined_tools1_train/'
+test_path = 'combined_tools1_test/'
+
+# json_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/'
+# json_name = 'coco_clutter_'
+#
+# data_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/'
+# val_path = 'combined_clutter1_val/'
+# train_path = 'combined_clutter1_train/'
+# test_path = 'combined_clutter1_test/'
 
 image_ext = '_label.png' ### affordances '_gt_affordance.png'
 

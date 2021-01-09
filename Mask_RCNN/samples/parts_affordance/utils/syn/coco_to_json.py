@@ -139,10 +139,10 @@ print("Affordance IDs: \n{}\n".format(class_id))
 
 VISUALIZE = False
 
-use_random_idx = False
+use_random_idx = True
 num_val = 4
-num_train = 4
-num_test = 4
+num_train = 0
+num_test = 0
 
 # 1.
 scenes = [

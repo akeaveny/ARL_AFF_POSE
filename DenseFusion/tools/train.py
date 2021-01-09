@@ -33,6 +33,7 @@ from datasets.ycb.dataset import PoseDataset as PoseDataset_ycb
 from datasets.linemod.dataset import PoseDataset as PoseDataset_linemod
 from datasets.parts_affordance.dataset import PoseDataset as PoseDataset_syn
 from datasets.ycb_syn.dataset import PoseDataset as PoseDataset_ycb_syn
+from datasets.arl.dataset import PoseDataset as PoseDataset_arl
 from datasets.arl_real.dataset import PoseDataset as PoseDataset_arl_real
 from datasets.arl_syn.dataset import PoseDataset as PoseDataset_arl_syn
 
@@ -59,7 +60,7 @@ opt = parser.parse_args()
 ###################
 # GPU
 ###################
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def main():
     opt.manualSeed = random.randint(1, 10000)
@@ -92,49 +93,22 @@ def main():
         opt.w = 0.05
         opt.refine_margin = 0.01
 
-        # opt.start_epoch = 20
-        # opt.resume_posenet = 'pose_model_17_0.009960328408820027.pth'
-        ## resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
-
-    elif opt.dataset == 'arl-real':
-        opt.num_objects = 4  # number of object classes in the dataset
+    elif opt.dataset == 'arl':
+        opt.num_objects = 10  # number of object classes in the dataset
         opt.num_points = 1000  # number of points on the input pointcloud
-        opt.dataset_root = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL'
-        opt.outf = 'trained_models/arl_real/arl3'  # folder to save trained models
-        opt.log_dir = 'experiments/logs/arl_real/arl3'  # folder to save logs
-        test_folder = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/'
-        output_results = 'check_arl_real.txt'
-
-        opt.w = 0.05
-        opt.refine_margin = 0.01
-
-        opt.start_epoch = 20
-        opt.resume_posenet = 'pose_model_17_0.009960328408820027.pth'
-        ## resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
-
-    elif opt.dataset == 'arl-syn':
-        opt.num_objects = 4  # number of object classes in the dataset
-        opt.num_points = 1000  # number of points on the input pointcloud
-        opt.dataset_root = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL'
-        opt.outf = 'trained_models/arl_syn/arl1'  # folder to save trained models
-        opt.log_dir = 'experiments/logs/arl_syn/arl1'  # folder to save logs
+        opt.dataset_root = '/data/Akeaveny/Datasets/arl_dataset'
+        opt.outf = 'trained_models/arl/clutter/arl_syn_2'  # folder to save trained models
+        opt.log_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/logs/arl/clutter/arl_syn_2'  # folder to save logs
         output_results = 'check_arl_syn.txt'
 
+        opt.nepoch = 500
+
         opt.w = 0.05
-        opt.refine_margin = 0.01
+        opt.refine_margin = 0.015
 
-        # opt.start_epoch = 25
-        # opt.resume_posenet = 'pose_model_23_0.05664153265627049.pth'
-        ## resume_refinenet = 'pose_refine_model_247_0.04728509413062927.pth'
-
-    elif opt.dataset == 'parts-affordance':
-        print(opt.dataset)
-        opt.num_objects = 205
-        opt.num_points = 100
-        opt.outf = 'trained_models/parts_affordance/hammer_umd1'
-        opt.log_dir = 'experiments/logs/parts_affordance/hammer_umd1'
-        output_results = 'check_parts_affordance.txt'
-        opt.repeat_epoch = 1
+        # opt.start_epoch = 201
+        # opt.resume_posenet = 'pose_model_current.pth'
+        # opt.resume_refinenet = 'pose_refine_model_current.pth'
 
     else:
         print('Unknown dataset')
@@ -169,6 +143,8 @@ def main():
         dataset = PoseDataset_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'ycb-syn':
         dataset = PoseDataset_ycb_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+    elif opt.dataset == 'arl':
+        dataset = PoseDataset_arl('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'arl-real':
         dataset = PoseDataset_arl_real('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'arl-syn':
@@ -184,6 +160,8 @@ def main():
         test_dataset = PoseDataset_syn('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'ycb-syn':
         test_dataset = PoseDataset_ycb_syn('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
+    elif opt.dataset == 'arl':
+        test_dataset = PoseDataset_arl('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'arl-real':
         test_dataset = PoseDataset_arl_real('test', opt.num_points,  True, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'arl-syn':
@@ -356,6 +334,8 @@ def main():
                 dataset = PoseDataset_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
             elif opt.dataset == 'ycb-syn':
                 dataset = PoseDataset_ycb_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+            elif opt.dataset == 'arl':
+                dataset = PoseDataset_arl('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,opt.refine_start)
             elif opt.dataset == 'arl-real':
                 dataset = PoseDataset_arl_real('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,opt.refine_start)
             elif opt.dataset == 'arl-syn':
@@ -371,6 +351,8 @@ def main():
                 test_dataset = PoseDataset_syn('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'ycb-syn':
                 test_dataset = PoseDataset_ycb_syn('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
+            elif opt.dataset == 'arl':
+                test_dataset = PoseDataset_arl('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'arl-real':
                 test_dataset = PoseDataset_arl_real('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'arl-syn':

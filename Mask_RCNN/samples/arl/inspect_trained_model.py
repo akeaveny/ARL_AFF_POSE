@@ -34,7 +34,7 @@ parser.add_argument('--detect', required=False, default='rgbd',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -62,9 +62,30 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-# assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer'
-if args.dataset_type == 'syn':
-    import dataset_syn as Affordance
+if args.dataset_type == 'real':
+    import dataset_real as ARL
+    save_to_folder = '/images/test_images_real/'
+    MEAN_PIXEL_ = np.array([103.57, 103.38, 103.52])  ### REAL
+    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
+    ### config ###
+    MAX_GT_INSTANCES_ = 2
+    DETECTION_MAX_INSTANCES_ = 2
+    DETECTION_MIN_CONFIDENCE_ = 0.975  # 0.975
+    POST_NMS_ROIS_INFERENCE_ = 100
+    RPN_NMS_THRESHOLD_ = 0.8
+    DETECTION_NMS_THRESHOLD_ = 0.5
+    ### crop ###
+    # CROP = True
+    # IMAGE_RESIZE_MODE_ = "crop"
+    # IMAGE_MIN_DIM_ = 384
+    # IMAGE_MAX_DIM_ = 384
+    ### sqaure ###
+    CROP = False
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
+    IMAGE_MAX_DIM_ = 640
+elif args.dataset_type == 'syn':
+    import dataset_syn as ARL
     save_to_folder = '/images/test_images_syn/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     ### crop ###
@@ -97,6 +118,8 @@ if args.detect == 'rgb':
     from mrcnn import model as modellib, utils, visualize
 if args.detect == 'rgbd':
     from mrcnn import modeldepth as modellib, utils, visualize
+elif args.detect == 'rgbd+':
+    from mrcnn import modeldepthv2 as modellib, utils, visualize
 
 ###########################################################
 # Test
@@ -149,8 +172,8 @@ def detect_and_get_masks(model, config, args):
     ########################
 
     print("args.dataset_split", args.dataset_split)
-    dataset = Affordance.AffordanceDataset()
-    dataset.load_Affordance(args.dataset, args.dataset_split)
+    dataset = ARL.ARLDataset()
+    dataset.load_ARL(args.dataset, args.dataset_split)
     dataset.prepare()
 
     #### print KERAS model
@@ -165,7 +188,7 @@ def detect_and_get_masks(model, config, args):
     #  rgbd
     ########################
 
-    if args.detect == 'rgbd':
+    if args.detect == 'rgbd' or args.detect == 'rgbd+':
 
         ########################
         #  batch mAP
@@ -950,7 +973,7 @@ def detect_and_get_masks(model, config, args):
     
 if __name__ == '__main__':
 
-    class InferenceConfig(Affordance.AffordanceConfig):
+    class InferenceConfig(ARL.ARLConfig):
         GPU_COUNT = 1
         IMAGES_PER_GPU = 1
         MEAN_PIXEL = MEAN_PIXEL_

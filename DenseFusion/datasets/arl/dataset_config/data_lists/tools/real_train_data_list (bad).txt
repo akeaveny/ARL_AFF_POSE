@@ -1,0 +1,12 @@
+Chosen Files 
+ 16967
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/012095_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/012086_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/011913_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/012013_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/011993_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/012114_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/012028_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/011878_rgb.png
+/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_train/012214_rgb.png
+bad_choose_files:  9

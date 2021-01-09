@@ -3,11 +3,12 @@ function evaluate_ARL(path)
 % affordances index
 aff_start=1+1;   % ignore {background} label
 aff_end=4+1;   % change based on the dataset 
-aff_list = {1, 2, 3, 4};
+% aff_list = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+aff_list = {1, 2, 3, 4, 5};
 
 % get all files
-list_gt = getAllFiles(path, '*_mask_og.png', 1);   % get all files in current folder
-list_predicted = getAllFiles(path, '*_mask_cropped.png', 1);
+list_gt = getAllFiles(path, '*_mask_gt.png', 1);   % get all files in current folder
+list_predicted = getAllFiles(path, '*_mask_pred.png', 1);
 
 list_predicted = sort(list_predicted);
 list_gt = sort(list_gt); % make the same style

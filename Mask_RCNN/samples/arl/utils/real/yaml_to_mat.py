@@ -60,42 +60,51 @@ def yaml_to_mat(yaml_addr):
         output['Actor_Tag'] = []
 
         for idx, affordance_id in enumerate(labels_array):
-                if affordance_id in np.array([1, 4]): # TODO
-                        # print("affordance_id: ", affordance_id)
 
-                        # class idx
-                        if affordance_id == 1:
-                                actor_tag = "hammer_01_grasp"
-                        elif affordance_id == 2:
-                                actor_tag = "hammer_05_pound"
-                        elif affordance_id == 3:
-                                actor_tag = "spatula_06_support"
-                        elif affordance_id == 4:
-                                actor_tag = "spatula_01_grasp"
-                        else:
-                                print("*** ACTOR TAG DOESN'T EXIST ***")
-                                exit(1)
+                if affordance_id == 1:
+                        actor_tag = "mallet_1_grasp"
+                elif affordance_id == 2:
+                        actor_tag = "mallet_4_pound"
+                elif affordance_id == 3:
+                        actor_tag = "spatula_1_grasp"
+                elif affordance_id == 4:
+                        actor_tag = "spatula_2_support"
+                elif affordance_id == 5:
+                        actor_tag = "wooden_spoon_1_grasp"
+                elif affordance_id == 6:
+                        actor_tag = "wooden_spoon_3_scoop"
+                elif affordance_id == 7:
+                        actor_tag = "screwdriver_1_grasp"
+                elif affordance_id == 8:
+                        actor_tag = "screwdriver_2_screw"
+                elif affordance_id == 9:
+                        actor_tag = "garden_shovel_1_grasp"
+                elif affordance_id == 10:
+                        actor_tag = "garden_shovel_3_scoop"
+                else:
+                        print("*** ACTOR TAG DOESN'T EXIST ***")
+                        exit(1)
 
-                        count = 1000 + affordance_id
-                        meta_idx = str(count)[1:]
-                        output['Affordance_ID'].append(meta_idx)
-                        output['Actor_Tag'].append(actor_tag)
+                count = 1000 + affordance_id
+                meta_idx = str(count)[1:]
+                output['Affordance_ID'].append(meta_idx)
+                output['Actor_Tag'].append(actor_tag)
 
-                        # pose
-                        output['rot' + np.str(meta_idx)] = poses[0:3, 0:3, idx]
-                        output['cam_translation' + np.str(meta_idx)] = poses[0:3, -1, idx]
+                # pose
+                output['rot' + np.str(meta_idx)] = poses[0:3, 0:3, idx]
+                output['cam_translation' + np.str(meta_idx)] = poses[0:3, -1, idx]
 
-                        # ZED
-                        output['width' + np.str(meta_idx)] = 672
-                        output['height' + np.str(meta_idx)] = 376
-                        output['fx'+ np.str(meta_idx)] = 339.11297607421875
-                        output['fy'+ np.str(meta_idx)] = 339.11297607421875
-                        output['cx'+ np.str(meta_idx)] = 343.0655822753906
-                        output['cy'+ np.str(meta_idx)] = 176.86412048339844
+                # ZED
+                output['width' + np.str(meta_idx)] = 672
+                output['height' + np.str(meta_idx)] = 376
+                output['fx'+ np.str(meta_idx)] = 338.546630859375
+                output['fy'+ np.str(meta_idx)] = 338.546630859375
+                output['cx'+ np.str(meta_idx)] = 341.276
+                output['cy'+ np.str(meta_idx)] = 175.296
 
-                        output['camera_scale' + np.str(meta_idx)] = [np.asarray([1000], dtype=np.uint16)]
-                        output['border' + np.str(meta_idx)] = [-1, 40, 80, 120, 160, 200, 240, 280, 320,
-                                                               360, 400, 440, 480, 520, 560, 600, 640, 680]
+                output['camera_scale' + np.str(meta_idx)] = [np.asarray([1000], dtype=np.uint16)]
+                output['border' + np.str(meta_idx)] = [-1, 40, 80, 120, 160, 200, 240, 280, 320,
+                                                       360, 400, 440, 480, 520, 560, 600, 640, 680]
 
 
 

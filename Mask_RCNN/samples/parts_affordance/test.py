@@ -52,7 +52,6 @@ parser.add_argument('--dataset_split', required=False, default='test',
 
 parser.add_argument('--is_umd_real', required=False,
                     default=True,
-                    # default=False,
                     type=bool,
                     metavar="/path/to/YCB/dataset/")
 
@@ -72,7 +71,7 @@ parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/ or Logs and checkpoints directory (default=logs/)")
 
-parser.add_argument('--show_plots', required=False, default=False,
+parser.add_argument('--show_plots', required=False, default=True,
                     type=bool,
                     metavar='show plots from matplotlib')
 parser.add_argument('--save_output', required=False, default=False,
@@ -118,7 +117,7 @@ if args.dataset_type == 'real':
     ### config ###
     MAX_GT_INSTANCES_ = 2
     DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5 # 0.975
+    DETECTION_MIN_CONFIDENCE_ = 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -138,8 +137,8 @@ elif args.dataset_type == 'syn':
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 20
-    DETECTION_MAX_INSTANCES_ = 20
+    MAX_GT_INSTANCES_ = 2
+    DETECTION_MAX_INSTANCES_ = 2
     DETECTION_MIN_CONFIDENCE_ = 0.975 # 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
@@ -160,22 +159,22 @@ elif args.dataset_type == 'syn1':
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 20 # 2
-    DETECTION_MAX_INSTANCES_ = 20 # 2
+    MAX_GT_INSTANCES_ = 2 # 2
+    DETECTION_MAX_INSTANCES_ = 2 # 2
     DETECTION_MIN_CONFIDENCE_ = 0.975
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
     ### crop ###
-    # CROP = True
-    # IMAGE_RESIZE_MODE_ = "crop"
-    # IMAGE_MIN_DIM_ = 384
-    # IMAGE_MAX_DIM_ = 384
+    CROP = True
+    IMAGE_RESIZE_MODE_ = "crop"
+    IMAGE_MIN_DIM_ = 256
+    IMAGE_MAX_DIM_ = 256
     ### sqaure ###
-    CROP = False
-    IMAGE_RESIZE_MODE_ = "square"
-    IMAGE_MIN_DIM_ = 640
-    IMAGE_MAX_DIM_ = 640
+    # CROP = False
+    # IMAGE_RESIZE_MODE_ = "square"
+    # IMAGE_MIN_DIM_ = 640
+    # IMAGE_MAX_DIM_ = 640
 elif args.dataset_type == 'hammer':
     import objects.dataset_syn_hammer as Affordance
     save_to_folder = '/images/objects/test_images_syn_hammer/'
@@ -510,14 +509,14 @@ def detect_and_get_masks(model, config, args):
         cv2.imwrite(cropped_mask_addr, gt_label )
 
         if args.show_plots:  # TODO: boolean string
-            print("\tGT shape:", gt_label.shape)
-            print("\tPred shape:", instance_mask.shape)
-            print("\tGT Label:", np.unique(gt_label))
-            print("\tPred Labels:", np.unique(instance_mask))
+            # print("\tGT shape:", gt_label.shape)
+            # print("\tPred shape:", instance_mask.shape)
+            # print("\tGT Label:", np.unique(gt_label))
+            # print("\tPred Labels:", np.unique(instance_mask))
 
             cv2.imshow("gt", gt_label * 25)
             cv2.imshow("resize pred", instance_mask * 25)
-            cv2.waitKey(0)
+            cv2.waitKey(1)
 
 ###########################################################
 # FOR SYTHENTIC IMAGES

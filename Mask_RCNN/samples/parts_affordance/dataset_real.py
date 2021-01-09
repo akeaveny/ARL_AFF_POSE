@@ -76,8 +76,11 @@ class AffordanceConfig(Config):
     # STEPS_PER_EPOCH = (20181) // bs
     # VALIDATION_STEPS = (4326) // bs
 
-    STEPS_PER_EPOCH = (606) // bs
-    VALIDATION_STEPS = (131) // bs
+    # STEPS_PER_EPOCH = (606) // bs
+    # VALIDATION_STEPS = (131) // bs
+
+    STEPS_PER_EPOCH = (4000) // bs
+    VALIDATION_STEPS = (1000) // bs
 
     ##################################
     ###  FROM DATASET STATS
@@ -141,22 +144,20 @@ class AffordanceDataset(utils.Dataset):
         if subset == 'train':
              annotations = {}
              print("------------------LOADING TRAIN!------------------")
-             # annotations.update(json.load(
-             #   open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_80.json')))
-             #   open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_20181.json')))
-             ####################
              annotations.update(json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_train_606.json')))
+               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_20181.json')))
+             ####################
+             # annotations.update(json.load(
+             #   open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_train_606.json')))
 
         elif subset == 'val':
             annotations = {}
             print("------------------LOADING VAL!--------------------")
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_20.json')))
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_4326.json')))
-            #####################
             annotations.update(json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_val_131.json')))
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_4326.json')))
+            #####################
+            # annotations.update(json.load(
+            #    open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_val_131.json')))
 
         elif subset == 'test':
             annotations = {}

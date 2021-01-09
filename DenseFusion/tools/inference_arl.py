@@ -96,12 +96,11 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 ############################################################
 parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFusion')
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_config', required=False,
-                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
-                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config',
+                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config',
                     type=str,
                     metavar="")
 parser.add_argument('--dataset_type', required=False, default='test',
@@ -112,64 +111,78 @@ parser.add_argument('--ADD', required=False, default=2,
                     type=int,
                     metavar='ADD distance to evaluate')
 
-parser.add_argument('--test_file', required=False, default='test_data_list.txt',
+parser.add_argument('--test_file', required=False,
+                    ### train
+                    # default='data_lists/tools/real_train_data_list.txt',
+                    ### real
+                    # default='data_lists/tools/real_test_data_list.txt',
+                    default='data_lists/clutter/real_test_data_list.txt',
+                    ### test
+                    # default='data_lists/test/test_tools_data_list.txt',
+                    # default='data_lists/test/test_clutter_data_list.txt',
+                    ### syn
+                    # default='data_lists/tools/syn_test_data_list.txt',
+                    # default='data_lists/clutter/syn_test_data_list.txt',
                     metavar="/path/to/refine weights")
 
 parser.add_argument('--model', required=False,
-                    default=ROOT_DIR + '/trained_models/arl_real/arl3/pose_model_29_0.009128766480500781.pth',
-                    # default= ROOT_DIR + '/trained_models/arl_real/arl2/pose_model_7_0.009600434285816133.pth',
-                    # default= ROOT_DIR + '/trained_models/arl_syn/arl1/pose_model_2_0.012297131584097004.pth',
+                    default=ROOT_DIR + '/trained_models/arl/clutter/arl_real_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/tools/arl_syn_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_combined_1/pose_model_current.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
 parser.add_argument('--refine_model', required=False,
-                    default=ROOT_DIR + '/trained_models/arl_real/arl3/pose_refine_model_141_0.0035855435842326675.pth',
-                    # default=ROOT_DIR + '/trained_models/arl_real/arl2/pose_refine_model_9_0.007943017078422961.pth',
-                    # default= ROOT_DIR + '/trained_models/arl_syn/arl1/pose_refine_model_20_0.006663172990091059.pth',
+                    default=ROOT_DIR + '/trained_models/arl/clutter/arl_real_1/pose_refine_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/tools/arl_syn_1/pose_refine_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_combined_1/pose_refine_model_current.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--classes', required=False, default='classes.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
-parser.add_argument('--class_ids', required=False, default='class_ids.txt',
+parser.add_argument('--class_ids', required=False, default='classes_ids.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--classes_train', required=False, default='classes_train.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
-parser.add_argument('--class_ids_train', required=False, default='class_ids_train.txt',
+parser.add_argument('--class_ids_train', required=False, default='classes_ids_train.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--output_result_dir', required=False,
-                    default=ROOT_DIR + '/experiments/eval_result/arl_real',
-                    # default=ROOT_DIR + '/experiments/eval_result/arl_syn',
+                    default=ROOT_DIR + '/experiments/eval_result/arl',
                     type=str,
                     metavar="Visualize Results")
 parser.add_argument('--error_metrics_dir', required=False,
-                    default=ROOT_DIR + '/experiments/eval_result/arl_real/Densefusion_error_metrics_result/',
-                    # default=ROOT_DIR + '/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_syn/',
-                    # default=ROOT_DIR + '/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_real/',
+                    default=ROOT_DIR + '/experiments/eval_result/arl/Densefusion_error_metrics_result/',
                     type=str,
                     metavar="")
 
-parser.add_argument('--visualize', required=False, default=False,
+parser.add_argument('--visualize', required=False,
+                    default=True,
                     type=str,
                     metavar="Visualize Results")
 parser.add_argument('--save_images_path', required=False,
-                    default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/',
-                    # default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_syn/',
+                    default='/data/Akeaveny/Datasets/arl_dataset/test_densefusion/',
                     type=str,
                     metavar="Visualize Results")
 
 args = parser.parse_args()
 
-num_obj = 4
+#####################
+# clear old results
+#####################
+for log in os.listdir(args.error_metrics_dir):
+    os.remove(os.path.join(args.error_metrics_dir, log))
+
+num_obj = 10
 
 num_points = 1000
 num_points_mesh = 1000
-iteration = 5
+iteration = 2 ### HAS TO BE AN EVEN NUM
 bs = 1
 
-# norm_ = transforms.Normalize(mean=[112.83933655/255, 108.60317768/255, 100.21422303/255],           ### REAL
-#                                   std=[59.73553193/255, 63.61142929/255, 70.06586743/255])
-norm_ = transforms.Normalize(mean=[158.35670936 / 255, 154.18317088 / 255, 159.27607013 / 255],     ### SYN
-                                 std=[42.8105516 / 255, 37.71026474 / 255, 28.63753541 / 255])
+norm_ = transforms.Normalize(mean=[101.922237 / 255, 101.70265615 / 255, 101.82904089 / 255],   ### REAL
+                                 std=[63.51475563 / 255, 63.83739891 / 255, 62.70252537 / 255])
+# norm_ = transforms.Normalize(mean=[121.34891436/255, 116.52099986/255, 110.46291293/255],       ### SYN
+#                                 std=[49.99343061/255, 50.38399108/255, 48.07555426/255])
 
 ##################################
 ## classes
@@ -195,7 +208,7 @@ for idx, class_id in enumerate(class_IDs_train):
     # print("class_input: ", class_input)
     if not class_input:
         break
-    input_file = open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/models/{0}/{0}.xyz'.format(class_input[:-1]))
+    input_file = open('/data/Akeaveny/Datasets/arl_dataset/models/{0}.xyz'.format(class_input[:-1]))
     cld[class_id] = []
     while 1:
         input_line = input_file.readline()
@@ -260,6 +273,9 @@ for run_idx, idx in enumerate(test_idx):
     gt = np.array(Image.open(gt_addr))
     label = np.array(Image.open(mask_addr))
 
+    pred_rgb_img = np.array(Image.open(rgb_addr))
+    gt_rgb_img = np.array(Image.open(rgb_addr))
+
     # rgb
     img = np.array(img)
     if img.shape[-1] == 4:
@@ -287,7 +303,7 @@ for run_idx, idx in enumerate(test_idx):
 
     Class_id_list, ADD_list, ADD_S_list, R_list, T_list = [], [], [], [], []
 
-    affordance_ids = np.unique(label)[1:]
+    affordance_ids = np.unique(label)[0:]
     for affordance_id in affordance_ids:
         print("\nTesting on {} .. ".format(classes_full[int(affordance_id) - 1]))
         if affordance_id not in class_IDs_train:
@@ -435,24 +451,6 @@ for run_idx, idx in enumerate(test_idx):
                 dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
 
                 ############################
-                # pred
-                ############################
-
-                mat_r = quaternion_matrix(my_r)[0:3, 0:3]
-                my_t_ = my_t
-
-                rgb_img = Image.open(rgb_addr)
-                imgpts, jac = cv2.projectPoints(cld[itemid] * 1e3,
-                                                mat_r,
-                                                my_t_ * 1e3,
-                                                cam_mat, dist)
-                cv2_img = cv2.polylines(np.array(rgb_img), np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
-
-                img_name = args.save_images_path + 'test1.cv2.cloud.png'
-                cv2.imwrite(img_name, cv2_img)
-                cld_image = cv2.imread(img_name)
-
-                ############################
                 # gt
                 ############################
 
@@ -461,16 +459,40 @@ for run_idx, idx in enumerate(test_idx):
                                                    gt_rot,
                                                    gt_trans * 1e3,
                                                    cam_mat, dist)
-                cv2_img_gt = cv2.polylines(np.array(rgb_img), np.int32([np.squeeze(imgpts_gt)]), True, (0, 255, 255))
+                # cv2_img_gt = cv2.polylines(gt_rgb_img, np.int32([np.squeeze(imgpts_gt)]), True, (255, 0, 255))
 
-                img_name_gt = args.save_images_path + 'test1.gt.cloud.png'
-                cv2.imwrite(img_name_gt, cv2_img_gt)
-                cld_image_gt = cv2.imread(img_name_gt)
+                # img_name_gt = args.save_images_path + 'test1.gt.cloud.png'
+                # cv2.imwrite(img_name_gt, cv2_img_gt)
+                # cld_image_gt = cv2.imread(img_name_gt)
+
+                cv2_img = cv2.polylines(pred_rgb_img, np.int32([np.squeeze(imgpts_gt)]), True, (255, 0, 255))
+
+                img_name = args.save_images_path + 'test1.cv2.cloud.png'
+                cv2.imwrite(img_name, cv2_img)
+                cld_image = cv2.imread(img_name)
 
                 # print("pred_trans \n", my_t_)
                 # print("gt_trans \n", gt_trans)
                 # print("pred_rot \n", mat_r)
                 # print("gt_rot \n", gt_rot)
+
+                ############################
+                # pred
+                ############################
+
+                mat_r = quaternion_matrix(my_r)[0:3, 0:3]
+                my_t_ = my_t
+
+                # rgb_img = Image.open(rgb_addr)
+                imgpts, jac = cv2.projectPoints(cld[itemid] * 1e3,
+                                                mat_r,
+                                                my_t_ * 1e3,
+                                                cam_mat, dist)
+                cv2_img = cv2.polylines(pred_rgb_img, np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+
+                # img_name = args.save_images_path + 'test1.cv2.cloud.png'
+                # cv2.imwrite(img_name, cv2_img)
+                # cld_image = cv2.imread(img_name)
 
                 ############################
                 # reprojection error
@@ -533,29 +555,67 @@ for run_idx, idx in enumerate(test_idx):
                 ############################
                 ############################
 
-                if args.visualize:
-                    plt.subplot(3, 2, 1)
-                    plt.title("rgb")
-                    plt.imshow(img)
-                    plt.subplot(3, 2, 2)
-                    plt.title("depth")
-                    plt.imshow(depth)
-                    plt.subplot(3, 2, 3)
-                    plt.title("mask")
-                    plt.imshow(mask_label)
-                    plt.subplot(3, 2, 4)
-                    plt.title("bbox")
-                    plt.imshow(bbox_image)
-                    plt.subplot(3, 2, 5)
-                    plt.title("gt - quarternion")
-                    plt.imshow(cld_image_gt)
-                    plt.subplot(3, 2, 6)
-                    plt.title("pred - quarternion")
-                    plt.imshow(cld_image)
-                    plt.show()
+                # if args.visualize:
+                    # plt.subplot(3, 2, 1)
+                    # plt.title("rgb")
+                    # plt.imshow(img)
+                    # plt.subplot(3, 2, 2)
+                    # plt.title("depth")
+                    # plt.imshow(depth)
+                    # plt.subplot(3, 2, 3)
+                    # plt.title("mask")
+                    # plt.imshow(mask_label)
+                    # plt.subplot(3, 2, 4)
+                    # plt.title("bbox")
+                    # plt.imshow(bbox_image)
+                    # plt.subplot(3, 2, 5)
+                    # plt.title("gt - quarternion")
+                    # plt.imshow(cld_image_gt)
+                    # plt.subplot(3, 2, 6)
+                    # plt.title("pred - quarternion")
+                    # plt.imshow(cld_image)
+                    # plt.show()
 
             except ZeroDivisionError:
                 print("DenseFusion Detector Lost {0} at No.{1} keyframe".format(itemid, idx))
+
+    if args.visualize:
+        # fig = plt.figure(0)
+        # plt.tick_params(
+        #     axis='x',  # changes apply to the x-axis
+        #     which='both',  # both major and minor ticks are affected
+        #     bottom=False,  # ticks along the bottom edge are off
+        #     top=False,  # ticks along the top edge are off
+        #     labelbottom=False)  # labels along the bottom edge are off
+        # plt.tick_params(
+        #     axis='y',  # changes apply to the x-axis
+        #     which='both',  # both major and minor ticks are affected
+        #     bottom=False,  # ticks along the bottom edge are off
+        #     top=False,  # ticks along the top edge are off
+        #     labelbottom=False)  # labels along the bottom edge are off
+        # plt.title("LabelFusion Ground Truth")
+        # fig.tight_layout()
+        # plt.imshow(cld_image)
+        # fig = plt.figure(1)
+        # plt.tick_params(
+        #     axis='x',  # changes apply to the x-axis
+        #     which='both',  # both major and minor ticks are affected
+        #     bottom=False,  # ticks along the bottom edge are off
+        #     top=False,  # ticks along the top edge are off
+        #     labelbottom=False)  # labels along the bottom edge are off
+        # plt.tick_params(
+        #     axis='y',  # changes apply to the x-axis
+        #     which='both',  # both major and minor ticks are affected
+        #     bottom=False,  # ticks along the bottom edge are off
+        #     top=False,  # ticks along the top edge are off
+        #     labelbottom=False)  # labels along the bottom edge are off
+        # plt.title("DenseFusion Prediction")
+        # fig.tight_layout()
+        # plt.imshow(cv2_img)
+        # plt.show()
+        # cv
+        cv2.imshow("out", cv2_img)
+        cv2.waitKey(1)
 
     scio.savemat('{0}/{1}.mat'.format(args.error_metrics_dir, '%04d' % idx),
                  {"Class_IDs": Class_id_list, "ADD": ADD_list, "ADD_S": ADD_S_list, "R": R_list, "T": T_list})

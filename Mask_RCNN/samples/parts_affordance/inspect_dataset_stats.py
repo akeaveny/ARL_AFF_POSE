@@ -38,8 +38,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Get Stats from Image Dataset')
 
 parser.add_argument('--dataset', required=False,
-                    default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
-                    # default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
+                    # default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
+                    default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='syn',

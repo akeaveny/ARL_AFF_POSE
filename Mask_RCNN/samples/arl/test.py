@@ -35,7 +35,7 @@ parser.add_argument('--detect', required=False, default='rgb',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -46,8 +46,7 @@ parser.add_argument('--dataset_split', required=False, default='test',
                     metavar='test or val')
 
 parser.add_argument('--save_inference_images', required=False,
-                    default='test_maskrcnn_real/',
-                    # default='test_maskrcnn_syn/',
+                    default='test_maskrcnn/',
                     type=str,
                     metavar="/path/to/YCB/dataset/")
 
@@ -61,7 +60,7 @@ parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/ or Logs and checkpoints directory (default=logs/)")
 
-parser.add_argument('--show_plots', required=False, default=False,
+parser.add_argument('--show_plots', required=False, default=True,
                     type=bool,
                     metavar='show plots from matplotlib')
 parser.add_argument('--save_output', required=False, default=False,
@@ -70,54 +69,62 @@ parser.add_argument('--save_output', required=False, default=False,
 
 args = parser.parse_args()
 
+#####################
+# clear old results
+#####################
+for img in os.listdir(args.dataset + args.save_inference_images):
+    os.remove(os.path.join(args.dataset + args.save_inference_images, img))
+
 ############################################################
 #  REAL OR SYN
 ############################################################
 if args.dataset_type == 'real':
     import dataset_real as ARL
     save_to_folder = '/images/test_images_real/'
-    MEAN_PIXEL_ = np.array([114.34, 109.86, 101.07])  ### REAL
+    MEAN_PIXEL_ = np.array([103.57, 103.38, 103.52])  ### REAL
+    # MEAN_PIXEL_ = np.array([87.76, 81.59, 80.59])  ### TEST
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.975
+    MAX_GT_INSTANCES_ = 20
+    DETECTION_MAX_INSTANCES_ = 20
+    DETECTION_MIN_CONFIDENCE_ = 0.7  # 0.9 for tools & 0.7 for clutter
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
     ### crop ###
     # CROP = True
     # IMAGE_RESIZE_MODE_ = "crop"
-    # IMAGE_MIN_DIM_ = 384
-    # IMAGE_MAX_DIM_ = 384
+    # IMAGE_MIN_DIM_ = 256
+    # IMAGE_MAX_DIM_ = 256
     ### sqaure ###
     CROP = False
     IMAGE_RESIZE_MODE_ = "square"
     IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
+
 elif args.dataset_type == 'syn':
     import dataset_syn as ARL
     save_to_folder = '/images/test_images_syn/'
-    # MEAN_PIXEL_ = np.array([157.72, 151.18, 155.02])  ### SYN
-    MEAN_PIXEL_ = np.array([114.34, 109.86, 101.07])  ### REAL
+    MEAN_PIXEL_ = np.array([124.65, 119.64, 113.10])  ### SYN
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.975  # 0.975
+    MAX_GT_INSTANCES_ = 20
+    DETECTION_MAX_INSTANCES_ = 20
+    DETECTION_MIN_CONFIDENCE_ = 0.7  # 0.9 for tools & 0.7 for clutter
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
+    DETECTION_NMS_THRESHOLD_ = 0.8
     ### crop ###
     # CROP = True
     # IMAGE_RESIZE_MODE_ = "crop"
-    # IMAGE_MIN_DIM_ = 384
-    # IMAGE_MAX_DIM_ = 384
+    # IMAGE_MIN_DIM_ = 256
+    # IMAGE_MAX_DIM_ = 256
     ### sqaure ###
     CROP = False
     IMAGE_RESIZE_MODE_ = "square"
     IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
+
 else:
     print("*** No Dataset Type Selected ***")
     exit(1)
@@ -153,15 +160,18 @@ def seq_get_masks(image, cur_detection, gt_mask, args):
     instance_masks = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
     instance_mask_one = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
 
-    print("\tobject_ids", cur_class_ids)
+    # print("\tobject_ids", cur_class_ids)
     if cur_masks.shape[-1] > 0:
 
         for i in range(cur_masks.shape[-1]):
-            print("\tPred Label:", cur_class_ids[i])
+            ### object ID to affordance ID
+            cur_class_ids[i] = map_affordance_label(cur_class_ids[i])
+            # print("\tPred Aff Label:", cur_class_ids[i])
 
             ### instance_mask = instance_mask_one * (mask_index+1)
             instance_mask = instance_mask_one * cur_class_ids[i]
             instance_masks = np.where(cur_masks[:, :, i], instance_mask, instance_masks).astype(np.uint8)
+    print("\tPred aff_label:", np.unique(instance_masks)[1:])
 
     ########################
     #  add color to masks
@@ -216,9 +226,9 @@ def detect_and_get_masks(model, config, args):
         if os.path.isfile(gt_mask_addr) == False:
             continue
 
-        mask_addr = args.dataset + args.save_inference_images + str(num_image) + '_mask_og.png'
-        color_mask_addr = args.dataset + args.save_inference_images + str(num_image) + '_mask_color.png'
-        cropped_mask_addr = args.dataset + args.save_inference_images + str(num_image) + '_mask_cropped.png'
+        mask_addr = args.dataset + args.save_inference_images + str(num_image) + '_mask_gt.png'
+        color_mask_addr = args.dataset + args.save_inference_images + str(num_image) + '_mask_pred_color.png'
+        cropped_mask_addr = args.dataset + args.save_inference_images + str(num_image) + '_mask_pred.png'
         print("\tmask_addr:", mask_addr)
 
         ##############################
@@ -228,19 +238,41 @@ def detect_and_get_masks(model, config, args):
         rgb = np.array(skimage.io.imread(rgb_addr))
         depth = np.array(skimage.io.imread(depth_addr))
         gt_label = np.array(skimage.io.imread(gt_mask_addr))
-        print("\tGT Label:", np.unique(gt_label))
+
+        ##############################
+        ### OBJECT IDS TO AFF LABELS
+        ##############################
+
+        object_ids = np.unique(gt_label)[1:]
+        # print("\tGT object_ids:", object_ids)
+
+        gt_aff_mask = np.zeros((gt_label.shape[0], gt_label.shape[1]), dtype=np.uint8)
+        gt_mask_one = np.ones((gt_label.shape[0], gt_label.shape[1]), dtype=np.uint8)
+
+        for object_id in object_ids:
+            aff_label = map_affordance_label(object_id)
+            # print("\tGT aff_label:", aff_label)
+
+            gt_mask = gt_mask_one * aff_label
+            gt_aff_mask = np.where(gt_label == object_id, gt_mask, gt_aff_mask).astype(np.uint8)
+
+        print("\tGT aff_label:", np.unique(gt_aff_mask)[1:])
+
+        # plt.subplot(1, 2, 1)
+        # plt.title("gt_label")
+        # print("Object ids", np.unique(gt_label))
+        # plt.imshow(gt_label)
+        # plt.subplot(1, 2, 2)
+        # plt.title("gt_masks")
+        # print("Aff labels", np.unique(gt_aff_mask))
+        # plt.imshow(gt_aff_mask)
+        # plt.show()
+        # plt.ioff()
 
         ######################
         # configure depth
         ######################
         print("\tDEPTH:\tMin:\t{}, Max:\t{}, dtype:\t{} ".format(np.min(depth), np.max(depth), depth.dtype))
-        # depth = np.array(depth, dtype=np.int32)
-        #
-        # NDDS_DEPTH_CONST = 10e3 / (2 ** 8 - 1)
-        # depth = depth * NDDS_DEPTH_CONST
-        # depth = np.array(depth, dtype=np.int32)
-        #
-        # print("DEPTH:\tMin:\t{}, Max:\t{}, dtype:\t{} ".format(np.min(depth), np.max(depth), depth.dtype))
 
         ##################################
         # RGB has 4th channel - alpha
@@ -263,18 +295,7 @@ def detect_and_get_masks(model, config, args):
             rgb = rgb[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
             depth = depth[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
             gt_label = gt_label[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
-
-        # plt.subplot(1, 3, 1)
-        # plt.title("rgb")
-        # plt.imshow(rgb_og)
-        # plt.subplot(1, 3, 2)
-        # plt.title("rgb cropped")
-        # plt.imshow(rgb)
-        # plt.subplot(1, 3, 3)
-        # plt.title("depth cropped")
-        # plt.imshow(np.array(depth, dtype=np.uint8))
-        # plt.show()
-        # plt.ioff()
+            gt_aff_mask = gt_aff_mask[y:y + config.IMAGE_MIN_DIM, x:x + config.IMAGE_MIN_DIM]
 
         ##############################
         #  Detect
@@ -289,20 +310,90 @@ def detect_and_get_masks(model, config, args):
         # get instance_masks
         instance_mask, color_mask = seq_get_masks(rgb, cur_detect, gt_label, args)
 
-        ####################
+        ##############################
+        #  SAVE IMAGES
+        ##############################
 
-        cv2.imwrite(mask_addr, instance_mask)
+        cv2.imwrite(mask_addr, gt_aff_mask)
         cv2.imwrite(color_mask_addr, color_mask)
-        cv2.imwrite(cropped_mask_addr, gt_label )
+        cv2.imwrite(cropped_mask_addr, instance_mask)
 
         if args.show_plots:  # TODO: boolean string
-            print("GT shape:", gt_label.shape)
-            print("Pred shape:", instance_mask.shape)
-            print("resize_pred shape:", instance_mask.shape)
+            # print("\tGT shape:", gt_aff_mask.shape)
+            # print("\tPred shape:", instance_mask.shape)
+            # print("\tresize_pred shape:", instance_mask.shape)
 
-            cv2.imshow("gt", gt_label * 25)
-            cv2.imshow("resize pred", instance_mask * 25)
-            cv2.waitKey(0)
+            cv2.imshow("rgb", rgb)
+            cv2.imshow("depth", np.array(depth, dtype=np.uint8))
+            cv2.imshow("gt", gt_aff_mask * 25)
+            cv2.imshow("pred", instance_mask * 25)
+            cv2.waitKey(1)
+
+            # plt.subplot(2, 3, 1)
+            # plt.title("rgb")
+            # plt.imshow(rgb_og)
+            # plt.subplot(2, 3, 2)
+            # plt.title("rgb cropped")
+            # plt.imshow(rgb)
+            # plt.subplot(2, 3, 3)
+            # plt.title("depth cropped")
+            # plt.imshow(np.array(depth, dtype=np.uint8))
+            # plt.subplot(2, 3, 4)
+            # plt.title("gt_label")
+            # plt.imshow(gt_label)
+            # plt.subplot(2, 3, 5)
+            # plt.title("gt_masks")
+            # plt.imshow(gt_aff_mask)
+            # plt.subplot(2, 3, 6)
+            # plt.title("pred_mask")
+            # plt.imshow(instance_mask)
+            # plt.show()
+            # plt.ioff()
+
+###########################################################
+# LOOKUP FROM OBJECT ID TO AFFORDANCE LABEL
+###########################################################
+def map_affordance_label(current_id):
+
+    # 1
+    grasp = [
+        1, # 'mallet_1_grasp'
+        3, # 'spatula_1_grasp'
+        5, # 'wooden_spoon_1_grasp'
+        7, # 'screwdriver_1_grasp'
+        9, # 'garden_shovel_1_grasp'
+    ]
+
+    screw = [
+        8, # 'screwdriver_2_screw'
+    ]
+
+    scoop = [
+        6, # 'wooden_spoon_3_scoop'
+        10, # 'garden_shovel_3_scoop'
+    ]
+
+    pound = [
+        2, # 'mallet_4_pound'
+    ]
+
+    support = [
+        4, # 'spatula_2_support'
+    ]
+
+    if current_id in grasp:
+        return 1
+    elif current_id in screw:
+        return 2
+    elif current_id in scoop:
+        return 3
+    elif current_id in pound:
+        return 4
+    elif current_id in support:
+        return 5
+    else:
+        print(" --- Object ID does not map to Affordance Label --- ")
+        exit(1)
 
 ###########################################################
 # 
@@ -322,9 +413,9 @@ if __name__ == '__main__':
         MAX_GT_INSTANCES = MAX_GT_INSTANCES_
         DETECTION_MAX_INSTANCES = DETECTION_MAX_INSTANCES_
         DETECTION_MIN_CONFIDENCE = DETECTION_MIN_CONFIDENCE_
-        # POST_NMS_ROIS_INFERENCE = POST_NMS_ROIS_INFERENCE_
-        # RPN_NMS_THRESHOLD = RPN_NMS_THRESHOLD_
-        # DETECTION_NMS_THRESHOLD = DETECTION_NMS_THRESHOLD_
+        POST_NMS_ROIS_INFERENCE = POST_NMS_ROIS_INFERENCE_
+        RPN_NMS_THRESHOLD = RPN_NMS_THRESHOLD_
+        DETECTION_NMS_THRESHOLD = DETECTION_NMS_THRESHOLD_
     config = InferenceConfig()
 
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)

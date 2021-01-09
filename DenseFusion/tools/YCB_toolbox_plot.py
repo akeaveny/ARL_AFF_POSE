@@ -17,7 +17,7 @@ ROOT_DIR = os.path.abspath("..")
 sys.path.append(ROOT_DIR)
 print("ROOT_DIR", ROOT_DIR)
 
-MIN_DISTANCE = 1/10000 # 10 [cm]
+MIN_DISTANCE = 1/10000 # for formatting plot
 MAX_DISTANCE = 10/100 # 10 [cm]
 THRESHOLD = 2/100 # 2 [cm]
 
@@ -33,31 +33,34 @@ parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFu
 
 parser.add_argument('--dataset_config', required=False,
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/',
-                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
+                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config',
+                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config',
                     type=str,
                     metavar="")
 parser.add_argument('--classes', required=False, default='classes.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
-parser.add_argument('--class_ids', required=False, default='class_ids.txt',
+parser.add_argument('--class_ids', required=False, default='classes_ids.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--error_metrics_dir', required=False,
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/ycb/PoseCNN_error_metrics_result/',
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/ycb/Densefusion_error_metrics_result/',
-                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_real/Densefusion_error_metrics_result/',
+                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_real/Densefusion_error_metrics_result/',
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_syn/',
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_real/',
+                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl/Densefusion_error_metrics_result/',
                     type=str,
                     metavar="Data Path")
 
-parser.add_argument('--visualize', required=False, default=True,
+parser.add_argument('--visualize', required=False, default=False,
                     type=str,
                     metavar="Visualize Results")
 parser.add_argument('--save_images_path', required=False,
                     # default='/data/Akeaveny/Datasets/ycb_syn/test_densefusion/',
-                    default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/',
+                    # default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/',
                     # default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_syn/',
+                    default='/data/Akeaveny/Datasets/arl_dataset/test_densefusion_real/',
                     type=str,
                     metavar="Visualize Results")
 
@@ -105,8 +108,13 @@ df = pd.DataFrame({'Class_Id': history[:, 0],
 ##################################
 
 detected_class_IDs = np.unique(df['Class_Id'].values)
-# detected_class_IDs = np.array([1, 6, 14, 19, 20])
-for ycb_idx in detected_class_IDs:
+
+MEAN_ADD = np.zeros(shape=len(detected_class_IDs))
+MEAN_ADD_AUC = np.zeros(shape=len(detected_class_IDs))
+MEAN_ADDS = np.zeros(shape=len(detected_class_IDs))
+MEAN_ADDS_AUC = np.zeros(shape=len(detected_class_IDs))
+
+for mean_idx, ycb_idx in enumerate(detected_class_IDs):
     print("*************** {} ***************".format(classes[int(ycb_idx)-1]))
     fig, ax = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
     plt.suptitle("{}".format(classes[int(ycb_idx)-1]), fontsize=14)
@@ -145,6 +153,9 @@ for ycb_idx in detected_class_IDs:
     title = 'ADD\nADD<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(metrics[0], metrics[1])
     print('ADD<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(metrics[0], metrics[1]))
 
+    MEAN_ADD[int(mean_idx)] = metrics[0]
+    MEAN_ADD_AUC[int(mean_idx)] = metrics[1]
+
     # ADD
     ax[0, 0].plot(np.sort(ADD), accuracy, '-x', color='blue', linewidth=2)
     ax[0, 0].set_xlim(MIN_DISTANCE, MAX_DISTANCE)
@@ -179,6 +190,9 @@ for ycb_idx in detected_class_IDs:
     metrics = [c / n * 100, auc(ADD_S_auc, accuracy_auc) / (MAX_DISTANCE) * 100]
     title = 'ADD-S\nADD-S<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(metrics[0], metrics[1])
     print('ADD-S<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(metrics[0], metrics[1]))
+
+    MEAN_ADDS[int(mean_idx)] = metrics[0]
+    MEAN_ADDS_AUC[int(mean_idx)] = metrics[1]
 
     # ADD-S
     ax[0, 1].plot(ADD_S, accuracy, '-x', color='magenta', linewidth=2)
@@ -221,3 +235,7 @@ for ycb_idx in detected_class_IDs:
 
     if args.visualize:
         plt.show()
+
+print("\n*************** MEAN RESULTS ***************")
+print('ADD<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(np.mean(MEAN_ADD), np.mean(MEAN_ADD_AUC)))
+print('ADD-S<2cm = {:.2f} [%], AUC = {:.2f} [%]'.format(np.mean(MEAN_ADDS), np.mean(MEAN_ADDS_AUC)))

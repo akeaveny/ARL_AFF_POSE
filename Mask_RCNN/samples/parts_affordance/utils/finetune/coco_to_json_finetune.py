@@ -124,8 +124,8 @@ print("Affordance IDs: \n{}\n".format(class_id))
 VISUALIZE = False
 
 use_random_idx = True
-num_val = 5
-num_train = 20
+num_val = 30
+num_train = 120
 
 # 1.
 scenes = ['']

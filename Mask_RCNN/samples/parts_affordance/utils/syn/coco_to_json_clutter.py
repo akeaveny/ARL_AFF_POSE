@@ -142,17 +142,23 @@ print("Affordance IDs: \n{}\n".format(class_id))
 
 VISUALIZE = False
 
-use_random_idx = False
-num_val = 4
-num_train = 4
-num_test = 4
+use_random_idx = True
+
+num_val = 1401/4
+num_train = 6546/4
+num_test = 0
+
+# num_val = 4269/4
+# num_train = 19809/4
+# num_test = 0
+
 
 # 1.
 scenes = [
-        # 'bench/',
-        # 'floor/',
-        # 'turn_table/',
-        'dr/'
+        'bench/',
+        'floor/',
+        'turn_table/',
+        # 'dr/'
           ]
 
 #=====================
@@ -180,7 +186,8 @@ for scene in scenes:
 
         if use_random_idx:
             val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_val), replace=False)
-            print("Chosen Files \n", val_idx)
+            # val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(len(files)/2), replace=False)
+            print("Chosen Files ", len(val_idx))
             files = files[val_idx]
         else:
             num_val = len(files)
@@ -260,8 +267,9 @@ for scene in scenes:
         print("Loaded files: ", len(files))
 
         if use_random_idx:
-            train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
-            print("Chosen Files \n", train_idx)
+            # train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
+            train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(len(files)/2), replace=False)
+            print("Chosen Files ", len(train_idx))
             files = files[train_idx]
         else:
             num_train = len(files)
@@ -341,8 +349,9 @@ for scene in scenes:
         print("Loaded files: ", len(files))
 
         if use_random_idx:
-            test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_test), replace=False)
-            print("Chosen Files \n", test_idx)
+            # test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_test), replace=False)
+            test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(len(files)/2), replace=False)
+            print("Chosen Files ", len(test_idx))
             files = files[test_idx]
         else:
             num_test = len(files)

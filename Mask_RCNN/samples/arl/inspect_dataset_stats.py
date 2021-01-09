@@ -37,7 +37,7 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser(description='Get Stats from Image Dataset')
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
                     type=str,
                     metavar="/path/to/ARL/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -139,7 +139,7 @@ def image_stats(image_id):
 ''' --- based on https://github.com/matterport/Mask_RCNN/blob/master/samples/nucleus/inspect_nucleus_data.ipynb --- '''
 
 if __name__ == '__main__':
-    np.random.seed(5)
+    np.random.seed(0)
 
     if args.save_output:
         sys.stdout = open(os.getcwd() + save_to_folder + 'output.txt', "w")
@@ -287,36 +287,36 @@ if __name__ == '__main__':
     #                iaa.Affine(rotate=270)]),
     # ])
 
-    augmentation = iaa.Sometimes(0.833, iaa.Sequential([
-        iaa.Fliplr(0.5),  # horizontal flips
-        # iaa.Flipud(0.5),
-        iaa.Crop(percent=(0, 0.1)),  # random crops
-        # Small gaussian blur with random sigma between 0 and 0.5.
-        # But we only blur about 50% of all images.
-        iaa.Sometimes(0.5,
-                      iaa.GaussianBlur(sigma=(0, 0.5))
-                      ),
-        # Strengthen or weaken the contrast in each image.
-        iaa.ContrastNormalization((0.75, 1.25)),
-        # Add gaussian noise.
-        # For 50% of all images, we sample the noise once per pixel.
-        # For the other 50% of all images, we sample the noise per pixel AND
-        # channel. This can change the color (not only brightness) of the
-        # pixels.
-        iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
-        # Make some images brighter and some darker.
-        # In 20% of all cases, we sample the multiplier once per channel,
-        # which can end up changing the color of the images.
-        iaa.Multiply((0.8, 1.2), per_channel=0.2),
-        # Apply affine transformations to each image.
-        # Scale/zoom them, translate/move them, rotate them and shear them.
-        iaa.Affine(
-            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
-            # translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
-            # rotate=(-25, 25),
-            # shear=(-8, 8)
-        )
-    ], random_order=True))  # apply augmenters in random order
+    # augmentation = iaa.Sometimes(0.833, iaa.Sequential([
+    #     iaa.Fliplr(0.5),  # horizontal flips
+    #     # iaa.Flipud(0.5),
+    #     iaa.Crop(percent=(0, 0.1)),  # random crops
+    #     # Small gaussian blur with random sigma between 0 and 0.5.
+    #     # But we only blur about 50% of all images.
+    #     iaa.Sometimes(0.5,
+    #                   iaa.GaussianBlur(sigma=(0, 0.5))
+    #                   ),
+    #     # Strengthen or weaken the contrast in each image.
+    #     iaa.ContrastNormalization((0.75, 1.25)),
+    #     # Add gaussian noise.
+    #     # For 50% of all images, we sample the noise once per pixel.
+    #     # For the other 50% of all images, we sample the noise per pixel AND
+    #     # channel. This can change the color (not only brightness) of the
+    #     # pixels.
+    #     iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+    #     # Make some images brighter and some darker.
+    #     # In 20% of all cases, we sample the multiplier once per channel,
+    #     # which can end up changing the color of the images.
+    #     iaa.Multiply((0.8, 1.2), per_channel=0.2),
+    #     # Apply affine transformations to each image.
+    #     # Scale/zoom them, translate/move them, rotate them and shear them.
+    #     iaa.Affine(
+    #         scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+    #         # translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+    #         # rotate=(-25, 25),
+    #         # shear=(-8, 8)
+    #     )
+    # ], random_order=True))  # apply augmenters in random order
 
     # augmentation = iaa.Sometimes(0.833, iaa.Sequential([
     #     iaa.Sometimes(0.5, iaa.GaussianBlur((0, 3.0))),
@@ -338,6 +338,43 @@ if __name__ == '__main__':
     #         # iaa.Sometimes(0.5, iaa.Affine(rotate=5))  # rotate 50% of the images
     #     ]),
     # ], random_order=True))  # apply the augmentations in random order
+
+    augmentation = iaa.Sometimes(0.833, iaa.Sequential([
+        #########################
+        # COLOR & MASK
+        #########################
+        iaa.Fliplr(0.5),  # horizontal flips
+        iaa.Flipud(0.5),
+        iaa.Crop(percent=(0, 0.1)),  # random crops
+        # Apply affine transformations to each image.
+        # Scale/zoom them, translate/move them, rotate them and shear them.
+        iaa.Affine(
+            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+            translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+            # rotate=(-25, 25),
+            # shear=(-8, 8)
+        ),
+        #########################
+        # ONLY COLOR !!!
+        #########################
+        # Small gaussian blur with random sigma between 0 and 0.5.
+        # But we only blur about 50% of all images.
+        iaa.Sometimes(0.5,
+                      iaa.GaussianBlur(sigma=(0, 0.5))
+                      ),
+        # Strengthen or weaken the contrast in each image.
+        iaa.ContrastNormalization((0.75, 1.25)),
+        # Add gaussian noise.
+        # For 50% of all images, we sample the noise once per pixel.
+        # For the other 50% of all images, we sample the noise per pixel AND
+        # channel. This can change the color (not only brightness) of the
+        # pixels.
+        iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+        # Make some images brighter and some darker.
+        # In 20% of all cases, we sample the multiplier once per channel,
+        # which can end up changing the color of the images.
+        iaa.Multiply((0.8, 1.2), per_channel=0.2),
+    ], random_order=True))  # apply augmenters in random order
 
     # Load the image multiple times to show augmentations
     limit = 16

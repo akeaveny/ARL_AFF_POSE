@@ -45,7 +45,7 @@ parser.add_argument('--train', required=False, default='rgbd+',
                     type=str,
                     metavar="Train RGB or RGB+D")
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -153,13 +153,13 @@ def train(model, args):
     #############################
     #  Learning Rate Scheduler
     #############################
-
+    START = 0
     ### Training - Stage 1 HEADS
     ### HEADS
     print("\n************* trainining HEADS *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=40, #
+                epochs=START + 10, #
                 augmentation=augmentation,
                 layers='heads')
 
@@ -168,7 +168,7 @@ def train(model, args):
     print("\n************* trainining ResNET 4+ *************")
     model.train(dataset_train, dataset_val,
               learning_rate=config.LEARNING_RATE/10,
-              epochs=45,  # 100
+              epochs=START + 15,  # 100
               augmentation=augmentation,
               layers='4+')
 
@@ -177,7 +177,7 @@ def train(model, args):
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE/100,
-                epochs=50, # 60
+                epochs=START + 20, # 60
                 augmentation=augmentation,
                 layers='all')
 

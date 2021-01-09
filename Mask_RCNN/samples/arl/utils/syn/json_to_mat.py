@@ -15,7 +15,7 @@ def json_to_mat(json_file, camera_settings):
         # prelim
         ####################
 
-        if camera_settings == "Kinect":
+        if camera_settings == "kinect":
                 width, height = 640, 480
                 cam_fx = 1066.778
                 cam_fy = 1067.487
@@ -24,7 +24,7 @@ def json_to_mat(json_file, camera_settings):
 
                 border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640]
 
-        if camera_settings == "Xtion":
+        if camera_settings == "xtion":
                 width, height = 640, 480
                 cam_fx = 537.99040688
                 cam_fy = 539.09122804
@@ -33,7 +33,7 @@ def json_to_mat(json_file, camera_settings):
 
                 border_list = [-1, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640]
 
-        elif camera_settings == "ZED":
+        elif camera_settings == "zed":
                 width, height = 672, 376
                 cam_fx = 339.11297607421875
                 cam_fy = 339.11297607421875
@@ -60,59 +60,59 @@ def json_to_mat(json_file, camera_settings):
                 model_id = actor_tag.split("_")[1]
                 affordance_label = actor_tag.split("_")[-1]
 
-                if model_id == 'spatula':
-                        if affordance_label == 'grasp':
-                                idx = 4
-                                count = 1000 + idx
-                                affordance_id = str(count)[1:]
-                        elif affordance_label == 'support':
-                                idx = 3
-                                count = 1000 + idx
-                                affordance_id = str(count)[1:]
+                # if model_id == 'spatula':
+                #         if affordance_label == 'grasp':
+                #                 idx = 4
+                #                 count = 1000 + idx
+                #                 affordance_id = str(count)[1:]
+                #         elif affordance_label == 'support':
+                #                 idx = 3
+                #                 count = 1000 + idx
+                #                 affordance_id = str(count)[1:]
+                #
+                # if affordance_id in ['001', '004']:
+                #         # print('affordance_id: ', affordance_id)
 
-                if affordance_id in ['001', '004']:
-                        # print('affordance_id: ', affordance_id)
+                output['Affordance_ID'].append(affordance_id)
+                output['Affordance_Label'].append(affordance_label)
+                output['Model_ID'].append(model_id)
 
-                        output['Affordance_ID'].append(affordance_id)
-                        output['Affordance_Label'].append(affordance_label)
-                        output['Model_ID'].append(model_id)
+                ####################
+                # SE3
+                ####################
+                rot = np.asarray(object['pose_transform'])[0:3, 0:3]
 
-                        ####################
-                        # SE3
-                        ####################
-                        rot = np.asarray(object['pose_transform'])[0:3, 0:3]
+                # change LHS coordinates
+                cam_rotation4 = np.dot(np.array(rot), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+                cam_rotation4 = np.dot(cam_rotation4.T, np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]))
 
-                        # change LHS coordinates
-                        cam_rotation4 = np.dot(np.array(rot), np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-                        cam_rotation4 = np.dot(cam_rotation4.T, np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]))
+                # NDDS gives units in centimeters
+                translation = np.array(object['location']) * 10 # now in [mm]
+                translation /= 1e3  # now in [m]
 
-                        # NDDS gives units in centimeters
-                        translation = np.array(object['location']) * 10 # now in [mm]
-                        translation /= 1e3  # now in [m]
+                output['rot' + np.str(affordance_id)] = cam_rotation4
+                output['cam_translation' + np.str(affordance_id)] = translation
 
-                        output['rot' + np.str(affordance_id)] = cam_rotation4
-                        output['cam_translation' + np.str(affordance_id)] = translation
+                ####################
+                # bbox
+                ####################
+                rmax, cmax = np.asarray(object['bounding_box']['top_left'])
+                rmin, cmin = np.asarray(object['bounding_box']['bottom_right'])
+                output['bbox' + np.str(affordance_id)] = rmin, rmax, cmin, cmax
 
-                        ####################
-                        # bbox
-                        ####################
-                        rmax, cmax = np.asarray(object['bounding_box']['top_left'])
-                        rmin, cmin = np.asarray(object['bounding_box']['bottom_right'])
-                        output['bbox' + np.str(affordance_id)] = rmin, rmax, cmin, cmax
+                ####################
+                # cam
+                ####################
+                output['camera_setting' + np.str(affordance_id)] = camera_settings
 
-                        ####################
-                        # cam
-                        ####################
-                        output['camera_setting' + np.str(affordance_id)] = camera_settings
+                output['width' + np.str(affordance_id)] = width
+                output['height' + np.str(affordance_id)] = height
+                output['fx' + np.str(affordance_id)] = cam_fx
+                output['fy' + np.str(affordance_id)] = cam_fy
+                output['cx' + np.str(affordance_id)] = cam_cx
+                output['cy' + np.str(affordance_id)] = cam_cy
 
-                        output['width' + np.str(affordance_id)] = width
-                        output['height' + np.str(affordance_id)] = height
-                        output['fx' + np.str(affordance_id)] = cam_fx
-                        output['fy' + np.str(affordance_id)] = cam_fy
-                        output['cx' + np.str(affordance_id)] = cam_cx
-                        output['cy' + np.str(affordance_id)] = cam_cy
-
-                        output['camera_scale' + np.str(affordance_id)] = [np.asarray([1000], dtype=np.uint16)]
-                        output['border' + np.str(affordance_id)] = border_list
+                output['camera_scale' + np.str(affordance_id)] = [np.asarray([1000], dtype=np.uint16)]
+                output['border' + np.str(affordance_id)] = border_list
 
         return output

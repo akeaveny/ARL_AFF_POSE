@@ -1,4 +1,5 @@
 """
+------------------------------------------------------------
 Mask R-CNN for Object_RPE
 ------------------------------------------------------------
 """
@@ -41,7 +42,7 @@ class ARLConfig(Config):
     NAME = "ARL"
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 4  # Background + objects
+    NUM_CLASSES = 1 + 10  # Background + objects
 
     ##################################
     ###  GPU
@@ -78,14 +79,14 @@ class ARLConfig(Config):
     ##################################
 
     # tools
-    STEPS_PER_EPOCH = (2954) * 1 // bs
-    VALIDATION_STEPS = (633) * 1 // bs
+    STEPS_PER_EPOCH = (4000) * 1 // bs
+    VALIDATION_STEPS = (1000) * 1 // bs
 
     ##################################
     ###  FROM DATASET STATS
     ##################################
-    # MEAN_PIXEL_ = np.array([157.72, 151.18, 155.02])  ### SYN
-    # MEAN_PIXEL_ = np.array([114.34, 109.86, 101.07])  ### REAL
+    # MEAN_PIXEL = np.array([103.57, 103.38, 103.52])  ### REAL
+    MEAN_PIXEL = np.array([87.83, 81.66, 80.64])  ### TEST
 
     # IMAGE_RESIZE_MODE = "crop"
     # IMAGE_MIN_DIM = 384
@@ -121,10 +122,16 @@ class ARLDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("ARL", 1, "hammer_01_grasp")
-        self.add_class("ARL", 2, "hammer_05_pound")
-        self.add_class("ARL", 3, "spatula_06_support")
-        self.add_class("ARL", 4, "spatula_01_grasp")
+        self.add_class("ARL", 1, "mallet_1_grasp")
+        self.add_class("ARL", 2, "mallet_4_pound")
+        self.add_class("ARL", 3, "spatula_1_grasp")
+        self.add_class("ARL", 4, "spatula_2_support")
+        self.add_class("ARL", 5, "wooden_spoon_1_grasp")
+        self.add_class("ARL", 6, "wooden_spoon_3_scoop")
+        self.add_class("ARL", 7, "screwdriver_1_grasp")
+        self.add_class("ARL", 8, "screwdriver_2_screw")
+        self.add_class("ARL", 9, "garden_shovel_1_grasp")
+        self.add_class("ARL", 10, "garden_shovel_3_scoop")
 
         # Train or validation dataset?
         assert subset in ["train", "val", "test"]
@@ -132,20 +139,63 @@ class ARLDataset(utils.Dataset):
         if subset == 'train':
             annotations = {}
             print("\n************************** LOADING TRAIN **************************")
+            ### tools
+            # annotations.update(json.load(
+            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_train_16967.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_train_1789.json')))
+
+            #######################
+            # TEST
+            #######################
+            ### tools
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/real/coco_tools_train_2954.json')))
+                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/coco_tools_train_40.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/coco_clutter_train_752.json')))
 
         elif subset == 'val':
             annotations = {}
             print("\n************************** LOADING VAL **************************")
+            ### tools
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_val_3180.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_val_336.json')))
+
+            #######################
+            # TEST
+            #######################
+            ### tools
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/real/coco_tools_val_633.json')))
+                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/coco_tools_val_10.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/coco_clutter_val_209.json')))
+
 
         elif subset == 'test':
             annotations = {}
             print("\n************************** LOADING TEST! **************************")
+            ### tools
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/real/coco_tools_test_636.json')))
+                open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_test_1078.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_test_114.json')))
+
+            #######################
+            # TEST
+            #######################
+            ### tools
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/coco_tools_test_151.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/coco_clutter_test_114.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -203,11 +253,27 @@ class ARLDataset(utils.Dataset):
                         dtype=np.uint8)
         class_IDs = np.zeros([len(info["polygons"])], dtype=np.int32)
 
+        #################
+        # tools
+        #################
+
+        # for i, p in enumerate(info["polygons"]):
+        #     # Get indexes of pixels inside the polygon and set them to 1
+        #     rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+        #     mask[rr, cc, i] = 1
+        #     class_IDs[i] = p['class_id']
+
+        #################
+        # clutter
+        #################
+
         for i, p in enumerate(info["polygons"]):
-            # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
-            mask[rr, cc, i] = 1
-            class_IDs[i] = p['class_id']
+            for countour_idx, _ in enumerate(range(p["num_contours"])):
+                # Get indexes of pixels inside the polygon and set them to 1
+                rr, cc = skimage.draw.polygon(p['all_points_y' + str(countour_idx)],
+                                              p['all_points_x' + str(countour_idx)])
+                mask[rr, cc, i] = 1
+                class_IDs[i] = p['class_id']
 
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s

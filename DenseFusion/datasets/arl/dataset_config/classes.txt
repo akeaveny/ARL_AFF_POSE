@@ -1,0 +1,10 @@
+001_mallet_1_grasp
+002_mallet_4_pound
+003_spatula_1_grasp
+004_spatula_5_support
+005_wooden_spoon_1_grasp
+006_wooden_spoon_3_scoop
+007_screwdriver_1_grasp
+008_screwdriver_2_screw
+009_garden_shovel_1_grasp
+010_garden_shovel_3_scoop

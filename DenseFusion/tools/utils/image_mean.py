@@ -2,6 +2,8 @@ import cv2
 import glob
 import numpy as np
 
+from PIL import Image
+
 import argparse
 
 ############################################################
@@ -9,16 +11,13 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFusion')
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
                     type=str,
-                    metavar="/path/to/Affordance/dataset/")
+                    metavar="")
 parser.add_argument('--dataset_config', required=False,
-                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
+                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/',
                     type=str,
-                    metavar="/path/to/Affordance/dataset/")
-parser.add_argument('--dataset_type', required=False, default='val',
-                    type=str,
-                    metavar='train or val')
+                    metavar="")
 
 args = parser.parse_args()
 
@@ -26,12 +25,8 @@ args = parser.parse_args()
 # load images
 #########################
 num_random = 1000
-if args.dataset_type == 'val':
-    # images_file = 'test_data_list.txt'
-    images_file = 'test_data_list_combined.txt'
-elif args.dataset_type == 'train':
-    # images_file = 'train_data_list.txt'
-    images_file = 'train_data_list_combined.txt'
+# images_file = 'real_train_data_list.txt'
+images_file = 'syn_train_data_list.txt'
 
 images_paths = np.loadtxt('{}/{}'.format(args.dataset_config, images_file), dtype=np.str)
 print("Num Images: ", len(images_paths))
@@ -41,10 +36,14 @@ print("Random Img Selected: ", len(images_paths[random_idx]))
 
 dataset_mean, dataset_std, dataset_count = 0, 0, 0
 for images_path in images_paths[random_idx]:
-    image_path_ = args.dataset + images_path + "_rgb.png"
-    ### print("image_path_: ", image_path_)
-    image = cv2.imread(image_path_)
+    image_path_ = images_path + "_rgb.png"
+    print("image_path_: ", image_path_)
+    # image = cv2.imread(image_path_)
+    pil_image = Image.open(image_path_)
+    image = cv2.cvtColor(np.array(pil_image, dtype=np.uint8), cv2.COLOR_RGB2BGR)
     mean, stddev = cv2.meanStdDev(image.astype(np.uint8))
+    # mean, stddev = cv2.meanStdDev(image)
+    print("mean: ", mean)
     dataset_mean += mean
     dataset_std += stddev
     dataset_count += 1

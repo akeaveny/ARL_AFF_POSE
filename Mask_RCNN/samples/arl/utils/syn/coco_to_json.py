@@ -49,8 +49,7 @@ def create_sub_masks(mask_image):
 
     return sub_masks
 
-def create_sub_mask_annotation(sub_mask, class_id, label_img):
-
+def create_sub_mask_annotation(sub_mask, class_id, label_img, rgb_img):
     #############
     # cv image
     #############
@@ -72,33 +71,36 @@ def create_sub_mask_annotation(sub_mask, class_id, label_img):
 
     # On this output, draw all of the contours that we have detected
     # in white, and set the thickness to be 3 pixels
-    cv2.drawContours(label_img, contours, -1, 255, 3)
+    cv2.drawContours(rgb_img, contours, -1, 255, 3)
 
-    x_list = []
-    y_list = []
-    for k in contours:
+    region = {}
+    region['region_attributes'] = {}
+    region['shape_attributes'] = {}
+    region['shape_attributes']["name"] = "polygon"
+    region['shape_attributes']["num_contours"] = len(contours)
+    # region['shape_attributes']["all_points_x"] = np.array(x_list).tolist()
+    # region['shape_attributes']["all_points_y"] = np.array(y_list).tolist()
+    region['shape_attributes']["class_id"] = class_id
+
+    for contour_idx, k in enumerate(contours):
+        x_list = []
+        y_list = []
         for i in k:
             for j in i:
                 x_list.append(j[0])
                 y_list.append(j[1])
+        region['shape_attributes']["all_points_x" + str(contour_idx)] = np.array(x_list).tolist()
+        region['shape_attributes']["all_points_y" + str(contour_idx)] = np.array(y_list).tolist()
 
     if VISUALIZE:
         # cv
-        cv2.imshow("out", label_img)
+        cv2.imshow("out", rgb_img)
         cv2.waitKey(0)
         # matplotlib
         # plt.imshow(label_img)
         # plt.plot(x_list, y_list, linewidth=1)
         # plt.show()
         # plt.ioff()
-
-    region = {}
-    region['region_attributes'] = {}
-    region['shape_attributes'] = {}
-    region['shape_attributes']["name"] = "polygon"
-    region['shape_attributes']["all_points_x"] = np.array(x_list).tolist()
-    region['shape_attributes']["all_points_y"] = np.array(y_list).tolist()
-    region['shape_attributes']["class_id"] = class_id
 
     return region
 
@@ -109,37 +111,56 @@ np.random.seed(1)
 
 dataset_name = 'ARL'
 
-data_path = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/'
+######################
+# TOOLS
+######################
+data_path = '/data/Akeaveny/Datasets/arl_dataset/'
+val_path = 'combined_syn_tools_2_val/'
+train_path = 'combined_syn_tools_2_train/'
+test_path = 'combined_syn_tools_2_test/'
 
-######################
-# aff
-######################
-json_path = '/data/Akeaveny/Datasets/arl_scanned_objects/ARL/json/syn/'
+json_path = '/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/'
 json_name = 'coco_tools_'
-val_path = 'combined_syn_tools2_val/'
-train_path = 'combined_syn_tools2_train/'
-test_path = 'combined_syn_tools2_test/'
+
+# ######################
+# # CLUTTER
+# ######################
+# data_path = '/data/Akeaveny/Datasets/arl_dataset/'
+# val_path = 'combined_syn_clutter_2_val/'
+# train_path = 'combined_syn_clutter_2_train/'
+# test_path = 'combined_syn_clutter_2_test/'
+#
+# json_path = '/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/'
+# json_name = 'coco_clutter_'
 
 image_ext = '_label.png'
 
-class_id = [0, 1, 2, 3, 4, 5, 6, 7]
+class_id = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 print("Affordance IDs: \n{}\n".format(class_id))
 
 VISUALIZE = False
 
-use_random_idx = False
-num_val = 4
-num_train = 4
-num_test = 4
+use_random_idx = True
+BASE_NUM_IMAGES = int(21225*2)
+### PR
+# num_val = int(BASE_NUM_IMAGES/5*0.2)
+# num_train = int(BASE_NUM_IMAGES/5*0.8)
+# num_test = 0
+### DR
+num_val = int(BASE_NUM_IMAGES*0.2)
+num_train = int(BASE_NUM_IMAGES*0.8)
+num_test = 0
 
 # 1.
 scenes = [
-        # 'bench/',
-        # 'floor/',
-        # 'turn_table/',
-        'dr/'
-          ]
+    # '1_bench/',
+    # '2_work_bench/',
+    # '3_coffee_table/',
+    # '4_old_table/',
+    # '5_bedside_table/',
+    '6_dr/'
+]
 
 #=====================
 # JSON FILES
@@ -166,7 +187,7 @@ for scene in scenes:
 
         if use_random_idx:
             val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_val), replace=False)
-            print("Chosen Files \n", val_idx)
+            print("Chosen Files: ", len(val_idx))
             files = files[val_idx]
         else:
             num_val = len(files)
@@ -220,7 +241,7 @@ for scene in scenes:
                     if int(idx) > 0:
                         object_id = int(idx)
                         print("object_id: ", object_id)
-                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img), rgb_img)
                         regions[np.str(object_id)] = region
                 data[obj_name]['regions'] = regions
             iteration += 1
@@ -247,7 +268,7 @@ for scene in scenes:
 
         if use_random_idx:
             train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
-            print("Chosen Files \n", train_idx)
+            print("Chosen Files: ", len(train_idx))
             files = files[train_idx]
         else:
             num_train = len(files)
@@ -301,7 +322,7 @@ for scene in scenes:
                     if int(idx) > 0:
                         object_id = int(idx)
                         print("object_id: ", object_id)
-                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img), rgb_img)
                         regions[np.str(object_id)] = region
                 data[obj_name]['regions'] = regions
             iteration += 1
@@ -328,7 +349,7 @@ for scene in scenes:
 
         if use_random_idx:
             test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_test), replace=False)
-            print("Chosen Files \n", test_idx)
+            print("Chosen Files: ", len(test_idx))
             files = files[test_idx]
         else:
             num_test = len(files)
@@ -382,7 +403,7 @@ for scene in scenes:
                     if int(idx) > 0:
                         object_id = int(idx)
                         print("object_id: ", object_id)
-                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img))
+                        region = create_sub_mask_annotation(sub_mask, object_id, np.array(label_img), rgb_img)
                         regions[np.str(object_id)] = region
                 data[obj_name]['regions'] = regions
             iteration += 1

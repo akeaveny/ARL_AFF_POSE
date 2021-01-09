@@ -46,8 +46,8 @@ parser.add_argument('--train', required=False, default='rgbd',
                     metavar="Train RGB or RGB+D")
 
 parser.add_argument('--dataset', required=False,
-                    default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
-                    # default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
+                    # default='/data/Akeaveny/Datasets/part-affordance_combined/real/',
+                    default='/data/Akeaveny/Datasets/part-affordance_combined/ndds4/',
                     type=str,
                     metavar="/path/to/Affordance/dataset/")
 parser.add_argument('--dataset_type', required=False, default='real',
@@ -175,45 +175,13 @@ def train(model, args):
     #############################
     #  Learning Rate Scheduler
     #############################
-
-    # ### Training - Stage 1 HEADS
-    # ### HEADS
-    # print("\n************* trainining HEADS *************")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE,
-    #             epochs=10,
-    #             augmentation=augmentation,
-    #             layers='heads')
-    #
-    # ### Training - Stage 2a
-    # ### Finetune layers from ResNet stage 4 and up
-    # print("\n************* trainining ResNET 4+ *************")
-    # model.train(dataset_train, dataset_val,
-    #           learning_rate=config.LEARNING_RATE/10,
-    #           epochs=15,
-    #           augmentation=augmentation,
-    #           layers='4+')
-    #
-    # ### Training - Stage 3
-    # ### Fine tune all layers
-    # print("\n************* trainining ALL *************")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=20,
-    #             augmentation=augmentation,
-    #             layers='all')
-
-    # ########################
-    # # Finetuning
-    # ########################
     START = 20
     ### Training - Stage 1 HEADS
-    ## Training - Stage 1 HEADS
-    # HEADS
+    ### HEADS
     print("\n************* trainining HEADS *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=START + 40,
+                epochs=START + 10, #
                 augmentation=augmentation,
                 layers='heads')
 
@@ -222,7 +190,7 @@ def train(model, args):
     print("\n************* trainining ResNET 4+ *************")
     model.train(dataset_train, dataset_val,
               learning_rate=config.LEARNING_RATE/10,
-              epochs=START + 50,
+              epochs=START + 15,  # 100
               augmentation=augmentation,
               layers='4+')
 
@@ -231,7 +199,7 @@ def train(model, args):
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE/100,
-                epochs=START + 60,
+                epochs=START + 20, # 60
                 augmentation=augmentation,
                 layers='all')
 

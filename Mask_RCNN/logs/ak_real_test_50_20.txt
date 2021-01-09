@@ -1,0 +1,35 @@
+##################
+# real -tools 
+##################
+
+### 20
+
+Averaged F_wb for affordance id=1 is: 0.637002 
+Averaged F_wb for affordance id=2 is: 0.591110 
+Averaged F_wb for affordance id=3 is: 0.570252 
+Averaged F_wb for affordance id=4 is: 0.547530 
+Averaged F_wb for affordance id=5 is: 0.532712 
+
+AVE over all Affordance IDs: 0.575721
+
+##################
+# real - clutter
+##################
+
+##################
+# test - tools
+##################
+
+### 20
+
+Averaged F_wb for affordance id=1 is: 0.860655 
+Averaged F_wb for affordance id=2 is: 0.833250 
+Averaged F_wb for affordance id=3 is: 0.852045 
+Averaged F_wb for affordance id=4 is: 0.849858 
+Averaged F_wb for affordance id=5 is: 0.842067 
+
+AVE over all Affordance IDs: 0.847575
+
+##################
+# test - clutter
+##################

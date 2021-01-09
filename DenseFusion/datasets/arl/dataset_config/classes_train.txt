@@ -1,0 +1,5 @@
+001_mallet_1_grasp
+003_spatula_1_grasp
+005_wooden_spoon_1_grasp
+007_screwdriver_1_grasp
+009_garden_shovel_1_grasp
