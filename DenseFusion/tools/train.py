@@ -31,11 +31,10 @@ from lib.utils import setup_logger
 
 from datasets.ycb.dataset import PoseDataset as PoseDataset_ycb
 from datasets.linemod.dataset import PoseDataset as PoseDataset_linemod
-from datasets.parts_affordance.dataset import PoseDataset as PoseDataset_syn
 from datasets.ycb_syn.dataset import PoseDataset as PoseDataset_ycb_syn
 from datasets.arl.dataset import PoseDataset as PoseDataset_arl
-from datasets.arl_real.dataset import PoseDataset as PoseDataset_arl_real
-from datasets.arl_syn.dataset import PoseDataset as PoseDataset_arl_syn
+from datasets.arl1.dataset import PoseDataset as PoseDataset_arl1
+from datasets.elevator.dataset import PoseDataset as PoseDataset_elevator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str, default = 'ycb-syn', help='ycb or linemod')
@@ -97,18 +96,61 @@ def main():
         opt.num_objects = 10  # number of object classes in the dataset
         opt.num_points = 1000  # number of points on the input pointcloud
         opt.dataset_root = '/data/Akeaveny/Datasets/arl_dataset'
-        opt.outf = 'trained_models/arl/clutter/arl_syn_2'  # folder to save trained models
-        opt.log_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/logs/arl/clutter/arl_syn_2'  # folder to save logs
+        opt.outf = 'trained_models/arl/clutter/arl_finetune_syn_2'  # folder to save trained models
+        opt.log_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/logs/arl/clutter/arl_finetune_syn_2'  # folder to save logs
         output_results = 'check_arl_syn.txt'
 
-        opt.nepoch = 500
+        opt.nepoch = 750
+
+        opt.w = 0.05
+        opt.refine_margin = 0.0045
+
+         # TODO
+        opt.repeat_epoch = 20
+        opt.start_epoch = 0
+        opt.resume_posenet = 'pose_model_1_0.012397416144377301.pth'
+        opt.resume_refinenet = 'pose_refine_model_153_0.004032851301599294.pth'
+
+    elif opt.dataset == 'arl1':
+        opt.num_objects = 5  # number of object classes in the dataset
+        opt.num_points = 1000  # number of points on the input pointcloud
+        opt.dataset_root = '/data/Akeaveny/Datasets/arl_dataset'
+        opt.outf = 'trained_models/arl1/clutter/arl_real_2'  # folder to save trained models
+        opt.log_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/logs/arl1/clutter/arl_real_2'  # folder to save logs
+        output_results = 'check_arl_syn.txt'
+
+        opt.nepoch = 750
 
         opt.w = 0.05
         opt.refine_margin = 0.015
 
-        # opt.start_epoch = 201
+        # opt.start_epoch = 120
         # opt.resume_posenet = 'pose_model_current.pth'
-        # opt.resume_refinenet = 'pose_refine_model_current.pth'
+        # opt.resume_refinenet = 'pose_refine_model_115_0.008727498716640046.pth'
+
+    elif opt.dataset == 'elevator':
+        opt.num_objects = 1  # number of object classes in the dataset
+        opt.num_points = 1000  # number of points on the input pointcloud
+        opt.dataset_root = '/data/Akeaveny/Datasets/elevator_dataset'
+        opt.outf = 'trained_models/elevator/elevator_2'  # folder to save trained models
+        opt.log_dir = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/logs/elevator/elevator_2'  # folder to save logs
+        output_results = 'check_arl_syn.txt'
+
+        opt.nepoch = 750
+
+        opt.w = 0.05
+        opt.refine_margin = 0.015
+
+        opt.nepoch = 750
+
+        opt.w = 0.05
+        opt.refine_margin = 0.015
+
+        # TODO
+        opt.repeat_epoch = 40
+        # opt.start_epoch = 47
+        # opt.resume_posenet = 'pose_model_current.pth'
+        # opt.resume_refinenet = 'pose_refine_model_46_0.007581770288279472.pth'
 
     else:
         print('Unknown dataset')
@@ -124,8 +166,8 @@ def main():
 
     if opt.resume_refinenet != '':
         refiner.load_state_dict(torch.load('{0}/{1}'.format(opt.outf, opt.resume_refinenet)))
-        opt.refine_start = True
-        opt.decay_start = True
+        opt.refine_start = False
+        opt.decay_start = False
         opt.lr *= opt.lr_rate
         opt.w *= opt.w_rate
         opt.batch_size = int(opt.batch_size / opt.iteration)
@@ -139,16 +181,14 @@ def main():
         dataset = PoseDataset_ycb('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'linemod':
         dataset = PoseDataset_linemod('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
-    elif opt.dataset == 'parts-affordance':
-        dataset = PoseDataset_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'ycb-syn':
         dataset = PoseDataset_ycb_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
     elif opt.dataset == 'arl':
         dataset = PoseDataset_arl('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
-    elif opt.dataset == 'arl-real':
-        dataset = PoseDataset_arl_real('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
-    elif opt.dataset == 'arl-syn':
-        dataset = PoseDataset_arl_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+    elif opt.dataset == 'arl1':
+        dataset = PoseDataset_arl1('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+    elif opt.dataset == 'elevator':
+        dataset = PoseDataset_elevator('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
 
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
 
@@ -156,16 +196,14 @@ def main():
         test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'linemod':
         test_dataset = PoseDataset_linemod('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
-    elif opt.dataset == 'parts-affordance':
-        test_dataset = PoseDataset_syn('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'ycb-syn':
         test_dataset = PoseDataset_ycb_syn('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
     elif opt.dataset == 'arl':
         test_dataset = PoseDataset_arl('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
-    elif opt.dataset == 'arl-real':
-        test_dataset = PoseDataset_arl_real('test', opt.num_points,  True, opt.dataset_root, 0.0, opt.refine_start)
-    elif opt.dataset == 'arl-syn':
-        test_dataset = PoseDataset_arl_syn('test', opt.num_points,  True, opt.dataset_root, 0.0, opt.refine_start)
+    elif opt.dataset == 'arl1':
+        test_dataset = PoseDataset_arl1('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
+    elif opt.dataset == 'elevator':
+        test_dataset = PoseDataset_elevator('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
 
     testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
     
@@ -243,7 +281,8 @@ def main():
                 train_count += 1
 
                 if train_count % opt.batch_size == 0:
-                    logger.info('Train time {} Epoch {} Batch {} Frame {} Avg_dis: {:.2f} [cm]'.format(time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - st_time)), epoch, int(train_count / opt.batch_size), train_count, train_dis_avg / opt.batch_size * 100))
+                    logger.info('Train time {} Epoch {} Batch {} Frame {}/{} Avg_dis: {:.2f} [cm]'
+                                .format(time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - st_time)), epoch, int(train_count / opt.batch_size), train_count, len(dataset.list), train_dis_avg / opt.batch_size * 100))
                     optimizer.step()
                     optimizer.zero_grad()
 
@@ -330,16 +369,15 @@ def main():
                 dataset = PoseDataset_ycb('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
             elif opt.dataset == 'linemod':
                 dataset = PoseDataset_linemod('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
-            elif opt.dataset == 'parts-affordance':
-                dataset = PoseDataset_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
             elif opt.dataset == 'ycb-syn':
                 dataset = PoseDataset_ycb_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
             elif opt.dataset == 'arl':
                 dataset = PoseDataset_arl('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,opt.refine_start)
-            elif opt.dataset == 'arl-real':
-                dataset = PoseDataset_arl_real('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,opt.refine_start)
-            elif opt.dataset == 'arl-syn':
-                dataset = PoseDataset_arl_syn('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+            elif opt.dataset == 'arl1':
+                dataset = PoseDataset_arl1('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,opt.refine_start)
+            elif opt.dataset == 'elevator':
+                dataset = PoseDataset_elevator('train', opt.num_points, True, opt.dataset_root, opt.noise_trans,
+                                           opt.refine_start)
 
             dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
 
@@ -347,16 +385,14 @@ def main():
                 test_dataset = PoseDataset_ycb('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'linemod':
                 test_dataset = PoseDataset_linemod('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
-            elif opt.dataset == 'parts-affordance':
-                test_dataset = PoseDataset_syn('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'ycb-syn':
                 test_dataset = PoseDataset_ycb_syn('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
             elif opt.dataset == 'arl':
                 test_dataset = PoseDataset_arl('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
-            elif opt.dataset == 'arl-real':
-                test_dataset = PoseDataset_arl_real('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
-            elif opt.dataset == 'arl-syn':
-                test_dataset = PoseDataset_arl_syn('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
+            elif opt.dataset == 'arl1':
+                test_dataset = PoseDataset_arl1('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
+            elif opt.dataset == 'elevator':
+                test_dataset = PoseDataset_elevator('test', opt.num_points, True, opt.dataset_root, 0.0, opt.refine_start)
 
             testdataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
             

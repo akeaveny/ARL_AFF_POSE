@@ -11,29 +11,29 @@ import scipy.io as sio
 # ############################
 # # TOOLS
 # ############################
-# data_path = '/data/Akeaveny/Datasets/arl_dataset/syn/tools/'
-# new_data_path = '/data/Akeaveny/Datasets/arl_dataset/combined_syn_tools_2_'
-#
-# objects = [
-#     '1_mallet/',
-#     '2_spatula/',
-#     '3_wooden_spoon/',
-#     '4_screwdriver/',
-#     '5_garden_shovel/',
-# ]
+data_path = '/data/Akeaveny/Datasets/arl_dataset/syn/tools/'
+new_data_path = '/data/Akeaveny/Datasets/arl_dataset/combined_syn_tools_2_'
+
+objects = [
+    '1_mallet/',
+    '2_spatula/',
+    '3_wooden_spoon/',
+    '4_screwdriver/',
+    '5_garden_shovel/',
+]
 
 ############################
 # CLUTTER
 ############################
-data_path = '/data/Akeaveny/Datasets/arl_dataset/syn/clutter/'
-new_data_path = '/data/Akeaveny/Datasets/arl_dataset/combined_syn_clutter_2_'
-
-objects = [
-    'clutter_1/',
-    'clutter_2/',
-    'clutter_3/',
-    'clutter_5/',
-]
+# data_path = '/data/Akeaveny/Datasets/arl_dataset/syn/clutter/'
+# new_data_path = '/data/Akeaveny/Datasets/arl_dataset/combined_syn_clutter_2_'
+#
+# objects = [
+#     'clutter_1/',
+#     'clutter_2/',
+#     'clutter_3/',
+#     'clutter_5/',
+# ]
 
 #######################
 #######################
@@ -101,8 +101,8 @@ for split in splits:
 
                     val_idx = np.random.choice(val_test_idx, size=int(val_test_split * len(val_test_idx)), replace=False)
                     test_idx = np.delete(val_test_idx, val_idx)
-                    val_files = files[val_idx]
-                    test_files = files[test_idx]
+                    val_files = val_test_files[val_idx]
+                    test_files = val_test_files[test_idx]
 
                     print("Chosen Train Files {}/{}".format(len(train_files), len(files)))
                     print("Chosen Val Files {}/{}".format(len(val_files), len(files)))

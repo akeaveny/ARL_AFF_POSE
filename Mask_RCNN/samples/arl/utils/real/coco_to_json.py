@@ -121,37 +121,13 @@ dataset_name = 'ARL'
 # CLUTTER
 ######################
 
-# data_path = '/data/Akeaveny/Datasets/arl_dataset/'
-# val_path = 'combined_real_clutter_4_val/'
-# train_path = 'combined_real_clutter_4_train/'
-# test_path = 'combined_real_clutter_4_test/'
-#
-# json_path = '/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/'
-# json_name = 'coco_clutter_'
-
-######################
-# TEST - TOOLS
-######################
-
 data_path = '/data/Akeaveny/Datasets/arl_dataset/'
-val_path = 'combined_test_tools_3_val/'
-train_path = 'combined_test_tools_3_train/'
-test_path = 'combined_test_tools_3_test/'
+val_path = 'combined_real_clutter_4_val/'
+train_path = 'combined_real_clutter_4_train/'
+test_path = 'combined_real_clutter_4_test/'
 
-json_path = '/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/'
-json_name = 'coco_tools_'
-
-######################
-# TEST - CLUTTER
-######################
-
-# data_path = '/data/Akeaveny/Datasets/arl_dataset/'
-# val_path = 'combined_test_clutter_3_val/'
-# train_path = 'combined_test_clutter_3_train/'
-# test_path = 'combined_test_clutter_3_test/'
-#
-# json_path = '/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/'
-# json_name = 'coco_clutter_'
+json_path = '/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/'
+json_name = 'coco_clutter_'
 
 image_ext = '_label.png'
 
@@ -163,11 +139,7 @@ VISUALIZE = False
 
 use_random_idx = True
 ###
-# num_val   = 4
-# num_train = 4
-# num_test  = 0
-###
-NUM_IMAGES = 50
+NUM_IMAGES = 1500
 num_val   = int(NUM_IMAGES*0.2)
 num_train = int(NUM_IMAGES*0.8)
 num_test  = 0

@@ -57,7 +57,6 @@ for aff_idx = 1:length(aff_list)  % from 2 --> final_aff_id
     end
     fprintf('Averaged F_wb for affordance id=%d is: %f \n', aff_id-1, nanmean(F_wb_aff));
     F_wb_non_rank = [F_wb_non_rank; nanmean(F_wb_aff)];
-    
 end
 fprintf('\nAVE over all Affordance IDs: %f \n\n', nanmean(F_wb_non_rank));
 

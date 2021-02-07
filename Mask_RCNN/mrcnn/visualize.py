@@ -102,10 +102,71 @@ def apply_mask(image, mask, color, alpha=0.5):
                                   image[:, :, c])
     return image
 
+###########################
+# UMD
+###########################
+# class_names = np.array(['grasp', 'cut', 'scoop', 'contain', 'pound', 'support', 'wrap-grasp'])
+
+# def color_map():
+#
+#     color_map_dic = {
+#     0:  (1, 0, 0), # grasp
+#     1:  (0, 0, 0), # TODO: cut
+#     2:  (1, 1, 0), # scoop
+#     3:  (0, 0, 0), # TODO: contain
+#     4:  (0, 1, 1), # pound
+#     5:  (1, 0, 1), # support
+#     6:  (0, 0, 0), # TODO: wrap-grasp
+#     7:  (0, 0, 0), # TODO: wrap-grasp
+#     }
+#     return color_map_dic
+#
+# def color_map_names():
+#
+#     color_map_dic = {
+#     0:  'red',     # grasp
+#     1:  'black',   # TODO: cut
+#     2:  'yellow',  # scoop
+#     3:  'black',   # TODO: contain
+#     4:  'cyan',    # pound
+#     5:  'm',       # support
+#     6:  'black',   # TODO: wrap-grasp
+#     7:  'black',   # TODO: wrap-grasp
+#     }
+#
+#     return color_map_dic
+
+########################
+### ARL
+########################
+### class_names = np.array(['grasp', 'screw', 'scoop', 'pound', 'support',])
+
+def color_map():
+
+    color_map_dic = {
+    0:  (1, 0, 0), # grasp
+    1:  (0, 1, 0), # screw
+    2:  (1, 1, 0), # scoop
+    3:  (0, 1, 1), # pound
+    4:  (1, 0, 1), # support
+    }
+    return color_map_dic
+
+def color_map_names():
+
+    color_map_dic = {
+    0:  'red',     # grasp
+    1:  'green',   # screw
+    2:  'yellow',  # scoop
+    3:  'cyan',    # pound
+    4:  'm'        # support
+    }
+
+    return color_map_dic
 
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
-                      figsize=(16, 16), ax=None,
+                      figsize=(9, 5), ax=None,
                       show_mask=True, show_bbox=True,
                       colors=None, captions=None):
     """
@@ -125,7 +186,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     if not N:
         print("\n*** No instances to display *** \n")
     else:
-        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+        # assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+        assert boxes.shape[0] == class_ids.shape[0]
 
     # If no axis is passed, create one and automatically call show()
     auto_show = False
@@ -134,7 +196,9 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         auto_show = True
 
     # Generate random colors
-    colors = colors or random_colors(N)
+    # colors = colors or random_colors(N)
+    colors = color_map()
+    color_names = color_map_names()
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
@@ -144,8 +208,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     ax.set_title(title)
 
     masked_image = image.astype(np.uint32).copy()
-    for i in range(N):
-        color = colors[i]
+    for i, class_id in zip(range(N), class_ids):
+        color = colors[class_id]
 
         # Bounding box
         if not np.any(boxes[i]):
@@ -159,17 +223,22 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
 
         # Label
-        if not captions:
-            class_id = class_ids[i]
-            score = scores[i] if scores is not None else None
-            label = class_names[class_id]
-            x = random.randint(x1, (x1 + x2) // 2)
-            caption = "{} {:.3f}".format(label, score) if score else label
-        else:
-            caption = captions[i]
-            ax.text(x1, y1 + 8, caption, color='w', size=11, backgroundcolor="none")
+        # if not captions:
+        #     class_id = class_ids[i]
+        #     score = scores[i] if scores is not None else None
+        #     label = class_names[class_id]
+        #     x = random.randint(x1, (x1 + x2) // 2)
+        #     caption = "{} {:.3f}".format(label, score) if score else label
+        # else:
+            # caption = captions[i]
+            # ax.text(x1, y1 + 8, caption, color='w', size=11, backgroundcolor="none")
+        caption = class_names[class_id]
+        # ax.text(x1, y1 + 8, caption, color=color_names[class_id], size=20, backgroundcolor="none")
 
-        # Mask
+        ################
+        ### PRED
+        ################
+
         mask = masks[:, :, i]
         if show_mask:
             masked_image = apply_mask(masked_image, mask, color)
@@ -185,7 +254,17 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
+
+        ################
+        ### gt
+        ################
+        # print("class_name: ", class_names[class_id])
+        # mask = np.zeros_like(masks)
+        # mask[np.where(masks == class_id+1)] = 1
+        # masked_image = apply_mask(masked_image, mask, colors[class_id])
+
     ax.imshow(masked_image.astype(np.uint8))
+    return masked_image.astype(np.uint8)
     # if auto_show:
     #     plt.show()
 

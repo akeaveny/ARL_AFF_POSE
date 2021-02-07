@@ -229,6 +229,10 @@ if __name__ == '__main__':
             visualize.display_instances(image, bbox, mask, class_ids, dataset.class_names,
                                         ax=ax[i // int(np.sqrt(limit)), i % int(np.sqrt(limit))],
                                         captions=captions[class_ids].tolist())
+
+            depth = np.array(image.copy())
+            print("\tDEPTH:\tMin:\t{}, Max:\t{}, dtype:\t{} ".format(np.min(depth), np.max(depth), depth.dtype))
+
             # log("molded_image", image)
             # log("mask", mask)
             # log("class_ids", class_ids)

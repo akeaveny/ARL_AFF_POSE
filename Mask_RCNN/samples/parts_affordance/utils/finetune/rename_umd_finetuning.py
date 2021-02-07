@@ -8,12 +8,9 @@ import scipy.misc
 from PIL import Image
 
 # =================== new directory ========================
-NUM_TRAIN_FINETUNING = 500
-NUM_VAL_FINETUNING = 125
-offset = 0
-
 data_path = '/data/Akeaveny/Datasets/part-affordance_combined/real/combined_tools1_'
 new_data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/finetune/umd1_'
+offset = 0
 
 # =================== directories ========================
 objects = ['']
@@ -38,6 +35,9 @@ image_exts = [
             image_ext2,
             image_ext3
 ]
+
+NUM_TRAIN_FINETUNING = 500
+NUM_VAL_FINETUNING = 125
 
 # =================== new directory ========================
 offset_train, offset_val = 0, 0

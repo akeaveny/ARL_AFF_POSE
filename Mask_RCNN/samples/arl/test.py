@@ -25,6 +25,8 @@ print("ROOT_DIR: ", ROOT_DIR)
 # Path to trained weights file
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import argparse
 ############################################################
 #  Parse command line arguments
@@ -81,13 +83,13 @@ for img in os.listdir(args.dataset + args.save_inference_images):
 if args.dataset_type == 'real':
     import dataset_real as ARL
     save_to_folder = '/images/test_images_real/'
-    MEAN_PIXEL_ = np.array([103.57, 103.38, 103.52])  ### REAL
-    # MEAN_PIXEL_ = np.array([87.76, 81.59, 80.59])  ### TEST
+    # MEAN_PIXEL_ = np.array([103.57, 103.38, 103.52])  ### REAL
+    MEAN_PIXEL_ = np.array([93.70, 92.43, 89.58])  ### TEST
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 20
-    DETECTION_MAX_INSTANCES_ = 20
-    DETECTION_MIN_CONFIDENCE_ = 0.7  # 0.9 for tools & 0.7 for clutter
+    MAX_GT_INSTANCES_ = 10
+    DETECTION_MAX_INSTANCES_ = 10
+    DETECTION_MIN_CONFIDENCE_ = 0.5  ### SYN TOOLS: 0.7 real / 0.85 test, TEST Tools: 0.7 real / 0.975 test
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -108,17 +110,17 @@ elif args.dataset_type == 'syn':
     MEAN_PIXEL_ = np.array([124.65, 119.64, 113.10])  ### SYN
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 20
-    DETECTION_MAX_INSTANCES_ = 20
-    DETECTION_MIN_CONFIDENCE_ = 0.7  # 0.9 for tools & 0.7 for clutter
+    MAX_GT_INSTANCES_ = 10
+    DETECTION_MAX_INSTANCES_ = 10
+    DETECTION_MIN_CONFIDENCE_ = 0.9
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.8
     ### crop ###
     # CROP = True
     # IMAGE_RESIZE_MODE_ = "crop"
-    # IMAGE_MIN_DIM_ = 256
-    # IMAGE_MAX_DIM_ = 256
+    # IMAGE_MIN_DIM_ = 384
+    # IMAGE_MAX_DIM_ = 384
     ### sqaure ###
     CROP = False
     IMAGE_RESIZE_MODE_ = "square"
@@ -139,7 +141,7 @@ import tensorflow as tf
 
 if args.detect == 'rgb':
     from mrcnn import model as modellib, utils, visualize
-if args.detect == 'rgbd':
+elif args.detect == 'rgbd':
     from mrcnn import modeldepth as modellib, utils, visualize
 elif args.detect == 'rgbd+':
     from mrcnn import modeldepthv2 as modellib, utils, visualize
@@ -171,6 +173,7 @@ def seq_get_masks(image, cur_detection, gt_mask, args):
             ### instance_mask = instance_mask_one * (mask_index+1)
             instance_mask = instance_mask_one * cur_class_ids[i]
             instance_masks = np.where(cur_masks[:, :, i], instance_mask, instance_masks).astype(np.uint8)
+
     print("\tPred aff_label:", np.unique(instance_masks)[1:])
 
     ########################
@@ -321,36 +324,33 @@ def detect_and_get_masks(model, config, args):
         if args.show_plots:  # TODO: boolean string
             # print("\tGT shape:", gt_aff_mask.shape)
             # print("\tPred shape:", instance_mask.shape)
-            # print("\tresize_pred shape:", instance_mask.shape)
+            # print("\tresize_pred shape:", instance_mask.shape
 
-            cv2.imshow("rgb", rgb)
-            cv2.imshow("depth", np.array(depth, dtype=np.uint8))
-            cv2.imshow("gt", gt_aff_mask * 25)
-            cv2.imshow("pred", instance_mask * 25)
-            cv2.waitKey(1)
-
-            # plt.subplot(2, 3, 1)
-            # plt.title("rgb")
-            # plt.imshow(rgb_og)
-            # plt.subplot(2, 3, 2)
-            # plt.title("rgb cropped")
-            # plt.imshow(rgb)
-            # plt.subplot(2, 3, 3)
-            # plt.title("depth cropped")
-            # plt.imshow(np.array(depth, dtype=np.uint8))
-            # plt.subplot(2, 3, 4)
-            # plt.title("gt_label")
-            # plt.imshow(gt_label)
-            # plt.subplot(2, 3, 5)
-            # plt.title("gt_masks")
-            # plt.imshow(gt_aff_mask)
-            # plt.subplot(2, 3, 6)
-            # plt.title("pred_mask")
-            # plt.imshow(instance_mask)
+            masks = cur_detect['masks']
+            # masks = gt_aff_mask
+            class_ids = np.array(cur_detect['class_ids']) - 1
+            ### print("class_ids:  ", class_ids)
+            class_names = np.array(['grasp','screw','scoop','pound','support'])
+            visualize.display_instances(image=rgb, boxes=cur_detect['rois'],masks=masks,
+                                                       class_ids=class_ids, class_names=class_names,
+                                                       scores=cur_detect['scores'],
+                                                       title="Predictions",
+                                                       show_bbox=False, show_mask=True)
+            plt.tight_layout()
             # plt.show()
-            # plt.ioff()
 
-###########################################################
+            ### plotting
+            # cv2.imshow("rgb", cv2.cvtColor(rgb, cv2.COLOR_BGR2RGB))
+            # cv2.imshow("depth", np.array(depth, dtype=np.uint8))
+            # cv2.imshow("gt", gt_aff_mask * 25)
+            # cv2.imshow("pred", instance_mask * 25)
+            mask_file_path = os.getcwd() + save_to_folder + "pred.png"
+            plt.savefig(mask_file_path, bbox_inches='tight')
+            masked_image = cv2.imread(mask_file_path)
+            cv2.imshow("masked_image", masked_image)
+            cv2.waitKey(0)
+
+        ###########################################################
 # LOOKUP FROM OBJECT ID TO AFFORDANCE LABEL
 ###########################################################
 def map_affordance_label(current_id):

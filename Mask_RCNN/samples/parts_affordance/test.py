@@ -25,8 +25,6 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 UMD_DEPTH_MAX = 3626
 
-
-
 import argparse
 ############################################################
 #  Parse command line arguments
@@ -108,7 +106,6 @@ args = parser.parse_args()
 ############################################################
 #  REAL OR SYN
 ############################################################
-# assert args.dataset_type == 'real' or args.dataset_type == 'syn' or args.dataset_type == 'syn1' or args.dataset_type == 'hammer' or args.dataset_type == 'hammer1'
 if args.dataset_type == 'real':
     import dataset_real as Affordance
     save_to_folder = '/images/test_images_real/'
@@ -117,7 +114,7 @@ if args.dataset_type == 'real':
     ### config ###
     MAX_GT_INSTANCES_ = 2
     DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.975
+    DETECTION_MIN_CONFIDENCE_ = 0.925
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -131,155 +128,36 @@ if args.dataset_type == 'real':
     IMAGE_RESIZE_MODE_ = "square"
     IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
-elif args.dataset_type == 'syn':
-    import dataset_syn as Affordance
-    save_to_folder = '/images/test_images_syn/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.975 # 0.975
-    POST_NMS_ROIS_INFERENCE_ = 100
-    RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    # CROP = True
-    # IMAGE_RESIZE_MODE_ = "crop"
-    # IMAGE_MIN_DIM_ = 384
-    # IMAGE_MAX_DIM_ = 384
-    ### sqaure ###
-    CROP = False
-    IMAGE_RESIZE_MODE_ = "square"
-    IMAGE_MIN_DIM_ = 640
-    IMAGE_MAX_DIM_ = 640
+
 elif args.dataset_type == 'syn1':
     import dataset_syn1 as Affordance
     save_to_folder = '/images/test_images_syn1/'
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
+
     ### config ###
-    MAX_GT_INSTANCES_ = 2 # 2
-    DETECTION_MAX_INSTANCES_ = 2 # 2
-    DETECTION_MIN_CONFIDENCE_ = 0.975
-    POST_NMS_ROIS_INFERENCE_ = 100
-    RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 256
-    IMAGE_MAX_DIM_ = 256
-    ### sqaure ###
-    # CROP = False
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
-elif args.dataset_type == 'hammer':
-    import objects.dataset_syn_hammer as Affordance
-    save_to_folder = '/images/objects/test_images_syn_hammer/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
+    # RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
+    # MAX_GT_INSTANCES_ = 2
+    # DETECTION_MAX_INSTANCES_ = 2
+    # DETECTION_MIN_CONFIDENCE_ = 0.975
+    # POST_NMS_ROIS_INFERENCE_ = 100
+    # RPN_NMS_THRESHOLD_ = 0.8
+    # DETECTION_NMS_THRESHOLD_ = 0.5
+
+    ### config ###
+    RPN_ANCHOR_SCALES_ = (8, 16, 32, 64, 128)
     MAX_GT_INSTANCES_ = 2
     DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5
+    DETECTION_MIN_CONFIDENCE_ = 0.7
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
+
     ### sqaure ###
-    # CROP = False
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
-elif args.dataset_type == 'hammer1':
-    import objects.dataset_syn_hammer1 as Affordance
-    save_to_folder = '/images/objects/test_images_syn_hammer1/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5
-    POST_NMS_ROIS_INFERENCE_ = 100
-    RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
-    ### sqaure ###
-    # CROP = False
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 896
-    # IMAGE_MAX_DIM_ = 896
-elif args.dataset_type == 'scissors_real':
-    import objects.dataset_real_scissors as Affordance
-    save_to_folder = '/images/objects/test_images_real_scissors/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5
-    POST_NMS_ROIS_INFERENCE_ = 100
-    RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
-    ### sqaure ###
-    # CROP = False
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
-elif args.dataset_type == 'scissors':
-    import objects.dataset_syn_scissors as Affordance
-    save_to_folder = '/images/objects/test_images_syn_scissors/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5
-    POST_NMS_ROIS_INFERENCE_ = 100
-    RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
-    ### sqaure ###
-    # CROP = False
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
-elif args.dataset_type == 'scissors_20k':
-    import objects.dataset_syn_scissors_20k as Affordance
-    save_to_folder = '/images/objects/test_images_syn_scissors_20k/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.5
-    POST_NMS_ROIS_INFERENCE_ = 100
-    RPN_NMS_THRESHOLD_ = 0.8
-    DETECTION_NMS_THRESHOLD_ = 0.5
-    ### crop ###
-    CROP = True
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
-    ### sqaure ###
-    # CROP = False
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
+    CROP = False
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
+    IMAGE_MAX_DIM_ = 640
+
 else:
     print("*** No Dataset Type Selected ***")
     exit(1)
@@ -299,8 +177,9 @@ if args.detect == 'rgbd':
 elif args.detect == 'rgbd+':
     from mrcnn import modeldepthv2 as modellib, utils, visualize
 else:
-    print("*** No Model Selected ***")
-    exit(1)
+    assert "*** No Model Selected ***"
+    # print("*** No Model Selected ***")
+    # exit(1)
 
 ###########################################################
 # Test
@@ -360,6 +239,7 @@ def detect_and_get_masks(model, config, args):
     # select random test images
     np.random.seed(0)
     test_idx = np.random.choice(np.arange(0, len(dataset.image_ids), 1), size=int(args.num_frames), replace=False)
+    # test_idx = np.random.choice(np.arange(0, len(dataset.image_ids), 1), size=int(len(dataset.image_ids)), replace=False)
     print("Chosen Files \n", len(test_idx))
 
     for num_image, idx in enumerate(test_idx):
@@ -418,17 +298,6 @@ def detect_and_get_masks(model, config, args):
         depth[depth == -np.inf] = 0
         depth[depth == np.inf] = 0
 
-        # convert to 8-bit image
-        # depth = depth * (2 ** 16 -1) / UMD_DEPTH_MAX  ### 16 bit
-        # depth = depth * (2 ** 8 - 1) / UMD_DEPTH_MAX  ### 8 bit
-        # depth = np.array(depth, dtype=np.uint16)
-
-        # print("depth min: ", np.min(np.array(depth)))
-        # print("depth max: ", np.max(np.array(depth)))
-        #
-        # print("depth type: ", depth.dtype)
-        # print("depth shape: ", depth.shape)
-
         ##################################
         # RGB has 4th channel - alpha
         # depth to 3 channels
@@ -461,6 +330,7 @@ def detect_and_get_masks(model, config, args):
                 print("\tGT shape:", gt_label.shape)
                 print("\tgt label addr: ", cropped_mask_addr)
                 exit()
+
         # print("gt_label: ", gt_label.shape)
 
         # plt.subplot(1, 2, 1)
@@ -471,7 +341,6 @@ def detect_and_get_masks(model, config, args):
         # plt.imshow(rgb)
         # plt.show()
         # plt.ioff()
-
 
         ##############################
         #  Detect
@@ -509,13 +378,32 @@ def detect_and_get_masks(model, config, args):
         cv2.imwrite(cropped_mask_addr, gt_label )
 
         if args.show_plots:  # TODO: boolean string
-            # print("\tGT shape:", gt_label.shape)
+            # print("\tGT shape:", gt_aff_mask.shape)
             # print("\tPred shape:", instance_mask.shape)
-            # print("\tGT Label:", np.unique(gt_label))
-            # print("\tPred Labels:", np.unique(instance_mask))
+            # print("\tresize_pred shape:", instance_mask.shape
 
-            cv2.imshow("gt", gt_label * 25)
-            cv2.imshow("resize pred", instance_mask * 25)
+            masks = cur_detect['masks']
+            # masks = gt_aff_mask
+            class_ids = np.array(cur_detect['class_ids']) - 1
+            ### print("class_ids:  ", class_ids)
+            class_names = np.array(['grasp', 'cut', 'scoop', 'contain', 'pound', 'support', 'wrap-grasp'])
+            visualize.display_instances(image=rgb, boxes=cur_detect['rois'], masks=masks,
+                                        class_ids=class_ids, class_names=class_names,
+                                        scores=cur_detect['scores'],
+                                        title="Predictions",
+                                        show_bbox=True, show_mask=True)
+            plt.tight_layout()
+            # plt.show()
+
+            ### plotting
+            # cv2.imshow("rgb", cv2.cvtColor(rgb, cv2.COLOR_BGR2RGB))
+            # cv2.imshow("depth", np.array(depth, dtype=np.uint8))
+            # cv2.imshow("gt", gt_aff_mask * 25)
+            # cv2.imshow("pred", instance_mask * 25)
+            mask_file_path = os.getcwd() + save_to_folder + "pred.png"
+            plt.savefig(mask_file_path, bbox_inches='tight')
+            masked_image = cv2.imread(mask_file_path)
+            cv2.imshow("masked_image", masked_image)
             cv2.waitKey(1)
 
 ###########################################################

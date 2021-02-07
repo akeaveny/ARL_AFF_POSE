@@ -6,77 +6,19 @@ import os
 from yaml_to_mat import yaml_to_mat
 import scipy.io as sio
 
-# ############################
-# # TOOLS
-# ############################
+############################
+### TOOLS
+############################
 # data_path = '/data/Akeaveny/Datasets/arl_dataset/real/tools/'
 # new_data_path = '/data/Akeaveny/Datasets/arl_dataset/combined_real_tools_4_'
-#
-# ############################
-# ############################
-# subfolder = 'images/'
-# objects = [
-#     'arl_single_garden_shovel_1/' + subfolder,
-#     'arl_single_garden_shovel_2/' + subfolder,
-#     'arl_single_garden_shovel_3/' + subfolder,
-#     'arl_single_garden_shovel_4/' + subfolder,
-#     'arl_single_garden_shovel_5/' + subfolder,
-#     'arl_single_garden_shovel_6/' + subfolder,
-#     'arl_single_garden_shovel_7/' + subfolder,
-#     'arl_single_garden_shovel_8/' + subfolder,
-#     'arl_single_mallet_1/' + subfolder,
-#     'arl_single_mallet_2/' + subfolder,
-#     'arl_single_mallet_3/' + subfolder,
-#     'arl_single_mallet_4/' + subfolder,
-#     'arl_single_mallet_5/' + subfolder,
-#     'arl_single_mallet_6/' + subfolder,
-#     'arl_single_mallet_7/' + subfolder,
-#     'arl_single_mallet_8/' + subfolder,
-#     'arl_single_screwdriver_1/' + subfolder,
-#     'arl_single_screwdriver_2/' + subfolder,
-#     'arl_single_screwdriver_3/' + subfolder,
-#     'arl_single_screwdriver_4/' + subfolder,
-#     'arl_single_screwdriver_5/' + subfolder,
-#     'arl_single_screwdriver_6/' + subfolder,
-#     'arl_single_screwdriver_7/' + subfolder,
-#     'arl_single_screwdriver_8/' + subfolder,
-#     'arl_single_spatula_1/' + subfolder,
-#     'arl_single_spatula_2/' + subfolder,
-#     'arl_single_spatula_3/' + subfolder,
-#     'arl_single_spatula_4/' + subfolder,
-#     'arl_single_spatula_5/' + subfolder,
-#     'arl_single_spatula_6/' + subfolder,
-#     'arl_single_spatula_7/' + subfolder,
-#     'arl_single_spatula_8/' + subfolder,
-#     'arl_single_wooden_spoon_1/' + subfolder,
-#     'arl_single_wooden_spoon_2/' + subfolder,
-#     'arl_single_wooden_spoon_3/' + subfolder,
-#     'arl_single_wooden_spoon_4/' + subfolder,
-#     'arl_single_wooden_spoon_5/' + subfolder,
-#     'arl_single_wooden_spoon_6/' + subfolder,
-#     'arl_single_wooden_spoon_7/' + subfolder,
-#     'arl_single_wooden_spoon_8/' + subfolder,
-#     ]
 
 ############################
-# CLUTTER
+### CLUTTER
 ############################
 data_path = '/data/Akeaveny/Datasets/arl_dataset/real/clutter/'
 new_data_path = '/data/Akeaveny/Datasets/arl_dataset/combined_real_clutter_4_'
 
-#######################
-#######################
-subfolder = 'images/'
-objects = [
-    'arl_clutter_scene_1/' + subfolder,
-    'arl_clutter_scene_2/' + subfolder,
-    'arl_clutter_scene_3/' + subfolder,
-    'arl_clutter_scene_4/' + subfolder,
-    'arl_clutter_scene_5/' + subfolder,
-    'arl_clutter_scene_6/' + subfolder,
-    'arl_clutter_scene_7/' + subfolder,
-    'arl_clutter_scene_8/' + subfolder,
-]
+objects = ['']
 
 # 2.
 scenes =  ['']
@@ -96,9 +38,9 @@ image_ext20 = '_depth.png'
 image_ext30 = '_labels.png'
 image_ext40 = '_poses.yaml'
 image_exts = [
-    # image_ext10,
-    # image_ext20,
-    # image_ext30,
+    image_ext10,
+    image_ext20,
+    image_ext30,
     image_ext40,
 ]
 
@@ -111,7 +53,7 @@ for split in splits:
             for camera in cameras:
                 files_offset = 0
                 for image_ext in image_exts:
-                    file_path = data_path + object + scene + split + camera + '*' + image_ext
+                    file_path = data_path + '*/' + '*/' + '*' + image_ext
                     print("File path: ", file_path)
                     files = np.array(sorted(glob.glob(file_path)))
                     print("offset: ", offset_train, offset_val, offset_test)
@@ -131,8 +73,8 @@ for split in splits:
 
                     val_idx = np.random.choice(val_test_idx, size=int(val_test_split * len(val_test_idx)), replace=False)
                     test_idx = np.delete(val_test_idx, val_idx)
-                    val_files = files[val_idx]
-                    test_files = files[test_idx]
+                    val_files = val_test_files[val_idx]
+                    test_files = val_test_files[test_idx]
 
                     print("Chosen Train Files {}/{}".format(len(train_files), len(files)))
                     print("Chosen Val Files {}/{}".format(len(val_files), len(files)))

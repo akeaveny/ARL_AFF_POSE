@@ -71,11 +71,12 @@ args = parser.parse_args()
 if args.dataset_type == 'real':
     import dataset_real as Affordance
     save_to_folder = '/images/test_images_real/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
+    # MEAN_PIXEL_ = np.array([103.57, 103.38, 103.52])  ### REAL
+    MEAN_PIXEL_ = np.array([93.70, 92.43, 89.58])  ### TEST
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
+    MAX_GT_INSTANCES_ = 10
+    DETECTION_MAX_INSTANCES_ = 10
     DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.985
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
@@ -96,8 +97,8 @@ elif args.dataset_type == 'syn':
     MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
+    MAX_GT_INSTANCES_ = 10
+    DETECTION_MAX_INSTANCES_ = 10
     DETECTION_MIN_CONFIDENCE_ = 0.9  # 0.985
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8

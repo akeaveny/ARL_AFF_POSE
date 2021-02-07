@@ -68,9 +68,9 @@ if args.dataset_type == 'real':
     MEAN_PIXEL_ = np.array([103.57, 103.38, 103.52])  ### REAL
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
     ### config ###
-    MAX_GT_INSTANCES_ = 2
-    DETECTION_MAX_INSTANCES_ = 2
-    DETECTION_MIN_CONFIDENCE_ = 0.975  # 0.975
+    MAX_GT_INSTANCES_ = 10
+    DETECTION_MAX_INSTANCES_ = 10
+    DETECTION_MIN_CONFIDENCE_ = 0.7  # 0.9 for tools & 0.7 for clutter
     POST_NMS_ROIS_INFERENCE_ = 100
     RPN_NMS_THRESHOLD_ = 0.8
     DETECTION_NMS_THRESHOLD_ = 0.5
@@ -84,26 +84,29 @@ if args.dataset_type == 'real':
     IMAGE_RESIZE_MODE_ = "square"
     IMAGE_MIN_DIM_ = 640
     IMAGE_MAX_DIM_ = 640
+
 elif args.dataset_type == 'syn':
     import dataset_syn as ARL
     save_to_folder = '/images/test_images_syn/'
-    MEAN_PIXEL_ = np.array([91.13, 88.92, 98.65])  ### REAL RGB
-    ### crop ###
-    MAX_GT_INSTANCES_ = 3
-    DETECTION_MAX_INSTANCES_ = 30
-    DETECTION_MIN_CONFIDENCE_ = 0.5
+    MEAN_PIXEL_ = np.array([124.65, 119.64, 113.10])  ### SYN
     RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    IMAGE_RESIZE_MODE_ = "crop"
-    IMAGE_MIN_DIM_ = 384
-    IMAGE_MAX_DIM_ = 384
+    ### crop ###
+    MAX_GT_INSTANCES_ = 10
+    DETECTION_MAX_INSTANCES_ = 10
+    DETECTION_MIN_CONFIDENCE_ = 0.7  # 0.9 for tools & 0.7 for clutter
+    POST_NMS_ROIS_INFERENCE_ = 100
+    RPN_NMS_THRESHOLD_ = 0.8
+    DETECTION_NMS_THRESHOLD_ = 0.8
+    ### crop ###
+    # CROP = True
+    # IMAGE_RESIZE_MODE_ = "crop"
+    # IMAGE_MIN_DIM_ = 384
+    # IMAGE_MAX_DIM_ = 384
     ### sqaure ###
-    # MAX_GT_INSTANCES_ = 3
-    # DETECTION_MAX_INSTANCES_ = 30
-    # DETECTION_MIN_CONFIDENCE_ = 0.5
-    # RPN_ANCHOR_SCALES_ = (16, 32, 64, 128, 256)
-    # IMAGE_RESIZE_MODE_ = "square"
-    # IMAGE_MIN_DIM_ = 640
-    # IMAGE_MAX_DIM_ = 640
+    CROP = False
+    IMAGE_RESIZE_MODE_ = "square"
+    IMAGE_MIN_DIM_ = 640
+    IMAGE_MAX_DIM_ = 640
 
 if not (os.path.exists(os.getcwd()+save_to_folder)):
     os.makedirs(os.getcwd()+save_to_folder)
@@ -221,7 +224,6 @@ def detect_and_get_masks(model, config, args):
         #################
         print('\n --------------- Activations ---------------')
 
-        np.random.seed(0)
         image_id = int(np.random.choice(len(dataset.image_ids), size=1)[0])
         image, depthimage, image_meta, gt_class_id, gt_bbox, gt_mask = \
                 modellib.load_images_gt(dataset, config, image_id, use_mini_mask=False)
@@ -290,6 +292,7 @@ def detect_and_get_masks(model, config, args):
         ########################
         for idx_samples in range(4):
             print('\n --------------- detect ---------------')
+            np.random.seed(0)
             # for image_id in dataset.image_ids:
             image_ids = np.random.choice(len(dataset.image_ids), size=16)
             # Load the image multiple times to show augmentations
@@ -325,6 +328,9 @@ def detect_and_get_masks(model, config, args):
                 results = model.detectWdepth([image], [depthimage], verbose=1)
                 r = results[0]
                 class_ids = r['class_ids'] - 1
+
+                # cv2.imshow("rgb",cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB))
+                # cv2.imshow("depth", np.array(depthimage).astype(np.uint16))
 
                 # plot
                 visualize.display_instances(image, r['rois'], r['masks'], class_ids, dataset.class_names, r['scores'],
@@ -661,7 +667,6 @@ def detect_and_get_masks(model, config, args):
         #################
         print('\n --------------- Activations ---------------')
 
-        np.random.seed(0)
         image_id = int(np.random.choice(len(dataset.image_ids), size=1)[0])
         image, depthimage, image_meta, gt_class_id, gt_bbox, gt_mask = \
             modellib.load_images_gt(dataset, config, image_id, use_mini_mask=False)

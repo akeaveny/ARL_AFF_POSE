@@ -175,7 +175,7 @@ def train(model, args):
     #############################
     #  Learning Rate Scheduler
     #############################
-    START = 20
+    START = 0
     ### Training - Stage 1 HEADS
     ### HEADS
     print("\n************* trainining HEADS *************")
@@ -190,7 +190,7 @@ def train(model, args):
     print("\n************* trainining ResNET 4+ *************")
     model.train(dataset_train, dataset_val,
               learning_rate=config.LEARNING_RATE/10,
-              epochs=START + 15,  # 100
+              epochs=START + 15,
               augmentation=augmentation,
               layers='4+')
 
@@ -199,7 +199,7 @@ def train(model, args):
     print("\n************* trainining ALL *************")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE/100,
-                epochs=START + 20, # 60
+                epochs=START + 20,
                 augmentation=augmentation,
                 layers='all')
 

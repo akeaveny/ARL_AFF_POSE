@@ -79,9 +79,6 @@ class ARLConfig(Config):
     ##################################
 
     # tools
-    # STEPS_PER_EPOCH = (5 * 14400 + 72000) * 1 // bs
-    # VALIDATION_STEPS = (5* 2700 + 13500) * 1 // bs
-
     STEPS_PER_EPOCH = (4000) * 1 // bs
     VALIDATION_STEPS = (1000) * 1 // bs
 
@@ -89,7 +86,6 @@ class ARLConfig(Config):
     ###  FROM DATASET STATS
     ##################################
     MEAN_PIXEL = np.array([124.65, 119.64, 113.10])  ### SYN
-    # MEAN_PIXEL = np.array([103.57, 103.38, 103.52])  ### REAL
 
     # IMAGE_RESIZE_MODE = "crop"
     # IMAGE_MIN_DIM = 384
@@ -154,19 +150,19 @@ class ARLDataset(utils.Dataset):
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_train_14400.json')))
             # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_train_72000.json')))
-            ### num images
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/1_bench/coco_tools_train_3396.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/2_work_bench/coco_tools_train_3396.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/3_coffee_table/coco_tools_train_3396.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/4_old_table/coco_tools_train_3396.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_train_3396.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_train_16980.json')))
+            ### NUM IMAGES
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/1_bench/coco_tools_train_560.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/2_work_bench/coco_tools_train_560.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/3_coffee_table/coco_tools_train_560.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/4_old_table/coco_tools_train_560.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_train_560.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_train_2800.json')))
 
             ### clutter
             # annotations.update(json.load(
@@ -181,24 +177,6 @@ class ARLDataset(utils.Dataset):
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/5_bedside_table/coco_clutter_train_4800.json')))
             # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/6_dr/coco_clutter_train_24000.json')))
-
-            ########################
-            ### real
-            ########################
-            ### tools
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_train_16967.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_train_1789.json')))
-
-            #######################
-            # TEST
-            #######################
-            ### tools
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/coco_tools_train_1488.json')))
-            ### clutter
 
         elif subset == 'val':
             annotations = {}
@@ -216,19 +194,19 @@ class ARLDataset(utils.Dataset):
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_val_2700.json')))
             # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_val_13500.json')))
-            ### tools
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/1_bench/coco_tools_val_849.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/2_work_bench/coco_tools_val_849.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/3_coffee_table/coco_tools_val_849.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/4_old_table/coco_tools_val_849.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_val_849.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_val_4245.json')))
+            ### NUM IMAGES
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/1_bench/coco_tools_val_140.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/2_work_bench/coco_tools_val_140.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/3_coffee_table/coco_tools_val_140.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/4_old_table/coco_tools_val_140.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_val_140.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_val_700.json')))
 
             ### clutter
             # annotations.update(json.load(
@@ -242,42 +220,24 @@ class ARLDataset(utils.Dataset):
             # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/5_bedside_table/coco_clutter_val_900.json')))
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/6_dr/coco_clutter_val_4500.json')))
-
-            ########################
-            ### real
-            ########################
-            ### tools
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_val_3180.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_val_336.json')))
-
-            #######################
-            # TEST
-            #######################
-            ### tools
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/coco_tools_val_222.json')))
-            ### clutter
+            #    open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/6_dr/coco_clutter_val_4500.json')))
 
         elif subset == 'test':
             annotations = {}
             print("\n************************** LOADING TEST! **************************")
             ### tools
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/1_bench/coco_tools_test_900.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/2_work_bench/coco_tools_test_900.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/3_coffee_table/coco_tools_test_900.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/4_old_table/coco_tools_test_900.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_test_900.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_test_4500.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/1_bench/coco_tools_test_900.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/2_work_bench/coco_tools_test_900.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/3_coffee_table/coco_tools_test_900.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/4_old_table/coco_tools_test_900.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/5_bedside_table/coco_tools_test_900.json')))
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/6_dr/coco_tools_test_4500.json')))
 
             ### clutter
             # annotations.update(json.load(
@@ -292,26 +252,6 @@ class ARLDataset(utils.Dataset):
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/5_bedside_table/coco_clutter_test_300.json')))
             # annotations.update(json.load(
             #     open('/data/Akeaveny/Datasets/arl_dataset/json/syn/clutter/6_dr/coco_clutter_test_1500.json')))
-
-            #######################
-            # REAL
-            #######################
-            ### tools
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_test_1078.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_test_114.json')))
-
-            #######################
-            # TEST
-            #######################
-            ### tools
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/coco_tools_test_151.json')))
-            ### test - clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/coco_clutter_test_162.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

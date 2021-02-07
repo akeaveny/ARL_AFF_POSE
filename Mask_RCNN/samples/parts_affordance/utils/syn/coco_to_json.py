@@ -74,13 +74,24 @@ def create_sub_mask_annotation(sub_mask, class_id, label_img):
     # in white, and set the thickness to be 3 pixels
     cv2.drawContours(label_img, contours, -1, 255, 3)
 
-    x_list = []
-    y_list = []
-    for k in contours:
+    region = {}
+    region['region_attributes'] = {}
+    region['shape_attributes'] = {}
+    region['shape_attributes']["name"] = "polygon"
+    region['shape_attributes']["num_contours"] = len(contours)
+    # region['shape_attributes']["all_points_x"] = np.array(x_list).tolist()
+    # region['shape_attributes']["all_points_y"] = np.array(y_list).tolist()
+    region['shape_attributes']["class_id"] = class_id
+
+    for contour_idx, k in enumerate(contours):
+        x_list = []
+        y_list = []
         for i in k:
             for j in i:
                 x_list.append(j[0])
                 y_list.append(j[1])
+        region['shape_attributes']["all_points_x" + str(contour_idx)] = np.array(x_list).tolist()
+        region['shape_attributes']["all_points_y" + str(contour_idx)] = np.array(y_list).tolist()
 
     if VISUALIZE:
         # cv
@@ -91,14 +102,6 @@ def create_sub_mask_annotation(sub_mask, class_id, label_img):
         # plt.plot(x_list, y_list, linewidth=1)
         # plt.show()
         # plt.ioff()
-
-    region = {}
-    region['region_attributes'] = {}
-    region['shape_attributes'] = {}
-    region['shape_attributes']["name"] = "polygon"
-    region['shape_attributes']["all_points_x"] = np.array(x_list).tolist()
-    region['shape_attributes']["all_points_y"] = np.array(y_list).tolist()
-    region['shape_attributes']["class_id"] = class_id
 
     return region
 
@@ -120,7 +123,7 @@ data_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/'
 ######################
 
 json_path = '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/'
-json_name = 'coco_tools_'
+json_name = 'coco_clutter_'
 val_path = 'combined_tools5_val/'
 train_path = 'combined_tools5_train/'
 test_path = 'combined_tools5_test/'
@@ -139,10 +142,12 @@ print("Affordance IDs: \n{}\n".format(class_id))
 
 VISUALIZE = False
 
-use_random_idx = True
+use_random_idx = False
 num_val = 4
-num_train = 0
-num_test = 0
+num_train = 4
+num_test = 4
+
+
 
 # 1.
 scenes = [
@@ -177,7 +182,8 @@ for scene in scenes:
 
         if use_random_idx:
             val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_val), replace=False)
-            print("Chosen Files \n", val_idx)
+            # val_idx = np.random.choice(np.arange(0, len(files), 1), size=int(len(files)/2), replace=False)
+            print("Chosen Files ", len(val_idx))
             files = files[val_idx]
         else:
             num_val = len(files)
@@ -257,8 +263,9 @@ for scene in scenes:
         print("Loaded files: ", len(files))
 
         if use_random_idx:
-            train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
-            print("Chosen Files \n", train_idx)
+            # train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_train), replace=False)
+            train_idx = np.random.choice(np.arange(0, len(files), 1), size=int(len(files)/2), replace=False)
+            print("Chosen Files ", len(train_idx))
             files = files[train_idx]
         else:
             num_train = len(files)
@@ -338,8 +345,9 @@ for scene in scenes:
         print("Loaded files: ", len(files))
 
         if use_random_idx:
-            test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_test), replace=False)
-            print("Chosen Files \n", test_idx)
+            # test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(num_test), replace=False)
+            test_idx = np.random.choice(np.arange(0, len(files), 1), size=int(len(files)/2), replace=False)
+            print("Chosen Files ", len(test_idx))
             files = files[test_idx]
         else:
             num_test = len(files)

@@ -35,6 +35,8 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import argparse
 ############################################################
 #  Parse command line arguments
@@ -153,7 +155,7 @@ def train(model, args):
     #############################
     #  Learning Rate Scheduler
     #############################
-    START = 0
+    START = 20
     ### Training - Stage 1 HEADS
     ### HEADS
     print("\n************* trainining HEADS *************")
@@ -161,6 +163,7 @@ def train(model, args):
                 learning_rate=config.LEARNING_RATE,
                 epochs=START + 10, #
                 augmentation=augmentation,
+                # augmentation=None,
                 layers='heads')
 
     ### Training - Stage 2a
@@ -170,6 +173,7 @@ def train(model, args):
               learning_rate=config.LEARNING_RATE/10,
               epochs=START + 15,  # 100
               augmentation=augmentation,
+              #   augmentation=None,
               layers='4+')
 
     ### Training - Stage 3
@@ -179,6 +183,7 @@ def train(model, args):
                 learning_rate=config.LEARNING_RATE/100,
                 epochs=START + 20, # 60
                 augmentation=augmentation,
+                # augmentation=None,
                 layers='all')
 
 ############################################################

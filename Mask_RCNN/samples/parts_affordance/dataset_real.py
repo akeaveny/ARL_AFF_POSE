@@ -52,14 +52,12 @@ class AffordanceConfig(Config):
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
-    ### gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
 
     ##################################
     ###  Backbone
     ##################################
 
-    # BACKBONE = "resnet50" or "resnet101"
-    # RESNET_ARCHITECTURE = "resnet50"
+    ### BACKBONE = "resnet50"
 
     ##################################
     ###
@@ -73,12 +71,6 @@ class AffordanceConfig(Config):
     ##################################
 
     # Number of training steps per epoch
-    # STEPS_PER_EPOCH = (20181) // bs
-    # VALIDATION_STEPS = (4326) // bs
-
-    # STEPS_PER_EPOCH = (606) // bs
-    # VALIDATION_STEPS = (131) // bs
-
     STEPS_PER_EPOCH = (4000) // bs
     VALIDATION_STEPS = (1000) // bs
 
@@ -145,28 +137,19 @@ class AffordanceDataset(utils.Dataset):
              annotations = {}
              print("------------------LOADING TRAIN!------------------")
              annotations.update(json.load(
-               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_train_20181.json')))
-             ####################
-             # annotations.update(json.load(
-             #   open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_train_606.json')))
+               open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/coco_combined_train_20190.json')))
 
         elif subset == 'val':
             annotations = {}
             print("------------------LOADING VAL!--------------------")
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_val_4326.json')))
-            #####################
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_val_131.json')))
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/coco_combined_val_7355.json')))
 
         elif subset == 'test':
             annotations = {}
             print("------------------LOADING Test!--------------------")
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_test_4336.json')))
-            #####################
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_test_131.json')))
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/coco_combined_test_1298.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

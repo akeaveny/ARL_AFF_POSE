@@ -112,28 +112,34 @@ parser.add_argument('--ADD', required=False, default=2,
                     metavar='ADD distance to evaluate')
 
 parser.add_argument('--test_file', required=False,
-                    ### train
-                    # default='data_lists/tools/real_train_data_list.txt',
                     ### real
                     # default='data_lists/tools/real_test_data_list.txt',
                     default='data_lists/clutter/real_test_data_list.txt',
-                    ### test
-                    # default='data_lists/test/test_tools_data_list.txt',
-                    # default='data_lists/test/test_clutter_data_list.txt',
                     ### syn
-                    # default='data_lists/tools/syn_test_data_list.txt',
                     # default='data_lists/clutter/syn_test_data_list.txt',
+                    ### household
+                    # default='data_lists/clutter/household_test_data_list.txt',
                     metavar="/path/to/refine weights")
 
 parser.add_argument('--model', required=False,
-                    default=ROOT_DIR + '/trained_models/arl/clutter/arl_real_1/pose_model_current.pth',
-                    # default=ROOT_DIR + '/trained_models/arl/tools/arl_syn_1/pose_model_current.pth',
-                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_combined_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_real_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_household_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_syn_1/pose_model_current.pth',
+                    ### finetune
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_ALL_real_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_1/pose_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_real_2/pose_model_20_0.022913837035512922.pth',
+                    default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_syn_2/pose_model_1_0.012397416144377301.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
 parser.add_argument('--refine_model', required=False,
-                    default=ROOT_DIR + '/trained_models/arl/clutter/arl_real_1/pose_refine_model_current.pth',
-                    # default=ROOT_DIR + '/trained_models/arl/tools/arl_syn_1/pose_refine_model_current.pth',
-                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_combined_1/pose_refine_model_current.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_real_1/pose_refine_model_194_0.004001785891647218.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_household_1/pose_refine_model_171_0.00399979614281117.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_syn_1/pose_refine_model_14_0.004011141744953432.pth',
+                    ### finetune
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_ALL_real_1/pose_refine_model_217_0.003941263111414856.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_1/pose_refine_model_89_0.004014483606054758.pth',
+                    # default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_real_2/pose_refine_model_9_0.004097097735890808.pth',
+                    default=ROOT_DIR + '/trained_models/arl/clutter/arl_finetune_syn_2/pose_refine_model_17_0.004223637628213813.pth',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--classes', required=False, default='classes.txt',
@@ -281,22 +287,6 @@ for run_idx, idx in enumerate(test_idx):
     if img.shape[-1] == 4:
         image = img[..., :3]
 
-    # if args.visualize:
-    #     plt.subplot(2, 2, 1)
-    #     plt.title("rgb")
-    #     plt.imshow(img)
-    #     plt.subplot(2, 2, 2)
-    #     plt.title("depth")
-    #     plt.imshow(depth)
-    #     plt.subplot(2, 2, 3)
-    #     plt.title("gt")
-    #     plt.imshow(gt)
-    #     plt.subplot(2, 2, 4)
-    #     plt.title("label")
-    #     plt.imshow(label)
-    #     plt.show()
-    #     plt.ioff()
-
     ####################
     # affordance_ids
     ####################
@@ -314,9 +304,9 @@ for run_idx, idx in enumerate(test_idx):
             count = 1000 + itemid
             meta_idx = str(count)[1:]
 
-            ############
-            # meta
-            ############
+            ######################
+            # meta - AFF
+            ######################
 
             height = meta['width' + meta_idx].flatten().astype(np.int32)[0]
             width = meta['height' + meta_idx].flatten().astype(np.int32)[0]
@@ -339,7 +329,7 @@ for run_idx, idx in enumerate(test_idx):
             # bbox
             ##############
 
-            rmin, rmax, cmin, cmax = get_bbox(label, itemid, width, height, border_list)
+            rmin, rmax, cmin, cmax = get_bbox(label, itemid, height, width, border_list)
             # print("\nbbox: ", rmin, rmax, cmin, cmax)
 
             # disp
@@ -459,22 +449,12 @@ for run_idx, idx in enumerate(test_idx):
                                                    gt_rot,
                                                    gt_trans * 1e3,
                                                    cam_mat, dist)
-                # cv2_img_gt = cv2.polylines(gt_rgb_img, np.int32([np.squeeze(imgpts_gt)]), True, (255, 0, 255))
 
-                # img_name_gt = args.save_images_path + 'test1.gt.cloud.png'
-                # cv2.imwrite(img_name_gt, cv2_img_gt)
-                # cld_image_gt = cv2.imread(img_name_gt)
-
-                cv2_img = cv2.polylines(pred_rgb_img, np.int32([np.squeeze(imgpts_gt)]), True, (255, 0, 255))
+                cv2_img = cv2.polylines(pred_rgb_img, np.int32([np.squeeze(imgpts_gt)]), True, (0, 255, 255))
 
                 img_name = args.save_images_path + 'test1.cv2.cloud.png'
                 cv2.imwrite(img_name, cv2_img)
                 cld_image = cv2.imread(img_name)
-
-                # print("pred_trans \n", my_t_)
-                # print("gt_trans \n", gt_trans)
-                # print("pred_rot \n", mat_r)
-                # print("gt_rot \n", gt_rot)
 
                 ############################
                 # pred
@@ -488,11 +468,15 @@ for run_idx, idx in enumerate(test_idx):
                                                 mat_r,
                                                 my_t_ * 1e3,
                                                 cam_mat, dist)
-                cv2_img = cv2.polylines(pred_rgb_img, np.int32([np.squeeze(imgpts)]), True, (0, 255, 255))
+                cv2_img = cv2.polylines(cv2_img, np.int32([np.squeeze(imgpts)]), True, (255, 0, 0))
+                # cv2_img = cv2.rectangle(cv2_img, (cmin, rmin), (cmax, rmax), (255, 0, 0), 2)
 
-                # img_name = args.save_images_path + 'test1.cv2.cloud.png'
-                # cv2.imwrite(img_name, cv2_img)
-                # cld_image = cv2.imread(img_name)
+                # rotV, _ = cv2.Rodrigues(mat_r)
+                # points = np.float32([[100, 0, 0], [0, 100, 0], [0, 0, 100], [0, 0, 0]]).reshape(-1, 3)
+                # axisPoints, _ = cv2.projectPoints(points, rotV, my_t_ * 1e3, cam_mat, dist)
+                # cv2_img = cv2.line(cv2_img, tuple(axisPoints[3].ravel()), tuple(axisPoints[0].ravel()), (0, 0, 255), 3)
+                # cv2_img = cv2.line(cv2_img, tuple(axisPoints[3].ravel()), tuple(axisPoints[1].ravel()), (0, 255, 0), 3)
+                # cv2_img = cv2.line(cv2_img, tuple(axisPoints[3].ravel()), tuple(axisPoints[2].ravel()), (255, 0, 0), 3)
 
                 ############################
                 # reprojection error
@@ -555,66 +539,12 @@ for run_idx, idx in enumerate(test_idx):
                 ############################
                 ############################
 
-                # if args.visualize:
-                    # plt.subplot(3, 2, 1)
-                    # plt.title("rgb")
-                    # plt.imshow(img)
-                    # plt.subplot(3, 2, 2)
-                    # plt.title("depth")
-                    # plt.imshow(depth)
-                    # plt.subplot(3, 2, 3)
-                    # plt.title("mask")
-                    # plt.imshow(mask_label)
-                    # plt.subplot(3, 2, 4)
-                    # plt.title("bbox")
-                    # plt.imshow(bbox_image)
-                    # plt.subplot(3, 2, 5)
-                    # plt.title("gt - quarternion")
-                    # plt.imshow(cld_image_gt)
-                    # plt.subplot(3, 2, 6)
-                    # plt.title("pred - quarternion")
-                    # plt.imshow(cld_image)
-                    # plt.show()
-
             except ZeroDivisionError:
                 print("DenseFusion Detector Lost {0} at No.{1} keyframe".format(itemid, idx))
 
     if args.visualize:
-        # fig = plt.figure(0)
-        # plt.tick_params(
-        #     axis='x',  # changes apply to the x-axis
-        #     which='both',  # both major and minor ticks are affected
-        #     bottom=False,  # ticks along the bottom edge are off
-        #     top=False,  # ticks along the top edge are off
-        #     labelbottom=False)  # labels along the bottom edge are off
-        # plt.tick_params(
-        #     axis='y',  # changes apply to the x-axis
-        #     which='both',  # both major and minor ticks are affected
-        #     bottom=False,  # ticks along the bottom edge are off
-        #     top=False,  # ticks along the top edge are off
-        #     labelbottom=False)  # labels along the bottom edge are off
-        # plt.title("LabelFusion Ground Truth")
-        # fig.tight_layout()
-        # plt.imshow(cld_image)
-        # fig = plt.figure(1)
-        # plt.tick_params(
-        #     axis='x',  # changes apply to the x-axis
-        #     which='both',  # both major and minor ticks are affected
-        #     bottom=False,  # ticks along the bottom edge are off
-        #     top=False,  # ticks along the top edge are off
-        #     labelbottom=False)  # labels along the bottom edge are off
-        # plt.tick_params(
-        #     axis='y',  # changes apply to the x-axis
-        #     which='both',  # both major and minor ticks are affected
-        #     bottom=False,  # ticks along the bottom edge are off
-        #     top=False,  # ticks along the top edge are off
-        #     labelbottom=False)  # labels along the bottom edge are off
-        # plt.title("DenseFusion Prediction")
-        # fig.tight_layout()
-        # plt.imshow(cv2_img)
-        # plt.show()
         # cv
-        cv2.imshow("out", cv2_img)
+        cv2.imshow("out",  cv2.cvtColor(cv2_img, cv2.COLOR_RGB2BGR))
         cv2.waitKey(1)
 
     scio.savemat('{0}/{1}.mat'.format(args.error_metrics_dir, '%04d' % idx),

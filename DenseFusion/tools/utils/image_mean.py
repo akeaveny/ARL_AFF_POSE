@@ -11,11 +11,11 @@ import argparse
 ############################################################
 parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFusion')
 
-parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/arl_dataset/',
+parser.add_argument('--dataset', required=False, default='/data/Akeaveny/Datasets/elevator_dataset/',
                     type=str,
                     metavar="")
 parser.add_argument('--dataset_config', required=False,
-                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/',
+                    default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/elevator/dataset_config/',
                     type=str,
                     metavar="")
 
@@ -24,9 +24,8 @@ args = parser.parse_args()
 #########################
 # load images
 #########################
-num_random = 1000
-# images_file = 'real_train_data_list.txt'
-images_file = 'syn_train_data_list.txt'
+num_random = 100
+images_file = 'data_lists/elevator_val_data_list.txt'
 
 images_paths = np.loadtxt('{}/{}'.format(args.dataset_config, images_file), dtype=np.str)
 print("Num Images: ", len(images_paths))
@@ -36,14 +35,14 @@ print("Random Img Selected: ", len(images_paths[random_idx]))
 
 dataset_mean, dataset_std, dataset_count = 0, 0, 0
 for images_path in images_paths[random_idx]:
-    image_path_ = images_path + "_rgb.png"
-    print("image_path_: ", image_path_)
+    image_path_ = args.dataset + images_path + "_rgb.png"
+    # print("image_path_: ", image_path_)
     # image = cv2.imread(image_path_)
     pil_image = Image.open(image_path_)
     image = cv2.cvtColor(np.array(pil_image, dtype=np.uint8), cv2.COLOR_RGB2BGR)
     mean, stddev = cv2.meanStdDev(image.astype(np.uint8))
     # mean, stddev = cv2.meanStdDev(image)
-    print("mean: ", mean)
+    # print("mean: ", mean)
     dataset_mean += mean
     dataset_std += stddev
     dataset_count += 1

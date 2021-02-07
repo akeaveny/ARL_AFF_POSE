@@ -153,47 +153,20 @@ class AffordanceDataset(utils.Dataset):
             # #################
             # simple
             # #################
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_train_19809.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_train_6546.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_train_6465.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_train_6244.json')))
-            ###################
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_train_9904.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_train_3273.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_train_3232.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_train_3122.json')))
-
-            # #################
-            # real
-            # #################
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/finetune/coco_finetune_train_120.json')))
-
-            # #################
-            # clutter
-            # #################
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_train_20271.json')))
             # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/dr/coco_clutter_train_6943.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_train_6789.json')))
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/bench/coco_clutter_train_2231.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_train_6705.json')))
             # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/floor/coco_clutter_train_2331.json')))
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/turn_table/coco_clutter_train_2331.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_train_6492.json')))
 
             # #################
             # real
             # #################
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_train_606.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/finetune/coco_finetune_train_120.json')))
 
         elif subset == 'val':
             annotations = {}
@@ -201,47 +174,20 @@ class AffordanceDataset(utils.Dataset):
             # #################
             # simple
             # #################
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_val_4269.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_val_1401.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_val_1383.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_val_1337.json')))
-            ###################
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_val_2134.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_val_700.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_val_700.json')))
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_val_700.json')))
-
-            # #################
-            # real
-            # #################
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/finetune/coco_finetune_val_30.json')))
-
-            # #################
-            # clutter
-            # #################
+                open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_val_4344.json')))
             # annotations.update(json.load(
-            #      open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/dr/coco_clutter_val_1492.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_val_1455.json')))
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/bench/coco_clutter_val_474.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_val_1437.json')))
             # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/floor/coco_clutter_val_495.json')))
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/turn_table/coco_clutter_val_495.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_val_1391.json')))
 
             # #################
             # real
             # #################
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_val_131.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/finetune/coco_finetune_val_30.json')))
 
         elif subset == 'test':
             annotations = {}
@@ -250,35 +196,19 @@ class AffordanceDataset(utils.Dataset):
             # simple
             # #################
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_test_1608.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_test_4344.json')))
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/dr/coco_clutter_test_4452.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/bench/coco_clutter_test_1455.json')))
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_test_1588.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/floor/coco_clutter_test_1438.json')))
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_test_1552.json')))
-
-            # #################
-            # clutter
-            # #################
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/bench/coco_clutter_test_483.json')))
-            # annotations.update(json.load(
-            #   open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/dr/coco_clutter_test_1492.json')))
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/floor/coco_clutter_test_504.json')))
-            # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_clutter/turn_table/coco_clutter_test_504.json')))
+            #     open('/data/Akeaveny/Datasets/part-affordance_combined/ndds4/json/rgb/aff_tools/turn_table/coco_clutter_test_1394.json')))
 
             # #################
             # real
             # #################
-            ### simple
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/combined/coco_combined_test_4336.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/clutter/rgb/coco_clutter_test_131.json')))
+                open('/data/Akeaveny/Datasets/part-affordance_combined/real/json/tools/rgb/coco_combined_test_1298.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any
@@ -320,9 +250,9 @@ class AffordanceDataset(utils.Dataset):
 
     def load_image_rgb_depth(self, image_id):
 
-        file_path = np.str(image_id).split("_rgb.jpg")[0]
+        file_path = np.str(image_id).split("_rgb.png")[0]
 
-        rgb = skimage.io.imread(file_path + "_rgb.jpg")
+        rgb = skimage.io.imread(file_path + "_rgb.png")
         depth = skimage.io.imread(file_path + "_depth.png")
 
         ##################################
@@ -350,26 +280,26 @@ class AffordanceDataset(utils.Dataset):
                         dtype=np.uint8)
         class_IDs = np.zeros([len(info["polygons"])], dtype=np.int32)
 
-        ################
-        # tools
-        ################
-
-        for i, p in enumerate(info["polygons"]):
-            # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
-            mask[rr, cc, i] = 1
-            class_IDs[i] = p['class_id']
-
-        # #################
-        # # clutter
-        # #################
+        # ################
+        # # tools
+        # ################
         #
         # for i, p in enumerate(info["polygons"]):
-        #     for countour_idx, _ in enumerate(range(p["num_contours"])):
-        #         # Get indexes of pixels inside the polygon and set them to 1
-        #         rr, cc = skimage.draw.polygon(p['all_points_y' + str(countour_idx)], p['all_points_x' + str(countour_idx)])
-        #         mask[rr, cc, i] = 1
-        #         class_IDs[i] = p['class_id']
+        #     # Get indexes of pixels inside the polygon and set them to 1
+        #     rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+        #     mask[rr, cc, i] = 1
+        #     class_IDs[i] = p['class_id']
+
+        #################
+        # clutter
+        #################
+
+        for i, p in enumerate(info["polygons"]):
+            for countour_idx, _ in enumerate(range(p["num_contours"])):
+                # Get indexes of pixels inside the polygon and set them to 1
+                rr, cc = skimage.draw.polygon(p['all_points_y' + str(countour_idx)], p['all_points_x' + str(countour_idx)])
+                mask[rr, cc, i] = 1
+                class_IDs[i] = p['class_id']
 
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s

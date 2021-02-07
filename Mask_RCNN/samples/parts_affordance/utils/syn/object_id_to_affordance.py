@@ -325,8 +325,8 @@ if __name__ == '__main__':
     # =================== new directory ========================
     # 0.
     data_paths = [
-                    # '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_tools5_',
-                  '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_clutter5_'
+                    '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_tools5_',
+                    # '/data/Akeaveny/Datasets/part-affordance_combined/ndds4/combined_clutter5_'
                   ]
 
     # =================== load from ========================

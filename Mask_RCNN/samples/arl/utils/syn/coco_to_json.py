@@ -122,9 +122,9 @@ test_path = 'combined_syn_tools_2_test/'
 json_path = '/data/Akeaveny/Datasets/arl_dataset/json/syn/tools/'
 json_name = 'coco_tools_'
 
-# ######################
-# # CLUTTER
-# ######################
+######################
+# CLUTTER
+######################
 # data_path = '/data/Akeaveny/Datasets/arl_dataset/'
 # val_path = 'combined_syn_clutter_2_val/'
 # train_path = 'combined_syn_clutter_2_train/'
@@ -142,24 +142,24 @@ print("Affordance IDs: \n{}\n".format(class_id))
 VISUALIZE = False
 
 use_random_idx = True
-BASE_NUM_IMAGES = int(21225*2)
+BASE_NUM_IMAGES = int(7000/2) ### DR + PR
 ### PR
-# num_val = int(BASE_NUM_IMAGES/5*0.2)
-# num_train = int(BASE_NUM_IMAGES/5*0.8)
-# num_test = 0
-### DR
-num_val = int(BASE_NUM_IMAGES*0.2)
-num_train = int(BASE_NUM_IMAGES*0.8)
+num_val = int(BASE_NUM_IMAGES/5*0.2)
+num_train = int(BASE_NUM_IMAGES/5*0.8)
 num_test = 0
+### DR
+# num_val =  int(BASE_NUM_IMAGES*0.2)
+# num_train = int(BASE_NUM_IMAGES*0.8)
+# num_test = 0
 
 # 1.
 scenes = [
-    # '1_bench/',
-    # '2_work_bench/',
-    # '3_coffee_table/',
-    # '4_old_table/',
-    # '5_bedside_table/',
-    '6_dr/'
+    '1_bench/',
+    '2_work_bench/',
+    '3_coffee_table/',
+    '4_old_table/',
+    '5_bedside_table/',
+    # '6_dr/'
 ]
 
 #=====================

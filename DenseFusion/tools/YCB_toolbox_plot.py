@@ -33,22 +33,20 @@ parser = argparse.ArgumentParser(description='Evaluate trained model for DenseFu
 
 parser.add_argument('--dataset_config', required=False,
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/ycb/dataset_config/',
-                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_real/dataset_config',
-                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl_syn/dataset_config',
+                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config',
                     default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config',
                     type=str,
                     metavar="")
+
 parser.add_argument('--classes', required=False, default='classes.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
+
 parser.add_argument('--class_ids', required=False, default='classes_ids.txt',
                     metavar="/path/to/weights.h5 or 'coco'")
 
 parser.add_argument('--error_metrics_dir', required=False,
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/ycb/PoseCNN_error_metrics_result/',
                     # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/ycb/Densefusion_error_metrics_result/',
-                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_real/Densefusion_error_metrics_result/',
-                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_syn/',
-                    # default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl_syn/Densefusion_error_metrics_result_real/',
                     default='/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/experiments/eval_result/arl/Densefusion_error_metrics_result/',
                     type=str,
                     metavar="Data Path")
@@ -56,6 +54,7 @@ parser.add_argument('--error_metrics_dir', required=False,
 parser.add_argument('--visualize', required=False, default=False,
                     type=str,
                     metavar="Visualize Results")
+
 parser.add_argument('--save_images_path', required=False,
                     # default='/data/Akeaveny/Datasets/ycb_syn/test_densefusion/',
                     # default='/data/Akeaveny/Datasets/arl_scanned_objects/ARL/test_densefusion_real/',
@@ -85,16 +84,19 @@ meta_list = sorted(glob.glob(args.error_metrics_dir + "*.mat"))
 history = []
 for meta_addr in meta_list:
     meta = scio.loadmat(meta_addr)
-    class_ids = meta['Class_IDs'][0]
-    for idx, class_id in enumerate(class_ids):
-        history_ = np.array([
-            class_id,
-            meta['ADD'][0][idx],
-            meta['ADD_S'][0][idx],
-            meta['T'][0][idx],
-            meta['R'][0][idx],
-        ])
-        history.append(history_)
+    if len(meta['Class_IDs']) == 0:
+        pass
+    else:
+        class_ids = meta['Class_IDs'][0]
+        for idx, class_id in enumerate(class_ids):
+            history_ = np.array([
+                class_id,
+                meta['ADD'][0][idx],
+                meta['ADD_S'][0][idx],
+                meta['T'][0][idx],
+                meta['R'][0][idx],
+            ])
+            history.append(history_)
 history = np.asarray(history)
 
 df = pd.DataFrame({'Class_Id': history[:, 0],

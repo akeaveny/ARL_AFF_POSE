@@ -86,7 +86,7 @@ class ARLConfig(Config):
     ###  FROM DATASET STATS
     ##################################
     # MEAN_PIXEL = np.array([103.57, 103.38, 103.52])  ### REAL
-    MEAN_PIXEL = np.array([87.83, 81.66, 80.64])  ### TEST
+    MEAN_PIXEL = np.array([93.70, 92.43, 89.58])  ### TEST
 
     # IMAGE_RESIZE_MODE = "crop"
     # IMAGE_MIN_DIM = 384
@@ -141,61 +141,74 @@ class ARLDataset(utils.Dataset):
             print("\n************************** LOADING TRAIN **************************")
             ### tools
             # annotations.update(json.load(
-            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_train_16967.json')))
+            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_train_16980.json')))
             ### clutter
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_train_1789.json')))
+            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_train_1791.json')))
+
 
             #######################
-            # TEST
+            # HOUSEHOLD
+            #######################
+            ### tools
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/household/tools/coco_household_tools_train_16980.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/household/clutter/coco_household_clutter_train_1791.json')))
+
+            #######################
+            # NUM IMAGES
             #######################
             ### tools
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/coco_tools_train_40.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/coco_clutter_train_752.json')))
+               open('/data/Akeaveny/Datasets/arl_dataset/json/household/clutter/coco_household_clutter_train_1200.json')))
 
         elif subset == 'val':
             annotations = {}
             print("\n************************** LOADING VAL **************************")
             ### tools
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_val_3180.json')))
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_val_3183.json')))
             ### clutter
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_val_336.json')))
+            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_val_336.json')))
 
             #######################
-            # TEST
+            # HOUSEHOLD
+            #######################
+            ### tools
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/household/tools/coco_household_tools_val_3183.json')))
+            ### clutter
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/household/clutter/coco_household_clutter_val_336.json')))
+
+            #######################
+            # NUM IMAGES
             #######################
             ### tools
             annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/coco_tools_val_10.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/coco_clutter_val_209.json')))
-
+                open('/data/Akeaveny/Datasets/arl_dataset/json/household/clutter/coco_household_clutter_val_300.json')))
 
         elif subset == 'test':
             annotations = {}
             print("\n************************** LOADING TEST! **************************")
-            ### tools
-            annotations.update(json.load(
-                open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_test_1078.json')))
+            # annotations.update(json.load(
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/tools/coco_tools_test_1078.json')))
             ### clutter
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_test_114.json')))
+            #    open('/data/Akeaveny/Datasets/arl_dataset/json/real/clutter/coco_clutter_test_114.json')))
 
             #######################
-            # TEST
+            # HOUSEHOLD
             #######################
             ### tools
             # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/tools/coco_tools_test_151.json')))
-            ### clutter
-            # annotations.update(json.load(
-            #     open('/data/Akeaveny/Datasets/arl_dataset/json/real/test/clutter/coco_clutter_test_114.json')))
+            #     open('/data/Akeaveny/Datasets/arl_dataset/json/household/tools/coco_household_tools_test_1062.json')))
+            ## clutter
+            annotations.update(json.load(
+                open('/data/Akeaveny/Datasets/arl_dataset/json/household/clutter/coco_household_clutter_test_112.json')))
 
         annotations = list(annotations.values())
         # The VIA tool saves images in the JSON even if they don't have any

@@ -24,21 +24,19 @@ class PoseDataset(data.Dataset):
         ##################################
 
         if mode == 'train':
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/tools/real_train_data_list.txt'
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/tools/syn_train_data_list.txt'
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/tools/combined_train_data_list.txt'
             ### clutter
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/clutter/real_train_data_list.txt'
-            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/clutter/syn_train_data_list.txt'
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/clutter/combined_train_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/syn_train_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/real_train_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/household_train_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/combined_real_household_train_data_list.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/finetune/household_train_1500_data_list.txt'
         elif mode == 'test':
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/tools/real_val_data_list.txt'
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/tools/syn_val_data_list.txt'
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/tools/combined_val_data_list.txt'
             ### clutter
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/clutter/real_val_data_list.txt'
-            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/clutter/syn_val_data_list.txt'
-            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/clutter/combined_val_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/syn_val_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/real_val_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/household_val_data_list.txt'
+            # self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/combined/combined_real_household_val_data_list.txt'
+            self.path = '/home/akeaveny/catkin_ws/src/object-rpe-ak/DenseFusion/datasets/arl/dataset_config/data_lists/finetune/household_val_1500_data_list.txt'
         print(self.path)
 
         self.num_pt = num_pt
@@ -82,17 +80,20 @@ class PoseDataset(data.Dataset):
         self.noise_img_scale = 7.0
         self.minimum_num_pt = 50
 
-        # self.norm = transforms.Normalize(mean=[101.922237/255, 101.70265615/255, 101.82904089/255],   ### REAL
+        # self.norm = transforms.Normalize(mean=[101.922237/255, 101.70265615/255, 101.82904089/255],       ### REAL
         #                                   std=[63.51475563/255, 63.83739891/255, 62.70252537/255])
-        self.norm = transforms.Normalize(mean=[121.34891436/255, 116.52099986/255, 110.4506291293/255],  ### SYN
-                                        std=[49.99343061/255, 50.38399108/255, 48.07555426/255])
+        self.norm = transforms.Normalize(mean=[91.75344387 / 255, 90.42050544 / 255, 87.27902478 / 255],  ### HOUSEHOLD
+                                         std=[61.66106514 / 255, 63.8300724 / 255, 65.03811577 / 255])
+        # self.norm = transforms.Normalize(mean=[97.68214658 / 255, 96.8577639 / 255, 95.39144887 / 255],     ### REAL + HOUSEHOLD
+        #                                  std=[65.38794998 / 255, 66.35411501 / 255, 66.11995676 / 255])
+        # self.norm = transforms.Normalize(mean=[121.34891436/255, 116.52099986/255, 110.4506291293/255],   ### SYN
+        #                                 std=[63.51475563/255, 63.83739891/255, 62.70252537/255])
 
         ##################################
         # 3D models
         ##################################
 
-        self.symmetry_obj_idx = []
-        # self.symmetry_obj_idx = [1, 3, 5, 7, 9]
+        self.symmetry_obj_idx = [9]
         self.num_pt_mesh_small = 500
         self.num_pt_mesh_large = 800
         self.refine = refine
