@@ -7,7 +7,6 @@ dist/
 *.h5
 *.uwarl-deep-learner
 
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -27,43 +27,43 @@ Pre-trained DenseFusion are avaliable [here]().
 ## Requirements
 1. Mask R-CNN
    ```
-   $ conda env create -f environment_tensorflow114.yml --name MaskRCNN
+   conda env create -f environment_tensorflow114.yml --name MaskRCNN
    ```
 2. DenseFusion
    ```
-   $ conda env create -f environment_pytorch101.yml --name DenseFusion
+   conda env create -f environment_pytorch101.yml --name DenseFusion
    ```
 
 ## Mask R-CNN
 1. To inspect dataset statistics run:
    ```
-   $ python inspect_dataset_stats.py --dataset='(file path to dataset)' --dataset_type='(real or syn)' --dataset_split='val'
+   python inspect_dataset_stats.py --dataset='(file path to dataset)' --dataset_type='(real or syn)' --dataset_split='val'
    ```
 2. To inspect trained model run:
    ```
-   $ python inspect_trained_model.py --dataset_type='(real or syn)' --detect=rgbd+ --weights='(file path to weights)'
+   python inspect_trained_model.py --dataset_type='(real or syn)' --detect=rgbd+ --weights='(file path to weights)'
    ```
 3. To get predicted Affordance-semantic Masks run:
    ```
-   $ python test.py --dataset_type='(real or syn)' --detect=rgbd+  --weights='(file path to weights)'
+   python test.py --dataset_type='(real or syn)' --detect=rgbd+  --weights='(file path to weights)'
    ```
 4. To test preformance with the weighted F-b measure run the following in MATLAB:
    ```
-   $ cd '(path to project)/Mask_RCNN/matlab/'
-   $ evaluate_UMD('file path to test folder')
+   cd '(path to project)/Mask_RCNN/matlab/'
+   evaluate_UMD('file path to test folder')
    ```
 ## DenseFusion
 1. To inspect dataset run:
    ```
-   $ python project_points.py
+   python project_points.py
    ```
 2. To get predicted pose run:
    ```
-   $ python inference_arl.py
+   python inference_arl.py
    ```
 3. To get evaluation metrics run:
    ```
-   $ python YCB_toolbox_plot.py
+   python YCB_toolbox_plot.py
    ```   
 
 
