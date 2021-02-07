@@ -10,7 +10,7 @@ This work is largely based on:
 
 ![Alt text](Images/AffPose.png?raw=true "Title")
    
-## Real UMD Dataset [Austin Myers, Ching L. Teo, Cornelia Fermüller, Yiannis Aloimonos]
+## Real UMD Dataset
 The RGB-D Part Affordance Dataset dataset is avaliable [here](http://users.umiacs.umd.edu/~amyers/part-affordance-dataset/).
 
 ## Synthetic UMD Dataset
